@@ -33,7 +33,9 @@
   "npm.packageManager": "yarn",
   // Extension: cSpell
   "cSpell.words": [
-    "Customizer"
+    "apexcharts",
+    "Customizer",
+    "Sneat"
   ],
   "search-node-modules.path": "node_modules",
   "markdown.extension.toc.updateOnSave": false

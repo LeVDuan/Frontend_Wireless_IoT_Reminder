@@ -5,40 +5,23 @@ const navigation = (): VerticalNavItemsType => {
   return [
     {
       title: 'Dashboards',
-      icon: 'bx:home-circle',
-      badgeContent: 'new',
-      badgeColor: 'error',
-      children: [
-        {
-          title: 'Analytics',
-          path: '/dashboards/analytics'
-        },
-        {
-          title: 'CRM',
-          path: '/dashboards/crm'
-        },
-        {
-          title: 'eCommerce',
-          path: '/dashboards/ecommerce'
-        }
-      ]
-    },
-    {
-      title: 'Home',
-      path: '/home',
+      path: '/dashboards',
       icon: 'bx:home-circle'
     },
     {
-      title: 'Second Page',
-      path: '/second-page',
-      icon: 'bx:envelope'
+      title: 'Device Control',
+      path: '/device-control',
+      icon: 'bx:devices'
     },
     {
-      path: '/acl',
-      action: 'read',
-      subject: 'acl-page',
-      title: 'Access Control',
-      icon: 'bx:shield'
+      title: 'Device List',
+      path: '/device-list',
+      icon: 'bx:align-justify'
+    },
+    {
+      title: 'Activity History',
+      path: '/activity-history',
+      icon: 'bx:history'
     }
   ]
 }
