@@ -55,10 +55,10 @@ const renderClient = (params: GridRenderCellParams) => {
 }
 
 const statusObj: StatusObj = {
-  1: { title: 'current', color: 'primary' },
-  2: { title: 'professional', color: 'success' },
-  3: { title: 'rejected', color: 'error' },
-  4: { title: 'resigned', color: 'warning' },
+  1: { title: 'active', color: 'success' },
+  2: { title: 'inactive', color: 'error' },
+  3: { title: 'resigned', color: 'warning' },
+  4: { title: 'current', color: 'primary' },
   5: { title: 'applied', color: 'info' }
 }
 
@@ -77,7 +77,7 @@ const getFullName = (params: GridRenderCellParams) =>
 
 const TableColumns = () => {
   // ** States
-  const [hideNameColumn, setHideNameColumn] = useState(false)
+  const [hideNameColumn, setHideNameColumn] = useState(true)
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 7 })
 
   const columns: GridColDef[] = [
@@ -105,34 +105,10 @@ const TableColumns = () => {
       }
     },
     {
-      flex: 0.175,
-      type: 'date',
-      minWidth: 120,
-      headerName: 'Date',
-      field: 'start_date',
-      valueGetter: params => new Date(params.value),
-      renderCell: (params: GridRenderCellParams) => (
-        <Typography variant='body2' sx={{ color: 'text.primary' }}>
-          {params.row.start_date}
-        </Typography>
-      )
-    },
-    {
-      flex: 0.15,
-      minWidth: 110,
-      field: 'salary',
-      headerName: 'Salary',
-      renderCell: (params: GridRenderCellParams) => (
-        <Typography variant='body2' sx={{ color: 'text.primary' }}>
-          {params.row.salary}
-        </Typography>
-      )
-    },
-    {
       flex: 0.1,
-      field: 'age',
+      field: 'id',
       minWidth: 80,
-      headerName: 'Age',
+      headerName: 'ID',
       renderCell: (params: GridRenderCellParams) => (
         <Typography variant='body2' sx={{ color: 'text.primary' }}>
           {params.row.age}
@@ -158,7 +134,7 @@ const TableColumns = () => {
       renderCell: (params: GridRenderCellParams) => {
         return (
           <Button size='small' variant='outlined' color='secondary' onClick={() => getFullName(params)}>
-            Get Name
+            Control
           </Button>
         )
       }
@@ -168,11 +144,11 @@ const TableColumns = () => {
   return (
     <Card>
       <CardHeader
-        title='Column'
+        title='Latest Update Device:'
         action={
           <div>
             <Button size='small' variant='contained' onClick={() => setHideNameColumn(!hideNameColumn)}>
-              Toggle Name Column
+              Update device status
             </Button>
           </div>
         }
