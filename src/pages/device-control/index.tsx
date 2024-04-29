@@ -14,6 +14,7 @@ import TableColumns from 'src/views/table/data-grid/TableColumns'
 import ButtonsContained from 'src/views/components/buttons/ButtonsContained'
 import CardSnippet from 'src/@core/components/card-snippet'
 import { Button } from '@mui/material'
+import { usePort } from 'src/context/PortContext'
 
 const LinkStyled = styled(Link)(({ theme }) => ({
   textDecoration: 'none',
@@ -21,19 +22,9 @@ const LinkStyled = styled(Link)(({ theme }) => ({
 }))
 
 const DeviceControl = () => {
-  const openPort = async () => {
-    // Prompt user to select any serial port.
-    const port = await navigator.serial.requestPort()
-
-    // // wait for the serial port to open.
-    await port.open({ baudRate: 9600 })
-
-    if (port.readable && port.writable) {
-      console.log(`Tên cổng COM: ${port.getInfo().usbProductId}`)
-      if (port.getInfo().usbProductId === 'undefined') {
-        console.log('Invalid com port')
-      }
-    }
+  const { connect, sendMessage } = usePort()
+  const handleClick = async () => {
+    await connect()
   }
   return (
     <Grid container spacing={6}>
@@ -52,10 +43,9 @@ const DeviceControl = () => {
         />
       </Grid>
       <Grid item xs={12} md={2} sx={{ order: -1 }}>
-        <Button variant='contained' className='demo-space-x' onClick={() => openPort()}>
+        <Button variant='contained' className='demo-space-x' onClick={handleClick}>
           Open Port
         </Button>
-        {/* <ButtonsContained /> */}
       </Grid>
       <Grid item xs={12}>
         <TableColumns />

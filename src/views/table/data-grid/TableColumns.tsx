@@ -24,6 +24,7 @@ import { getInitials } from 'src/@core/utils/get-initials'
 
 // ** Data Import
 import { rows } from 'src/@fake-db/table/static-data'
+import { usePort } from 'src/context/PortContext'
 
 interface StatusObj {
   [key: number]: {
@@ -62,23 +63,27 @@ const statusObj: StatusObj = {
   5: { title: 'applied', color: 'info' }
 }
 
-// ** Full Name Getter
-const getFullName = (params: GridRenderCellParams) =>
-  toast(
-    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-      {renderClient(params)}
-      <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-        <Typography noWrap variant='body2' sx={{ color: 'text.primary', fontWeight: 600 }}>
-          {params.row.full_name}
-        </Typography>
-      </Box>
-    </Box>
-  )
+// ** Send control command to device
+// const controlCMD = (params: GridRenderCellParams) => {
+//   const { sendMessage } = usePort()
+//   const cmd = params.row.age + params.row.status + params.row.name
+//   console.log(cmd)
+//   sendMessage('1 3 duan')
+// }
 
 const TableColumns = () => {
   // ** States
   const [hideNameColumn, setHideNameColumn] = useState(true)
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 7 })
+  const { sendMessage } = usePort()
+  const updateDevices = async () => {
+    await sendMessage('1 3 Duan')
+  }
+  const controlCMD = async (params: GridRenderCellParams) => {
+    const cmd = params.row.age + params.row.status + params.row.full_name
+    console.log(cmd)
+    sendMessage('1 3 duan')
+  }
 
   const columns: GridColDef[] = [
     {
@@ -133,7 +138,7 @@ const TableColumns = () => {
       headerName: 'Actions',
       renderCell: (params: GridRenderCellParams) => {
         return (
-          <Button size='small' variant='outlined' color='secondary' onClick={() => getFullName(params)}>
+          <Button size='small' variant='outlined' color='secondary' onClick={() => controlCMD(params)}>
             Control
           </Button>
         )
@@ -147,7 +152,7 @@ const TableColumns = () => {
         title='Latest Update Device:'
         action={
           <div>
-            <Button size='small' variant='contained' onClick={() => setHideNameColumn(!hideNameColumn)}>
+            <Button size='small' variant='contained' onClick={updateDevices}>
               Update device status
             </Button>
           </div>
