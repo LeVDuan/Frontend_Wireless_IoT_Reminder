@@ -5,16 +5,18 @@ import Link from 'next/link'
 import Grid from '@mui/material/Grid'
 import { styled } from '@mui/material/styles'
 import Typography from '@mui/material/Typography'
+import Icon from 'src/@core/components/icon'
 
 // ** Custom Components Imports
 import PageHeader from 'src/@core/components/page-header'
 
 // ** Demo Components Imports
-import TableColumns from 'src/views/table/data-grid/TableColumns'
+import TableColumns from 'src/views/table/TableColumns'
 import ButtonsContained from 'src/views/components/buttons/ButtonsContained'
 import CardSnippet from 'src/@core/components/card-snippet'
 import { Button } from '@mui/material'
 import { usePort } from 'src/context/PortContext'
+import { auto, right } from '@popperjs/core'
 
 const LinkStyled = styled(Link)(({ theme }) => ({
   textDecoration: 'none',
@@ -22,13 +24,13 @@ const LinkStyled = styled(Link)(({ theme }) => ({
 }))
 
 const DeviceControl = () => {
-  const { connect, sendMessage } = usePort()
+  const { connect } = usePort()
   const handleClick = async () => {
     await connect()
   }
   return (
     <Grid container spacing={6}>
-      <Grid item xs={12} lg={10} sx={{ order: -1 }}>
+      <Grid item xs={12} md={10}>
         <PageHeader
           title={
             <Typography variant='h3' color='primary.main'>
@@ -42,8 +44,14 @@ const DeviceControl = () => {
           }
         />
       </Grid>
-      <Grid item xs={12} md={2} sx={{ order: -1 }}>
-        <Button variant='contained' className='demo-space-x' onClick={handleClick}>
+      <Grid item xs={12} md={2} container display='flex' alignItems='center' justifyContent='flex-end'>
+        <Button
+          size='large'
+          variant='contained'
+          className='demo-space-x'
+          onClick={handleClick}
+          startIcon={<Icon icon='ic:sharp-usb' style={{ verticalAlign: 'center', marginBottom: '13px' }} />}
+        >
           Open Port
         </Button>
       </Grid>

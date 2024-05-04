@@ -1,28 +1,38 @@
-// ** MUI Imports
-import Card from '@mui/material/Card'
-import Grid from '@mui/material/Grid'
-import Typography from '@mui/material/Typography'
-import CardHeader from '@mui/material/CardHeader'
-import CardContent from '@mui/material/CardContent'
+// ** Next Import
+import Link from 'next/link'
 
-const SecondPage = () => {
+// ** MUI Imports
+import Grid from '@mui/material/Grid'
+import { styled } from '@mui/material/styles'
+import Typography from '@mui/material/Typography'
+
+// ** Custom Components Imports
+import PageHeader from 'src/@core/components/page-header'
+
+// ** Demo Components Imports
+import TableFilter from 'src/views/table/TableFilter'
+
+const LinkStyled = styled(Link)(({ theme }) => ({
+  textDecoration: 'none',
+  color: theme.palette.primary.main
+}))
+
+const DataGrid = () => {
   return (
     <Grid container spacing={6}>
+      <PageHeader
+        title={
+          <Typography variant='h3' color='primary.main'>
+            Device List
+          </Typography>
+        }
+        subtitle={<Typography variant='body1'>List of devices in the system.</Typography>}
+      />
       <Grid item xs={12}>
-        <Card>
-          <CardHeader title='Create Awesome 🙌'></CardHeader>
-          <CardContent>
-            <Typography sx={{ mb: 2 }}>This is your second page.</Typography>
-            <Typography>
-              Chocolate sesame snaps pie carrot cake pastry pie lollipop muffin.
-              Carrot cake dragée chupa chups jujubes. Macaroon liquorice cookie
-              wafer tart marzipan bonbon. Gingerbread jelly-o dragée chocolate.
-            </Typography>
-          </CardContent>
-        </Card>
+        <TableFilter />
       </Grid>
     </Grid>
   )
 }
 
-export default SecondPage
+export default DataGrid

@@ -11,12 +11,12 @@ const navigation = (): VerticalNavItemsType => {
     {
       title: 'Device Control',
       path: '/device-control',
-      icon: 'bx:devices'
+      icon: 'ri:remote-control-line'
     },
     {
       title: 'Device List',
       path: '/device-list',
-      icon: 'bx:align-justify'
+      icon: 'bi:device-ssd'
     },
     {
       title: 'Activity History',
