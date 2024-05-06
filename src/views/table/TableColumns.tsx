@@ -19,9 +19,11 @@ import CustomChip from 'src/@core/components/mui/chip'
 import { ThemeColor } from 'src/@core/layouts/types'
 
 // ** Data Import
-import { devices } from 'src/@fake-db/table/device-list'
+import { devices } from 'src/@fake-db/table/device-active-list'
 import { usePort } from 'src/context/PortContext'
 import Icon from 'src/@core/components/icon'
+import DialogSendControlSignal from '../components/dialogs/DialogSendControlSignal'
+import LinearProgress from '@mui/material/LinearProgress'
 
 interface StatusObj {
   [key: number]: {
@@ -31,47 +33,28 @@ interface StatusObj {
 }
 
 const statusObj: StatusObj = {
-  0: { title: 'ready', color: 'success' },
-  1: { title: 'charging', color: 'error' },
-  2: { title: 'using', color: 'warning' }
+  0: { title: 'free', color: 'success' },
+  1: { title: 'queuing', color: 'warning' }
 }
 
 const TableColumns = () => {
   // ** States
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 5 })
-  const { sendMessage } = usePort()
+  const { port, sendToPort } = usePort()
   const updateDevices = async () => {
-    await sendMessage('1 3 Duan')
-  }
-  const controlCMD = async (params: GridRenderCellParams) => {
-    const cmd = params.row.age + params.row.status + params.row.full_name
-    console.log(cmd)
-    sendMessage('1 3 duan')
+    if (port) {
+      if (!port || !port.writable) {
+        toast.error('Update failed!')
+      } else {
+        await sendToPort('BRD')
+        toast.success('Update successfully!')
+      }
+    } else {
+      toast.error('Please connect the COM port first')
+    }
   }
 
   const columns: GridColDef[] = [
-    {
-      flex: 0.25,
-      minWidth: 290,
-      field: 'name',
-      headerName: 'Device name',
-      renderCell: (params: GridRenderCellParams) => {
-        const { row } = params
-
-        return (
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-              <Typography noWrap variant='body2' sx={{ color: 'text.primary', fontWeight: 600 }}>
-                {row.name}
-              </Typography>
-              <Typography noWrap variant='caption'>
-                {row.email}
-              </Typography>
-            </Box>
-          </Box>
-        )
-      }
-    },
     {
       flex: 0.1,
       field: 'id',
@@ -84,9 +67,28 @@ const TableColumns = () => {
       )
     },
     {
+      flex: 0.25,
+      minWidth: 290,
+      field: 'name',
+      headerName: 'Name',
+      renderCell: (params: GridRenderCellParams) => {
+        const { row } = params
+
+        return (
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+              <Typography noWrap variant='body2' sx={{ color: 'text.primary' }}>
+                {row.name}
+              </Typography>
+            </Box>
+          </Box>
+        )
+      }
+    },
+    {
       flex: 0.2,
       type: 'date',
-      minWidth: 120,
+      minWidth: 100,
       headerName: 'Date',
       field: 'last_update',
       valueGetter: params => new Date(params.value),
@@ -102,9 +104,17 @@ const TableColumns = () => {
       field: 'pin',
       headerName: 'Pin status',
       renderCell: (params: GridRenderCellParams) => (
-        <Typography variant='body2' sx={{ color: 'text.primary' }}>
-          {params.row.pin}
-        </Typography>
+        <Box sx={{ display: 'inline-block' }}>
+          <LinearProgress
+            color={params.row.color}
+            variant='determinate'
+            value={params.row.pin}
+            sx={{ mr: 4, height: 10, width: '250%', display: 'inline-flex' }}
+          />
+          <Typography variant='body2' sx={{ color: 'text.primary', display: 'inline-flex' }}>
+            {`${params.row.pin}%`}
+          </Typography>
+        </Box>
       )
     },
     {
@@ -124,17 +134,7 @@ const TableColumns = () => {
       field: 'actions',
       headerName: 'Actions',
       renderCell: (params: GridRenderCellParams) => {
-        return (
-          <Button
-            size='small'
-            variant='outlined'
-            color='secondary'
-            endIcon={<Icon icon='bx:send' />}
-            onClick={() => controlCMD(params)}
-          >
-            Control
-          </Button>
-        )
+        return <DialogSendControlSignal id={params.row.id} name={params.row.name} />
       }
     }
   ]

@@ -157,6 +157,15 @@ export type DataGridRowType = {
   experience: string
 }
 
+export type DeviceGridRowType = {
+  id: number
+  name: string
+  last_update: string
+  pin: number
+  color: string
+  status: number
+}
+
 // Help Center
 //------------
 export type HelpCenterSubcategoryArticlesType = {
