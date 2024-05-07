@@ -2,13 +2,14 @@
 import Grid from '@mui/material/Grid'
 
 // ** Demo Components Imports
-import TimelineFilled from 'src/views/components/timeline/TimelineFilled'
+import LogsTimeline from 'src/views/components/timeline/LogsTimeline'
 
 const ActivityHistory = () => {
   return (
-    <Grid container spacing={6} className='match-height'>
-      <Grid item xs={12}>
-        <TimelineFilled />
+    <Grid container spacing={6} className='match-height' justifyItems='center'>
+      <Grid item xs={1}></Grid>
+      <Grid item xs={10}>
+        <LogsTimeline />
       </Grid>
     </Grid>
   )

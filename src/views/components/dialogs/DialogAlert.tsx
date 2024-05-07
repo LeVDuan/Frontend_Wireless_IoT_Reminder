@@ -38,7 +38,7 @@ const DialogAlert = () => {
         variant='contained'
         className='demo-space-x'
         onClick={handleClickOpen}
-        startIcon={<Icon icon='ic:sharp-usb' style={{ verticalAlign: 'center', marginBottom: '13px' }} />}
+        startIcon={<Icon icon='ic:sharp-usb' style={{ fontSize: 25, verticalAlign: 'center', marginBottom: '13px' }} />}
       >
         Open Port
       </Button>
