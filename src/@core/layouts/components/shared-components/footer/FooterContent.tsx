@@ -20,13 +20,9 @@ const FooterContent = () => {
   return (
     <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between' }}>
       <Typography sx={{ mr: 2 }}>
-        {`© ${new Date().getFullYear()}, Made with `}
-        <Box component='span' sx={{ color: 'error.main' }}>
-          ❤️
-        </Box>
-        {` by `}
+        {`© ${new Date().getFullYear()}, Made by DuanLe using `}
         <LinkStyled target='_blank' href='https://themeselection.com/'>
-          ThemeSelection
+          Themeselection
         </LinkStyled>
       </Typography>
       {hidden ? null : (

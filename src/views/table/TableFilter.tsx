@@ -7,7 +7,6 @@ import Card from '@mui/material/Card'
 import Typography from '@mui/material/Typography'
 import CardHeader from '@mui/material/CardHeader'
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid'
-import Button from '@mui/material/Button'
 import LinearProgress from '@mui/material/LinearProgress'
 
 // ** Custom Components
@@ -122,10 +121,8 @@ const columns: GridColDef[] = [
     renderCell: (params: GridRenderCellParams) => {
       return (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-            <DialogEditDevice device={params.row} />
-            <DialogDeleteConfirm deviceInfo={params.row} />
-          </Box>
+          <DialogEditDevice device={params.row} />
+          <DialogDeleteConfirm deviceInfo={params.row} />
         </Box>
       )
     }

@@ -24,7 +24,7 @@ const DialogDeleteConfirm: React.FC<DialogDeleteConfirmProps> = ({ deviceInfo })
 
   return (
     <Fragment>
-      <Button variant='outlined' color='error' onClick={handleClickOpen}>
+      <Button size='small' variant='outlined' color='error' onClick={handleClickOpen}>
         Delete
       </Button>
       <Dialog

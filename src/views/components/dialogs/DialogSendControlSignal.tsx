@@ -68,7 +68,7 @@ const DialogSendControlSignal: React.FC<DialogSendControlSignalProps> = ({ id, n
 
   return (
     <Fragment>
-      <Button variant='outlined' color='inherit' endIcon={<Icon icon='bx:send' />} onClick={handleControl}>
+      <Button size='small' variant='outlined' color='inherit' endIcon={<Icon icon='bx:send' />} onClick={handleControl}>
         Control
       </Button>
       <Dialog

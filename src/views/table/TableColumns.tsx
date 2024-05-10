@@ -1,5 +1,6 @@
 // ** React Imports
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import axios from 'axios'
 
 // ** MUI Imports
 import Box from '@mui/material/Box'
@@ -42,6 +43,12 @@ const TableColumns = () => {
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 5 })
   const { port, sendToPort } = usePort()
   const updateDevices = async () => {
+    // const res = await axios.get('http://localhost:5000/posts')
+    // console.log(res.data)
+    // res.data.map((obj: any) => {
+    //   console.log(obj)
+    // })
+
     if (port) {
       if (!port || !port.writable) {
         toast.error('Update failed!')

@@ -1,5 +1,5 @@
 // ** React Imports
-import React, { Ref, useState, forwardRef, ReactElement } from 'react'
+import React, { Ref, useState, forwardRef, ReactElement, Fragment } from 'react'
 
 // ** MUI Imports
 import Box from '@mui/material/Box'
@@ -72,8 +72,8 @@ const DialogEditDevice: React.FC<DialogEditDevicelProps> = ({ device }) => {
     })
   }
   return (
-    <Card sx={{ mr: 4 }}>
-      <Button variant='outlined' color='info' onClick={() => setShow(true)}>
+    <Fragment>
+      <Button sx={{ mr: 4 }} size='small' variant='outlined' color='info' onClick={() => setShow(true)}>
         Edit
       </Button>
       <Dialog
@@ -151,7 +151,7 @@ const DialogEditDevice: React.FC<DialogEditDevicelProps> = ({ device }) => {
           </Button>
         </DialogActions>
       </Dialog>
-    </Card>
+    </Fragment>
   )
 }
 
