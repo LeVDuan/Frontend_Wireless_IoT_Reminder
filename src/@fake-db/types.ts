@@ -158,7 +158,8 @@ export type DataGridRowType = {
 }
 
 export type DeviceGridRowType = {
-  id: number
+  _id: string
+  device_id: number
   name: string
   last_update: string
   pin: number

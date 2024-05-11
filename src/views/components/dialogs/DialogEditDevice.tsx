@@ -1,5 +1,5 @@
 // ** React Imports
-import React, { Ref, useState, forwardRef, ReactElement, Fragment } from 'react'
+import React, { Ref, useState, useEffect, forwardRef, ReactElement, Fragment } from 'react'
 
 // ** MUI Imports
 import Box from '@mui/material/Box'
@@ -25,6 +25,7 @@ import Icon from 'src/@core/components/icon'
 import { DeviceGridRowType } from 'src/@fake-db/types'
 import { ThemeColor } from 'src/@core/layouts/types'
 import toast from 'react-hot-toast'
+import { updateDevice } from 'src/api/devices'
 
 interface StatusObj {
   [key: number]: {
@@ -52,23 +53,39 @@ const Transition = forwardRef(function Transition(
 
 const DialogEditDevice: React.FC<DialogEditDevicelProps> = ({ device }) => {
   // ** States
+  const [response, setReponse] = useState<string>('')
   const [show, setShow] = useState<boolean>(false)
-  const status = statusObj[device.status]
+  const [name, setName] = useState<string>(device.name)
+  const [status, setStatus] = useState<number>(device.status)
+  const updatedDevice = { name, status }
+
   const handleAplly = () => {
+    setShow(false)
+    if (name != device.name || status != device.status) {
+      const update = async () => {
+        try {
+          const res = await updateDevice(device._id, updatedDevice)
+          setReponse(res)
+        } catch (error) {
+          console.error('Error fetching devices', error)
+        }
+      }
+      update()
+    } else {
+      setReponse('success')
+    }
     const promiseToast = new Promise((resolve, reject) => {
       setShow(false)
-      setTimeout(() => {
-        if (Math.random() < 0.5) {
-          resolve('foo')
-        } else {
-          reject('fox')
-        }
-      }, 1000)
+      if (response === 'success') {
+        reject('fox')
+      } else {
+        resolve('foo')
+      }
     })
     return toast.promise(promiseToast, {
       loading: 'Loading ...',
       success: 'Apply successfully!',
-      error: 'Error!'
+      error: 'Failed!'
     })
   }
   return (
@@ -109,11 +126,17 @@ const DialogEditDevice: React.FC<DialogEditDevicelProps> = ({ device }) => {
             </Typography>
           </Box>
           <Grid container spacing={6}>
-            <Grid item sm={3} xs={12}>
-              <TextField fullWidth value={device.id} label='ID' />
+            <Grid item sm={6} xs={12}>
+              <TextField fullWidth value={device.device_id} label='Device ID' />
             </Grid>
-            <Grid item sm={9} xs={12}>
-              <TextField fullWidth defaultValue={device.name} label='Name' placeholder='Device 0' />
+            <Grid item sm={6} xs={12}>
+              <TextField
+                fullWidth
+                defaultValue={device.name}
+                label='Name'
+                placeholder='Device 0'
+                onChange={e => setName(e.target.value)}
+              />
             </Grid>
             <Grid item sm={6} xs={12}>
               <TextField fullWidth value={device.last_update} label='Lastest Update' placeholder='/03/08/2001' />
@@ -121,15 +144,39 @@ const DialogEditDevice: React.FC<DialogEditDevicelProps> = ({ device }) => {
             <Grid item sm={6} xs={12}>
               <FormControl fullWidth>
                 <InputLabel id='status-select'>Status</InputLabel>
-                <Select fullWidth label='Status' defaultValue={status.title} labelId='status-select'>
-                  <MenuItem value='free'>
-                    <CustomChip rounded size='small' skin='light' color='success' label='Free' />
+                <Select
+                  fullWidth
+                  label='Status'
+                  defaultValue={device.status}
+                  labelId='status-select'
+                  onChange={e => setStatus(Number(e.target.value))}
+                >
+                  <MenuItem value={0}>
+                    <CustomChip
+                      rounded
+                      size='small'
+                      skin='light'
+                      color={statusObj[0].color}
+                      label={statusObj[0].title}
+                    />
                   </MenuItem>
-                  <MenuItem value='queuing'>
-                    <CustomChip rounded size='small' skin='light' color='warning' label='Queuing' />
+                  <MenuItem value={1}>
+                    <CustomChip
+                      rounded
+                      size='small'
+                      skin='light'
+                      color={statusObj[1].color}
+                      label={statusObj[1].title}
+                    />
                   </MenuItem>
-                  <MenuItem value='disconnected'>
-                    <CustomChip rounded size='small' skin='light' color='error' label='Disconnected' />
+                  <MenuItem value={2}>
+                    <CustomChip
+                      rounded
+                      size='small'
+                      skin='light'
+                      color={statusObj[2].color}
+                      label={statusObj[2].title}
+                    />
                   </MenuItem>
                 </Select>
               </FormControl>
@@ -138,7 +185,7 @@ const DialogEditDevice: React.FC<DialogEditDevicelProps> = ({ device }) => {
         </DialogContent>
         <DialogActions
           sx={{
-            justifyContent: 'center',
+            justifyContent: 'right',
             px: theme => [`${theme.spacing(5)} !important`, `${theme.spacing(15)} !important`],
             pb: theme => [`${theme.spacing(8)} !important`, `${theme.spacing(12.5)} !important`]
           }}

@@ -1,6 +1,5 @@
 // ** React Imports
 import { useState, useEffect } from 'react'
-import axios from 'axios'
 
 // ** MUI Imports
 import Box from '@mui/material/Box'
@@ -20,11 +19,12 @@ import CustomChip from 'src/@core/components/mui/chip'
 import { ThemeColor } from 'src/@core/layouts/types'
 
 // ** Data Import
-import { devices } from 'src/@fake-db/table/device-active-list'
 import { usePort } from 'src/context/PortContext'
 import Icon from 'src/@core/components/icon'
 import DialogSendControlSignal from '../components/dialogs/DialogSendControlSignal'
 import LinearProgress from '@mui/material/LinearProgress'
+import { getActiveDevices } from 'src/api/devices'
+import { DeviceGridRowType } from 'src/@fake-db/types'
 
 interface StatusObj {
   [key: number]: {
@@ -40,15 +40,25 @@ const statusObj: StatusObj = {
 
 const TableColumns = () => {
   // ** States
+  const [data, setData] = useState<DeviceGridRowType[]>([])
+
+  useEffect(() => {
+    const fetchActiveDevices = async () => {
+      try {
+        const data = await getActiveDevices()
+        setData(data)
+        // console.log(data)
+      } catch (error) {
+        console.error('Error fetching devices', error)
+      }
+    }
+
+    fetchActiveDevices()
+  }, [])
+
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 5 })
   const { port, sendToPort } = usePort()
   const updateDevices = async () => {
-    // const res = await axios.get('http://localhost:5000/posts')
-    // console.log(res.data)
-    // res.data.map((obj: any) => {
-    //   console.log(obj)
-    // })
-
     if (port) {
       if (!port || !port.writable) {
         toast.error('Update failed!')
@@ -64,36 +74,32 @@ const TableColumns = () => {
   const columns: GridColDef[] = [
     {
       flex: 0.1,
-      field: 'id',
+      field: 'device_id',
       minWidth: 80,
-      headerName: 'ID',
+      headerName: 'Device ID',
       renderCell: (params: GridRenderCellParams) => (
-        <Typography variant='body2' sx={{ color: 'text.primary' }}>
-          {params.row.id}
+        <Typography variant='body2' sx={{ color: 'text.primary', textAlign: 'center' }}>
+          {params.row.device_id}
         </Typography>
       )
     },
     {
-      flex: 0.25,
-      minWidth: 290,
+      flex: 0.175,
+      minWidth: 100,
       field: 'name',
-      headerName: 'Name',
+      headerName: 'Device Name',
       renderCell: (params: GridRenderCellParams) => {
         const { row } = params
 
         return (
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-              <Typography noWrap variant='body2' sx={{ color: 'text.primary' }}>
-                {row.name}
-              </Typography>
-            </Box>
-          </Box>
+          <Typography noWrap variant='body2' sx={{ color: 'text.primary' }}>
+            {row.name}
+          </Typography>
         )
       }
     },
     {
-      flex: 0.2,
+      flex: 0.175,
       type: 'date',
       minWidth: 100,
       headerName: 'Date',
@@ -106,19 +112,19 @@ const TableColumns = () => {
       )
     },
     {
-      flex: 0.2,
-      minWidth: 110,
+      flex: 0.3,
+      minWidth: 200,
       field: 'pin',
       headerName: 'Pin status',
       renderCell: (params: GridRenderCellParams) => (
-        <Box sx={{ display: 'inline-block' }}>
+        <Box sx={{ display: 'block' }}>
           <LinearProgress
             color={params.row.color}
             variant='determinate'
             value={params.row.pin}
-            sx={{ mr: 4, height: 10, width: '250%', display: 'inline-flex' }}
+            sx={{ mr: 3, height: 10, minWidth: 150, width: '100%', display: 'inline-block' }}
           />
-          <Typography variant='body2' sx={{ color: 'text.primary', display: 'inline-flex' }}>
+          <Typography variant='body2' sx={{ color: 'text.primary', display: 'inline-block' }}>
             {`${params.row.pin}%`}
           </Typography>
         </Box>
@@ -136,8 +142,8 @@ const TableColumns = () => {
       }
     },
     {
-      flex: 0.125,
-      minWidth: 140,
+      flex: 0.2,
+      minWidth: 200,
       field: 'actions',
       headerName: 'Actions',
       renderCell: (params: GridRenderCellParams) => {
@@ -149,18 +155,17 @@ const TableColumns = () => {
   return (
     <Card>
       <CardHeader
-        title='Latest Update Device:'
+        title='List of active devices: '
         action={
-          <div>
-            <Button size='small' variant='contained' endIcon={<Icon icon='bx:refresh' />} onClick={updateDevices}>
-              Update
-            </Button>
-          </div>
+          <Button size='small' variant='contained' endIcon={<Icon icon='bx:refresh' />} onClick={updateDevices}>
+            Update
+          </Button>
         }
       />
       <DataGrid
         autoHeight
-        rows={devices}
+        rows={data}
+        getRowId={row => row.device_id}
         columns={columns}
         disableRowSelectionOnClick
         pageSizeOptions={[5, 10, 25, 50]}
