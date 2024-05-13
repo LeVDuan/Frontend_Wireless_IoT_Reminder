@@ -1,22 +1,15 @@
 // ** Next Import
-import Link from 'next/link'
 
 // ** MUI Imports
 import Grid from '@mui/material/Grid'
-import { styled } from '@mui/material/styles'
 import Typography from '@mui/material/Typography'
 
 // ** Custom Components Imports
 import PageHeader from 'src/@core/components/page-header'
 
 // ** Demo Components Imports
-import TableColumns from 'src/views/table/TableColumns'
 import DialogAlert from 'src/views/components/dialogs/DialogAlert'
-
-const LinkStyled = styled(Link)(({ theme }) => ({
-  textDecoration: 'none',
-  color: theme.palette.primary.main
-}))
+import DeviceControlListTable from 'src/views/table/DeviceControlListTable'
 
 const DeviceControl = () => {
   return (
@@ -39,7 +32,7 @@ const DeviceControl = () => {
         <DialogAlert />
       </Grid>
       <Grid item xs={12}>
-        <TableColumns />
+        <DeviceControlListTable />
       </Grid>
     </Grid>
   )

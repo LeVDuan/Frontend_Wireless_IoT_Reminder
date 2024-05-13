@@ -1,18 +1,130 @@
 export const devices = [
-  { device_id: 0, name: 'Device 0', last_update: '05/07/2024', pin: 89.4, color: 'success', status: 1 },
-  { device_id: 1, name: 'Device 1', last_update: '05/07/2024', pin: 65.3, color: 'success', status: 1 },
-  { device_id: 2, name: 'Device 2', last_update: '05/07/2024', pin: 45.6, color: 'warning', status: 0 },
-  { device_id: 3, name: 'Device 3', last_update: '05/07/2024', pin: 15.8, color: 'error', status: 2 },
-  { device_id: 4, name: 'Device 4', last_update: '05/07/2024', pin: 78.9, color: 'success', status: 1 },
-  { device_id: 5, name: 'Device 5', last_update: '05/07/2024', pin: 55.4, color: 'warning', status: 0 },
-  { device_id: 6, name: 'Device 6', last_update: '05/07/2024', pin: 32.1, color: 'error', status: 1 },
-  { device_id: 7, name: 'Device 7', last_update: '05/07/2024', pin: 88.2, color: 'success', status: 0 },
-  { device_id: 8, name: 'Device 8', last_update: '05/07/2024', pin: 52.3, color: 'warning', status: 2 },
-  { device_id: 9, name: 'Device 9', last_update: '05/07/2024', pin: 19.4, color: 'error', status: 1 },
-  { device_id: 10, name: 'Device 10', last_update: '05/07/2024', pin: 70.5, color: 'success', status: 0 },
-  { device_id: 11, name: 'Device 11', last_update: '05/07/2024', pin: 40.6, color: 'warning', status: 2 },
-  { device_id: 12, name: 'Device 12', last_update: '05/07/2024', pin: 10.7, color: 'error', status: 1 },
-  { device_id: 13, name: 'Device 13', last_update: '05/07/2024', pin: 80.8, color: 'success', status: 0 },
-  { device_id: 14, name: 'Device 14', last_update: '05/07/2024', pin: 50.9, color: 'warning', status: 2 },
-  { device_id: 15, name: 'Device 15', last_update: '05/07/2024', pin: 20.0, color: 'error', status: 1 }
+  {
+    _id: '66421d39472d7402c217b87f',
+    deviceId: 0,
+    name: 'Device LeDuan',
+    lastUpdated: '2024-05-13T10:22:21.000Z',
+    batteryStatus: 85,
+    isActive: true
+  },
+  {
+    _id: '66421d39472d7402c217b880',
+    deviceId: 1,
+    name: 'Device Bolt',
+    lastUpdated: '2024-05-13T10:22:21.000Z',
+    batteryStatus: 90,
+    isActive: false
+  },
+  {
+    _id: '66421d39472d7402c217b881',
+    deviceId: 2,
+    name: 'Device Flash',
+    lastUpdated: '2024-05-13T10:22:21.000Z',
+    batteryStatus: 75,
+    isActive: true
+  },
+  {
+    _id: '66421d39472d7402c217b882',
+    deviceId: 3,
+    name: 'Device Pulse',
+    lastUpdated: '2024-05-13T10:22:21.000Z',
+    batteryStatus: 60,
+    isActive: false
+  },
+  {
+    _id: '66421d39472d7402c217b883',
+    deviceId: 4,
+    name: 'Device Quantum',
+    lastUpdated: '2024-05-13T10:22:21.000Z',
+    batteryStatus: 80,
+    isActive: true
+  },
+  {
+    _id: '66421d39472d7402c217b884',
+    deviceId: 5,
+    name: 'Device Nebula',
+    lastUpdated: '2024-05-13T10:22:21.000Z',
+    batteryStatus: 70,
+    isActive: false
+  },
+  {
+    _id: '66421d39472d7402c217b885',
+    deviceId: 6,
+    name: 'Device Polaris',
+    lastUpdated: '2024-05-13T10:22:21.000Z',
+    batteryStatus: 65,
+    isActive: true
+  },
+  {
+    _id: '66421d39472d7402c217b886',
+    deviceId: 7,
+    name: 'Device Aurora',
+    lastUpdated: '2024-05-13T10:22:21.000Z',
+    batteryStatus: 95,
+    isActive: false
+  },
+  {
+    _id: '66421d39472d7402c217b887',
+    deviceId: 8,
+    name: 'Device Eclipse',
+    lastUpdated: '2024-05-13T10:22:21.000Z',
+    batteryStatus: 85,
+    isActive: true
+  },
+  {
+    _id: '66421d39472d7402c217b888',
+    deviceId: 9,
+    name: 'Device Nova',
+    lastUpdated: '2024-05-13T10:22:21.000Z',
+    batteryStatus: 75,
+    isActive: false
+  },
+  {
+    _id: '66421d39472d7402c217b889',
+    deviceId: 10,
+    name: 'Device Pulsar',
+    lastUpdated: '2024-05-13T10:22:21.000Z',
+    batteryStatus: 80,
+    isActive: true
+  },
+  {
+    _id: '66421d39472d7402c217b88a',
+    deviceId: 11,
+    name: 'Device Quasar',
+    lastUpdated: '2024-05-13T10:22:21.000Z',
+    batteryStatus: 70,
+    isActive: false
+  },
+  {
+    _id: '66421d39472d7402c217b88b',
+    deviceId: 12,
+    name: 'Device Galaxy',
+    lastUpdated: '2024-05-13T10:22:21.000Z',
+    batteryStatus: 65,
+    isActive: true
+  },
+  {
+    _id: '66421d39472d7402c217b88c',
+    deviceId: 13,
+    name: 'Device Stellar',
+    lastUpdated: '2024-05-13T10:22:21.000Z',
+    batteryStatus: 95,
+    isActive: false
+  },
+  {
+    _id: '66421d39472d7402c217b88d',
+    deviceId: 14,
+    name: 'Device Cosmos',
+    lastUpdated: '2024-05-13T10:22:21.000Z',
+    batteryStatus: 85,
+    isActive: true
+  },
+  {
+    _id: '66421d39472d7402c217b88e',
+    deviceId: 15,
+    name: 'Device Vortex',
+    lastUpdated: '2024-05-13T10:22:21.000Z',
+    batteryStatus: 75,
+    isActive: false
+  }
 ]

@@ -159,12 +159,11 @@ export type DataGridRowType = {
 
 export type DeviceGridRowType = {
   _id: string
-  device_id: number
+  deviceId: number
   name: string
-  last_update: string
-  pin: number
-  color: string
-  status: number
+  lastUpdated: string
+  batteryStatus: number
+  isActive: boolean
 }
 
 // Help Center

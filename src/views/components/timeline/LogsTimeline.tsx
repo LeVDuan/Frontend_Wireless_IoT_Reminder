@@ -1,7 +1,6 @@
 // ** MUI Imports
 import Box from '@mui/material/Box'
 import { styled } from '@mui/material/styles'
-import TimelineDot from '@mui/lab/TimelineDot'
 import CustomTimelineDot from '@mui/lab/TimelineDot'
 import TimelineItem from '@mui/lab/TimelineItem'
 import Typography from '@mui/material/Typography'
@@ -12,11 +11,11 @@ import MuiTimeline, { TimelineProps } from '@mui/lab/Timeline'
 import { logs } from 'src/@fake-db/table/logs'
 import CustomChip from 'src/@core/components/mui/chip'
 import Divider from '@mui/material/Divider'
+import { getDateFromTimestamp, getTimeFromTimestamp, getDayOfWeekFromTimestamp } from 'src/utils/format'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
 import { ThemeColor } from 'src/@core/layouts/types'
-import { right } from '@popperjs/core'
 
 // Styled Timeline component
 const Timeline = styled(MuiTimeline)<TimelineProps>({
@@ -30,35 +29,13 @@ const Timeline = styled(MuiTimeline)<TimelineProps>({
   }
 })
 
-const getDateFromTimestamp = (timestamp: string) => {
-  const date = new Date(timestamp)
-  return `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`
-}
-
-const getTimeFromTimestamp = (timestamp: string) => {
-  const date = new Date(timestamp)
-  let hours = date.getHours()
-  let minutes: number | string = date.getMinutes()
-  let ampm = hours >= 12 ? 'PM' : 'AM'
-  hours = hours % 12
-  hours = hours ? hours : 12
-  minutes = minutes < 10 ? '0' + minutes : minutes
-  return `${hours}:${minutes} ${ampm}`
-}
-
-const getDayOfWeekFromTimestamp = (timestamp: string) => {
-  const date = new Date(timestamp)
-  const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
-  return daysOfWeek[date.getDay()]
-}
-
 const getControlType = (opcode: string) => {
   if (opcode === 'VBR') return 'Vibration'
   if (opcode === 'LGT') return 'Light up'
   if (opcode === 'VLG') return 'Vibration and light up'
 }
 
-const sortedLogs = logs.sort((a, b) => new Date(b.time_stamp).getTime() - new Date(a.time_stamp).getTime())
+const sortedLogs = logs.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
 
 const LogsTimeline = () => {
   return (
