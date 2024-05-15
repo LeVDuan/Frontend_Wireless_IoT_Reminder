@@ -11,6 +11,8 @@ import DialogContentText from '@mui/material/DialogContentText'
 import { DeviceGridRowType } from 'src/@fake-db/types'
 import { deleteDevice } from 'src/api/devices'
 import toast from 'react-hot-toast'
+import IconButton from '@mui/material/IconButton'
+import Icon from 'src/@core/components/icon'
 
 interface DialogDeleteConfirmProps {
   device: DeviceGridRowType
@@ -19,13 +21,13 @@ interface DialogDeleteConfirmProps {
 const DialogDeleteConfirm: React.FC<DialogDeleteConfirmProps> = ({ device }) => {
   // ** State
   const [open, setOpen] = useState<boolean>(false)
-  const [response, setReponse] = useState<string>('')
+  const [response, setResponse] = useState<string>('')
 
   const handleDelete = () => {
     const deletedDevice = async () => {
       try {
         const res = await deleteDevice(device._id)
-        setReponse(res)
+        setResponse(res)
       } catch (error) {
         console.error('Error fetching devices', error)
       }
@@ -39,6 +41,7 @@ const DialogDeleteConfirm: React.FC<DialogDeleteConfirmProps> = ({ device }) => 
         resolve('foo')
       }
     })
+
     return toast.promise(promiseToast, {
       loading: 'Loading ...',
       success: 'Apply successfully!',
@@ -51,9 +54,9 @@ const DialogDeleteConfirm: React.FC<DialogDeleteConfirmProps> = ({ device }) => 
 
   return (
     <Fragment>
-      <Button size='small' variant='outlined' color='error' onClick={handleClickOpen}>
-        Delete
-      </Button>
+      <IconButton size='small' onClick={handleClickOpen}>
+        <Icon icon='bx:trash-alt' fontSize={20} />
+      </IconButton>
       <Dialog
         open={open}
         disableEscapeKeyDown

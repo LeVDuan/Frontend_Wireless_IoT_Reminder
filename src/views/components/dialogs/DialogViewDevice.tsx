@@ -16,7 +16,6 @@ import FormControl from '@mui/material/FormControl'
 import Fade, { FadeProps } from '@mui/material/Fade'
 import DialogContent from '@mui/material/DialogContent'
 import DialogActions from '@mui/material/DialogActions'
-import Select, { SelectChangeEvent } from '@mui/material/Select'
 import CustomChip from 'src/@core/components/mui/chip'
 
 // ** Icon Imports
@@ -26,7 +25,10 @@ import Icon from 'src/@core/components/icon'
 import { DeviceGridRowType } from 'src/@fake-db/types'
 import { ThemeColor } from 'src/@core/layouts/types'
 import toast from 'react-hot-toast'
-import { updateDevice } from 'src/api/devices'
+
+interface DialogViewDeviceProps {
+  device: DeviceGridRowType
+}
 
 interface StatusObj {
   [key: number]: {
@@ -41,10 +43,6 @@ const statusObj: StatusObj = {
   2: { title: 'disconnected', color: 'error' }
 }
 
-interface DialogEditDeviceProps {
-  device: DeviceGridRowType
-}
-
 const Transition = forwardRef(function Transition(
   props: FadeProps & { children?: ReactElement<any, any> },
   ref: Ref<unknown>
@@ -52,7 +50,7 @@ const Transition = forwardRef(function Transition(
   return <Fade ref={ref} {...props} />
 })
 
-const DialogEditDevice: React.FC<DialogEditDeviceProps> = ({ device }) => {
+const DialogViewDevice = ({ device }: DialogViewDeviceProps) => {
   // ** States
   const [response, setResponse] = useState<string>('')
   const [show, setShow] = useState<boolean>(false)
@@ -94,7 +92,7 @@ const DialogEditDevice: React.FC<DialogEditDeviceProps> = ({ device }) => {
   return (
     <Fragment>
       <IconButton size='small' onClick={() => setShow(true)}>
-        <Icon icon='bx:pencil' fontSize={20} />
+        <Icon icon='bx:show' fontSize={20} />
       </IconButton>
       <Dialog
         fullWidth
@@ -205,4 +203,4 @@ const DialogEditDevice: React.FC<DialogEditDeviceProps> = ({ device }) => {
   )
 }
 
-export default DialogEditDevice
+export default DialogViewDevice
