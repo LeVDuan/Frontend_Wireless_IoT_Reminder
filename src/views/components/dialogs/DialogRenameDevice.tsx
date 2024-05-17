@@ -1,23 +1,17 @@
 // ** React Imports
-import React, { Ref, useState, useEffect, forwardRef, ReactElement, Fragment } from 'react'
+import React, { Ref, useState, forwardRef, ReactElement, Fragment } from 'react'
 
 // ** MUI Imports
 import Box from '@mui/material/Box'
 import Grid from '@mui/material/Grid'
-import Card from '@mui/material/Card'
 import Dialog from '@mui/material/Dialog'
 import Button from '@mui/material/Button'
-import MenuItem from '@mui/material/MenuItem'
 import TextField from '@mui/material/TextField'
 import IconButton from '@mui/material/IconButton'
 import Typography from '@mui/material/Typography'
-import InputLabel from '@mui/material/InputLabel'
-import FormControl from '@mui/material/FormControl'
 import Fade, { FadeProps } from '@mui/material/Fade'
 import DialogContent from '@mui/material/DialogContent'
 import DialogActions from '@mui/material/DialogActions'
-import Select, { SelectChangeEvent } from '@mui/material/Select'
-import CustomChip from 'src/@core/components/mui/chip'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
@@ -26,23 +20,22 @@ import Icon from 'src/@core/components/icon'
 import { DeviceGridRowType } from 'src/@fake-db/types'
 import { ThemeColor } from 'src/@core/layouts/types'
 import toast from 'react-hot-toast'
-import { updateDevice } from 'src/api/devices'
+import { renameDevice } from 'src/api/devices'
+
+interface DialogRenameDeviceProps {
+  device: DeviceGridRowType
+}
 
 interface StatusObj {
-  [key: number]: {
+  [key: string]: {
     title: string
     color: ThemeColor
   }
 }
 
 const statusObj: StatusObj = {
-  0: { title: 'free', color: 'success' },
-  1: { title: 'queuing', color: 'warning' },
-  2: { title: 'disconnected', color: 'error' }
-}
-
-interface DialogEditDeviceProps {
-  device: DeviceGridRowType
+  true: { title: 'Active', color: 'success' },
+  false: { title: 'Inactive', color: 'error' }
 }
 
 const Transition = forwardRef(function Transition(
@@ -52,20 +45,21 @@ const Transition = forwardRef(function Transition(
   return <Fade ref={ref} {...props} />
 })
 
-const DialogEditDevice: React.FC<DialogEditDeviceProps> = ({ device }) => {
+const DialogRenameDevice = ({ device }: DialogRenameDeviceProps) => {
   // ** States
   const [response, setResponse] = useState<string>('')
   const [show, setShow] = useState<boolean>(false)
   const [name, setName] = useState<string>(device.name)
-  const [status, setStatus] = useState<number>(device.status)
+  const status = statusObj[device.isActive.toString()]
+
   const updatedDevice = { name, status }
 
-  const handleAplly = () => {
+  const handleApply = () => {
     setShow(false)
-    if (name != device.name || status != device.status) {
+    if (name != device.name) {
       const update = async () => {
         try {
-          const res = await updateDevice(device._id, updatedDevice)
+          const res = await renameDevice(device._id, updatedDevice)
           setResponse(res)
         } catch (error) {
           console.error('Error fetching devices', error)
@@ -122,67 +116,29 @@ const DialogEditDevice: React.FC<DialogEditDeviceProps> = ({ device }) => {
           </IconButton>
           <Box sx={{ mb: 8, textAlign: 'center' }}>
             <Typography variant='h5' sx={{ mb: 3 }}>
-              Edit Device Information
+              Change the device's memorable name
             </Typography>
-            <Typography variant='body2'>
-              Edit device information, be careful not to sync with physical devices.
-            </Typography>
+            <Typography variant='body2'>Rename this device, be careful not to sync with physical devices.</Typography>
           </Box>
-          <Grid container spacing={6}>
-            <Grid item sm={6} xs={12}>
-              <TextField fullWidth value={device.device_id} label='Device ID' />
-            </Grid>
-            <Grid item sm={6} xs={12}>
+          <Grid container spacing={6} mt={10}>
+            <Grid item sm={5} xs={12}>
               <TextField
                 fullWidth
                 defaultValue={device.name}
-                label='Name'
-                placeholder='Device 0'
+                label='Current Name'
+                InputProps={{ readOnly: true }}
                 onChange={e => setName(e.target.value)}
               />
             </Grid>
-            <Grid item sm={6} xs={12}>
-              <TextField fullWidth value={device.last_update} label='Lastest Update' placeholder='/03/08/2001' />
+            <Grid item sm={2} xs={12}>
+              <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: 'row' }}>
+                <Icon icon='material-symbols:play-arrow' fontSize={30} />
+                <Icon icon='material-symbols:play-arrow' fontSize={30} />
+                <Icon icon='material-symbols:play-arrow' fontSize={30} />
+              </Box>
             </Grid>
-            <Grid item sm={6} xs={12}>
-              <FormControl fullWidth>
-                <InputLabel id='status-select'>Status</InputLabel>
-                <Select
-                  fullWidth
-                  label='Status'
-                  defaultValue={device.status}
-                  labelId='status-select'
-                  onChange={e => setStatus(Number(e.target.value))}
-                >
-                  <MenuItem value={0}>
-                    <CustomChip
-                      rounded
-                      size='small'
-                      skin='light'
-                      color={statusObj[0].color}
-                      label={statusObj[0].title}
-                    />
-                  </MenuItem>
-                  <MenuItem value={1}>
-                    <CustomChip
-                      rounded
-                      size='small'
-                      skin='light'
-                      color={statusObj[1].color}
-                      label={statusObj[1].title}
-                    />
-                  </MenuItem>
-                  <MenuItem value={2}>
-                    <CustomChip
-                      rounded
-                      size='small'
-                      skin='light'
-                      color={statusObj[2].color}
-                      label={statusObj[2].title}
-                    />
-                  </MenuItem>
-                </Select>
-              </FormControl>
+            <Grid item sm={5} xs={12}>
+              <TextField fullWidth label='New Name' placeholder='Duan LV' onChange={e => setName(e.target.value)} />
             </Grid>
           </Grid>
         </DialogContent>
@@ -190,10 +146,10 @@ const DialogEditDevice: React.FC<DialogEditDeviceProps> = ({ device }) => {
           sx={{
             justifyContent: 'right',
             px: theme => [`${theme.spacing(5)} !important`, `${theme.spacing(15)} !important`],
-            pb: theme => [`${theme.spacing(8)} !important`, `${theme.spacing(12.5)} !important`]
+            pb: theme => [`${theme.spacing(8)} !important`, `${theme.spacing(10)} !important`]
           }}
         >
-          <Button variant='contained' sx={{ mr: 1 }} onClick={handleAplly}>
+          <Button variant='contained' sx={{ mr: 1 }} onClick={handleApply}>
             Apply
           </Button>
           <Button variant='outlined' color='secondary' onClick={() => setShow(false)}>
@@ -205,4 +161,4 @@ const DialogEditDevice: React.FC<DialogEditDeviceProps> = ({ device }) => {
   )
 }
 
-export default DialogEditDevice
+export default DialogRenameDevice

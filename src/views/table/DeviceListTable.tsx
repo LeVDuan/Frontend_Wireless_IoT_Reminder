@@ -19,14 +19,15 @@ import { ThemeColor } from 'src/@core/layouts/types'
 import { DeviceGridRowType } from 'src/@fake-db/types'
 
 // ** Data Import
-import DialogEditDevice from '../components/dialogs/DialogEditDevice'
+import DialogRenameDevice from '../components/dialogs/DialogRenameDevice'
 import DialogDeleteConfirm from '../components/dialogs/DialogDeleteConfirm'
 import DialogViewDevice from '../components/dialogs/DialogViewDevice'
 import { getAllDevices } from 'src/api/devices'
 import CustomAvatar from 'src/@core/components/mui/avatar'
 import { formatTimestamp, getColorFromBatteryValue } from 'src/utils/format'
 import { Grid } from '@mui/material'
-import AddDeviceDrawer from 'src/views/components/drawer/AddDeviceDrawer'
+
+// import AddDeviceDrawer from 'src/views/components/drawer/AddDeviceDrawer'
 import Tooltip from '@mui/material/Tooltip'
 
 interface CellType {
@@ -139,7 +140,7 @@ const columns: GridColDef[] = [
             <DialogViewDevice device={row} />
           </Tooltip>
           <Tooltip title='Rename'>
-            <DialogEditDevice device={row} />
+            <DialogRenameDevice device={row} />
           </Tooltip>
           <Tooltip title='Delete'>
             <DialogDeleteConfirm device={row} />

@@ -15,7 +15,7 @@ const DataGrid = () => {
     <Grid container spacing={6}>
       <PageHeader
         title={
-          <Typography variant='h3' color='primary.main'>
+          <Typography variant='h4' color='primary.main'>
             Device List
           </Typography>
         }

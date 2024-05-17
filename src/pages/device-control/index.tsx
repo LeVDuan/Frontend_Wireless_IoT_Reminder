@@ -17,7 +17,7 @@ const DeviceControl = () => {
       <Grid item xs={12} md={10}>
         <PageHeader
           title={
-            <Typography variant='h3' color='primary.main'>
+            <Typography variant='h4' color='primary.main'>
               Select the device to control
             </Typography>
           }
