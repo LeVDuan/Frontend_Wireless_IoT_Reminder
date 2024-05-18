@@ -1,5 +1,5 @@
 // ** React Imports
-import { ChangeEvent, useState, useEffect } from 'react'
+import { ChangeEvent, useState } from 'react'
 
 // ** MUI Imports
 import Box from '@mui/material/Box'
@@ -23,15 +23,15 @@ import { usePort } from 'src/context/PortContext'
 import Icon from 'src/@core/components/icon'
 import DialogSendControlSignal from '../components/dialogs/DialogSendControlSignal'
 import LinearProgress from '@mui/material/LinearProgress'
-import { getActiveDevices } from 'src/api/devices'
-import { DeviceGridRowType } from 'src/@fake-db/types'
+import { DeviceTypes } from 'src/@core/utils/types'
 import { formatTimestamp, getColorFromBatteryValue } from 'src/utils/format'
 import { getInitials } from 'src/@core/utils/get-initials'
 import CustomAvatar from 'src/@core/components/mui/avatar'
 import QuickSearchToolbar from './QuickSearchToolbar'
+import { DeviceStoreType } from 'src/@core/utils/types'
 
 interface CellType {
-  row: DeviceGridRowType
+  row: DeviceTypes
 }
 
 interface StatusObj {
@@ -64,6 +64,9 @@ const renderAvatar = (name: string) => {
       {getInitials(name ? name : 'Device default')}
     </CustomAvatar>
   )
+}
+interface DeviceControlListTableProps {
+  store: DeviceStoreType
 }
 
 const columns: GridColDef[] = [
@@ -105,15 +108,15 @@ const columns: GridColDef[] = [
     headerName: 'Battery status',
     field: 'batteryValue',
     renderCell: ({ row }: CellType) => (
-      <Box sx={{ width: '100%' }}>
-        <Typography variant='body2'>{row.batteryStatus}%</Typography>
+      <>
         <LinearProgress
           variant='determinate'
           value={row.batteryStatus}
           color={getColorFromBatteryValue(row.batteryStatus)}
-          sx={{ height: 6, mt: 1 }}
+          sx={{ mr: 4, height: 6, width: '100%', borderRadius: 8, '& .MuiLinearProgress-bar': { borderRadius: 8 } }}
         />
-      </Box>
+        <Typography variant='body2'>{row.batteryStatus}%</Typography>
+      </>
     )
   },
   {
@@ -138,19 +141,16 @@ const columns: GridColDef[] = [
   }
 ]
 
-const DeviceControlListTable = () => {
+const DeviceControlListTable = ({ store }: DeviceControlListTableProps) => {
   // ** State
-  const [data, setData] = useState<DeviceGridRowType[]>([])
   const [searchText, setSearchText] = useState<string>('')
-  const [filteredData, setFilteredData] = useState<DeviceGridRowType[]>([])
-
-  // const [value, setValue] = useState<DeviceGridRowType[]>([])
+  const [filteredData, setFilteredData] = useState<DeviceTypes[]>(store.activeDevices ? store.activeDevices : [])
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 7 })
 
   const handleSearch = (searchValue: string) => {
     setSearchText(searchValue)
     const searchRegex = new RegExp(escapeRegExp(searchValue), 'i')
-    const filteredRows = data.filter(row => {
+    const filteredRows = store.activeDevices.filter(row => {
       return Object.keys(row).some(field => {
         // @ts-ignore
         return searchRegex.test(row[field].toString())
@@ -162,21 +162,6 @@ const DeviceControlListTable = () => {
       setFilteredData([])
     }
   }
-
-  useEffect(() => {
-    const fetchActiveDevices = async () => {
-      try {
-        const data = await getActiveDevices()
-        setData(data)
-
-        console.log(data)
-      } catch (error) {
-        console.error('Error fetching devices', error)
-      }
-    }
-
-    fetchActiveDevices()
-  }, [])
 
   const { port, sendToPort } = usePort()
   const updateDevices = async () => {
@@ -204,7 +189,7 @@ const DeviceControlListTable = () => {
       />
       <DataGrid
         autoHeight
-        rows={filteredData.length ? filteredData : data}
+        rows={filteredData.length ? filteredData : store.activeDevices}
         getRowId={row => row.deviceId}
         columns={columns}
         pageSizeOptions={[7, 10, 25, 50]}

@@ -1,5 +1,5 @@
 // ** React Imports
-import { ChangeEvent, useEffect, useState } from 'react'
+import { ChangeEvent, useState } from 'react'
 
 // ** MUI Imports
 import Box from '@mui/material/Box'
@@ -16,22 +16,26 @@ import QuickSearchToolbar from 'src/views/table/QuickSearchToolbar'
 
 // ** Types Imports
 import { ThemeColor } from 'src/@core/layouts/types'
-import { DeviceGridRowType } from 'src/@fake-db/types'
+import { DeviceTypes } from 'src/@core/utils/types'
 
 // ** Data Import
 import DialogRenameDevice from '../components/dialogs/DialogRenameDevice'
 import DialogDeleteConfirm from '../components/dialogs/DialogDeleteConfirm'
 import DialogViewDevice from '../components/dialogs/DialogViewDevice'
-import { getAllDevices } from 'src/api/devices'
 import CustomAvatar from 'src/@core/components/mui/avatar'
 import { formatTimestamp, getColorFromBatteryValue } from 'src/utils/format'
 import { Grid } from '@mui/material'
 
 // import AddDeviceDrawer from 'src/views/components/drawer/AddDeviceDrawer'
 import Tooltip from '@mui/material/Tooltip'
+import { DeviceStoreType } from 'src/@core/utils/types'
+
+interface DeviceListTableProps {
+  store: DeviceStoreType
+}
 
 interface CellType {
-  row: DeviceGridRowType
+  row: DeviceTypes
 }
 
 interface StatusObj {
@@ -105,15 +109,15 @@ const columns: GridColDef[] = [
     headerName: 'Battery status',
     field: 'batteryValue',
     renderCell: ({ row }: CellType) => (
-      <Box sx={{ width: '100%' }}>
-        <Typography variant='body2'>{row.batteryStatus}%</Typography>
+      <>
         <LinearProgress
           variant='determinate'
           value={row.batteryStatus}
           color={getColorFromBatteryValue(row.batteryStatus)}
-          sx={{ height: 6, mt: 1 }}
+          sx={{ mr: 4, height: 6, width: '100%', borderRadius: 8, '& .MuiLinearProgress-bar': { borderRadius: 8 } }}
         />
-      </Box>
+        <Typography variant='body2'>{row.batteryStatus}%</Typography>
+      </>
     )
   },
   {
@@ -151,19 +155,17 @@ const columns: GridColDef[] = [
   }
 ]
 
-const DeviceListTable = () => {
-  // ** States
-  const [data, setData] = useState<DeviceGridRowType[]>([])
+const DeviceListTable = ({ store }: DeviceListTableProps) => {
   const [searchText, setSearchText] = useState<string>('')
-  const [filteredData, setFilteredData] = useState<DeviceGridRowType[]>([])
-  const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 7 })
+  const [filteredData, setFilteredData] = useState<DeviceTypes[]>(store.devices ? store.devices : [])
 
-  // const [addDeviceOpen, setAddDeviceOpen] = useState<boolean>(false)
+  // const [value, setValue] = useState<DeviceGridRowType[]>([])
+  const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 7 })
 
   const handleSearch = (searchValue: string) => {
     setSearchText(searchValue)
     const searchRegex = new RegExp(escapeRegExp(searchValue), 'i')
-    const filteredRows = data.filter(row => {
+    const filteredRows = store.devices.filter(row => {
       return Object.keys(row).some(field => {
         // @ts-ignore
         return searchRegex.test(row[field].toString())
@@ -176,28 +178,13 @@ const DeviceListTable = () => {
     }
   }
 
-  useEffect(() => {
-    const fetchDevices = async () => {
-      try {
-        const data = await getAllDevices()
-        setData(data)
-
-        console.log(data)
-      } catch (error) {
-        console.error('Error fetching devices', error)
-      }
-    }
-
-    fetchDevices()
-  }, [])
-
   // const toggleAddDeviceDrawer = () => setAddDeviceOpen(!addDeviceOpen)
 
   return (
     <Grid container spacing={6}>
       <Grid item xs={12}>
         <Card>
-          <CardHeader title='List of devices in the system' />
+          <CardHeader title={`Number of devices in the system: ${store.totalDevices} devices.`} />
           <DataGrid
             autoHeight
             columns={columns}
@@ -205,7 +192,7 @@ const DeviceListTable = () => {
             paginationModel={paginationModel}
             slots={{ toolbar: QuickSearchToolbar }}
             onPaginationModelChange={setPaginationModel}
-            rows={filteredData.length ? filteredData : data}
+            rows={filteredData.length ? filteredData : store.devices}
             getRowId={row => row.deviceId}
             slotProps={{
               baseButton: {

@@ -157,15 +157,6 @@ export type DataGridRowType = {
   experience: string
 }
 
-export type DeviceGridRowType = {
-  _id: string
-  deviceId: number
-  name: string
-  lastUpdated: string
-  batteryStatus: number
-  isActive: boolean
-}
-
 // Help Center
 //------------
 export type HelpCenterSubcategoryArticlesType = {

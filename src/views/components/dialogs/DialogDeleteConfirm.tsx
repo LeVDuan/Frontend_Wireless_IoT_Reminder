@@ -8,45 +8,29 @@ import DialogTitle from '@mui/material/DialogTitle'
 import DialogContent from '@mui/material/DialogContent'
 import DialogActions from '@mui/material/DialogActions'
 import DialogContentText from '@mui/material/DialogContentText'
-import { DeviceGridRowType } from 'src/@fake-db/types'
-import { deleteDevice } from 'src/api/devices'
-import toast from 'react-hot-toast'
+import { DeviceTypes } from 'src/@core/utils/types'
 import IconButton from '@mui/material/IconButton'
 import Icon from 'src/@core/components/icon'
+import { useDispatch } from 'react-redux'
+import { AppDispatch } from 'src/store'
+import { deleteDevice } from 'src/store/device'
+
+import toast from 'react-hot-toast'
 
 interface DialogDeleteConfirmProps {
-  device: DeviceGridRowType
+  device: DeviceTypes
 }
 
-const DialogDeleteConfirm: React.FC<DialogDeleteConfirmProps> = ({ device }) => {
+const DialogDeleteConfirm = ({ device }: DialogDeleteConfirmProps) => {
   // ** State
   const [open, setOpen] = useState<boolean>(false)
-  const [response, setResponse] = useState<string>('')
+  const dispatch = useDispatch<AppDispatch>()
 
   const handleDelete = () => {
-    const deletedDevice = async () => {
-      try {
-        const res = await deleteDevice(device._id)
-        setResponse(res)
-      } catch (error) {
-        console.error('Error fetching devices', error)
-      }
-    }
-    deletedDevice()
-    const promiseToast = new Promise((resolve, reject) => {
-      setOpen(false)
-      if (response === 'success') {
-        reject('fox')
-      } else {
-        resolve('foo')
-      }
-    })
+    setOpen(false)
+    dispatch(deleteDevice(device._id))
 
-    return toast.promise(promiseToast, {
-      loading: 'Loading ...',
-      success: 'Apply successfully!',
-      error: 'Failed!'
-    })
+    return toast.success('Successfully!')
   }
   const handleClickOpen = () => setOpen(true)
 

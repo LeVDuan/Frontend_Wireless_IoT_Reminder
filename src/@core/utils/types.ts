@@ -19,3 +19,19 @@ export type PaymentTypes = {
   formatCardNumber(elem: HTMLInputElement): HTMLInputElement
   formatCardExpiry(elem: HTMLInputElement): HTMLInputElement
 }
+
+export type DeviceTypes = {
+  _id: string
+  deviceId: number
+  name: string
+  lastUpdated: string
+  batteryStatus: number
+  isActive: boolean
+}
+
+export type DeviceStoreType = {
+  devices: DeviceTypes[]
+  activeDevices: DeviceTypes[]
+  totalDevices: number
+  totalActiveDevices: number
+}
