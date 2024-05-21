@@ -17,13 +17,14 @@ import DialogActions from '@mui/material/DialogActions'
 import Icon from 'src/@core/components/icon'
 
 // ** Custom Components Imports
-import { DeviceGridRowType } from 'src/@fake-db/types'
+import { DeviceType } from 'src/@core/utils/types'
 import { ThemeColor } from 'src/@core/layouts/types'
 import toast from 'react-hot-toast'
-import { renameDevice } from 'src/api/devices'
+
+// import { renameDevice } from 'src/api/devices'
 
 interface DialogRenameDeviceProps {
-  device: DeviceGridRowType
+  device: DeviceType
 }
 
 interface StatusObj {
@@ -56,19 +57,20 @@ const DialogRenameDevice = ({ device }: DialogRenameDeviceProps) => {
 
   const handleApply = () => {
     setShow(false)
-    if (name != device.name) {
-      const update = async () => {
-        try {
-          const res = await renameDevice(device._id, updatedDevice)
-          setResponse(res)
-        } catch (error) {
-          console.error('Error fetching devices', error)
-        }
-      }
-      update()
-    } else {
-      setResponse('success')
-    }
+
+    // if (name != device.name) {
+    //   const update = async () => {
+    //     try {
+    //       const res = await renameDevice(device._id, updatedDevice)
+    //       setResponse(res)
+    //     } catch (error) {
+    //       console.error('Error fetching devices', error)
+    //     }
+    //   }
+    //   update()
+    // } else {
+    //   setResponse('success')
+    // }
     const promiseToast = new Promise((resolve, reject) => {
       setShow(false)
       if (response === 'success') {

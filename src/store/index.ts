@@ -3,10 +3,12 @@ import { configureStore } from '@reduxjs/toolkit'
 
 // ** Reducers
 import device from 'src/store/device'
+import log from 'src/store/log'
 
 export const store = configureStore({
   reducer: {
-    device
+    device,
+    log
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({

@@ -8,7 +8,7 @@ import DialogTitle from '@mui/material/DialogTitle'
 import DialogContent from '@mui/material/DialogContent'
 import DialogActions from '@mui/material/DialogActions'
 import DialogContentText from '@mui/material/DialogContentText'
-import { DeviceTypes } from 'src/@core/utils/types'
+import { DeviceType } from 'src/@core/utils/types'
 import IconButton from '@mui/material/IconButton'
 import Icon from 'src/@core/components/icon'
 import { useDispatch } from 'react-redux'
@@ -18,7 +18,7 @@ import { deleteDevice } from 'src/store/device'
 import toast from 'react-hot-toast'
 
 interface DialogDeleteConfirmProps {
-  device: DeviceTypes
+  device: DeviceType
 }
 
 const DialogDeleteConfirm = ({ device }: DialogDeleteConfirmProps) => {

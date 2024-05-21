@@ -20,7 +20,7 @@ export type PaymentTypes = {
   formatCardExpiry(elem: HTMLInputElement): HTMLInputElement
 }
 
-export type DeviceTypes = {
+export type DeviceType = {
   _id: string
   deviceId: number
   name: string
@@ -30,10 +30,15 @@ export type DeviceTypes = {
 }
 
 export type DeviceStoreType = {
-  devices: DeviceTypes[]
-  activeDevices: DeviceTypes[]
+  devices: DeviceType[]
+  activeDevices: DeviceType[]
   totalDevices: number
   totalActiveDevices: number
+}
+
+export type LogStoreType = {
+  logs: LogType[]
+  total: number
 }
 
 export type DetailsEdit = {

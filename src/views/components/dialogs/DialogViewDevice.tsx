@@ -24,12 +24,12 @@ import LinearProgress from '@mui/material/LinearProgress'
 import Icon from 'src/@core/components/icon'
 
 // ** Custom Components Imports
-import { DeviceGridRowType } from 'src/@fake-db/types'
+import { DeviceType } from 'src/@core/utils/types'
 import { ThemeColor } from 'src/@core/layouts/types'
 import { formatTimestamp, getColorFromBatteryValue } from 'src/utils/format'
 
 interface DialogViewDeviceProps {
-  device: DeviceGridRowType
+  device: DeviceType
 }
 
 interface StatusObj {

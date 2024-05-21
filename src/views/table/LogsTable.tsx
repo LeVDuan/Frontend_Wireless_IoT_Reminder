@@ -13,8 +13,7 @@ import TableCell from '@mui/material/TableCell'
 import Typography from '@mui/material/Typography'
 import IconButton from '@mui/material/IconButton'
 import TableContainer from '@mui/material/TableContainer'
-import { DetailsAdd, DetailsControl, DetailsDelete, DetailsEdit, LogType } from 'src/@core/utils/types'
-import { logs } from 'src/@fake-db/table/logs'
+import { DetailsAdd, DetailsControl, DetailsDelete, DetailsEdit, LogStoreType, LogType } from 'src/@core/utils/types'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
@@ -42,6 +41,10 @@ interface LogActionTypeObj {
     color: ThemeColor
     icon: string
   }
+}
+
+interface LogsTableProps {
+  store: LogStoreType
 }
 const Timeline = styled(MuiTimeline)<TimelineProps>({
   paddingLeft: 0,
@@ -565,16 +568,16 @@ const Row = ({ row }: RowProps) => {
   )
 }
 
-const TableCollapsible = () => {
+const LogsTable = ({ store }: LogsTableProps) => {
   const [page, setPage] = useState<number>(0)
-  const [rowsPerPage, setRowsPerPage] = useState<number>(5)
+  const [rowsPerPage, setRowsPerPage] = useState<number>(10)
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage)
   }
 
   const handleChangeRowsPerPage = (event: ChangeEvent<HTMLInputElement>) => {
-    setRowsPerPage(parseInt(event.target.value, 10))
+    setRowsPerPage(+event.target.value)
     setPage(0)
   }
 
@@ -593,23 +596,23 @@ const TableCollapsible = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {logs.map(row => (
-              <Row key={row.deviceId} row={row} />
+            {store.logs.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(row => (
+              <Row key={row._id} row={row} />
             ))}
           </TableBody>
         </Table>
       </TableContainer>
       <TablePagination
-        page={page}
+        rowsPerPageOptions={[10, 25, 100]}
         component='div'
-        count={logs.length}
+        count={store.total}
         rowsPerPage={rowsPerPage}
+        page={page}
         onPageChange={handleChangePage}
-        rowsPerPageOptions={[5, 10, 25]}
         onRowsPerPageChange={handleChangeRowsPerPage}
       />
     </Card>
   )
 }
 
-export default TableCollapsible
+export default LogsTable
