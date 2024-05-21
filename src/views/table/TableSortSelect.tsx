@@ -13,40 +13,494 @@ import TableCell from '@mui/material/TableCell'
 import Typography from '@mui/material/Typography'
 import IconButton from '@mui/material/IconButton'
 import TableContainer from '@mui/material/TableContainer'
+import { DetailsAdd, DetailsControl, DetailsDelete, DetailsEdit, LogType } from 'src/@core/utils/types'
+import { logs } from 'src/@fake-db/table/logs'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
-import { TablePagination } from '@mui/material'
+import { Card, Divider, TablePagination } from '@mui/material'
+import TimelineItem from '@mui/lab/TimelineItem'
+import TimelineSeparator from '@mui/lab/TimelineSeparator'
+import { ThemeColor } from 'src/@core/layouts/types'
+import CustomTimelineDot from 'src/@core/components/mui/timeline-dot'
+import TimelineConnector from '@mui/lab/TimelineConnector'
+import CustomChip from 'src/@core/components/mui/chip'
+import TimelineContent from '@mui/lab/TimelineContent'
+import MuiTimeline, { TimelineProps } from '@mui/lab/Timeline'
+import { styled } from '@mui/material/styles'
+import CustomAvatar from 'src/@core/components/mui/avatar'
 
-const createData = (name: string, calories: number, fat: number, carbs: number, protein: number, price: number) => {
-  return {
-    name,
-    calories,
-    fat,
-    carbs,
-    protein,
-    price,
-    history: [
-      {
-        date: '2020-01-05',
-        customerId: '11091700',
-        amount: 3
-      },
-      {
-        date: '2020-01-02',
-        customerId: 'Anonymous',
-        amount: 1
-      }
-    ]
+import { getInitials } from 'src/@core/utils/get-initials'
+
+interface RowProps {
+  row: LogType
+}
+
+interface LogActionTypeObj {
+  [key: string]: {
+    title: string
+    color: ThemeColor
+    icon: string
+  }
+}
+const Timeline = styled(MuiTimeline)<TimelineProps>({
+  paddingLeft: 0,
+  paddingRight: 0,
+  '& .MuiTimelineItem-root': {
+    width: '100%',
+    '&:before': {
+      display: 'none'
+    }
+  }
+})
+
+const logActionTypeObj: LogActionTypeObj = {
+  edit: { title: 'Edit', color: 'info', icon: 'bx:edit' },
+  add: { title: 'Add', color: 'success', icon: 'gg:add-r' },
+  delete: { title: 'Delete', color: 'error', icon: 'bx:trash-alt' },
+  control: { title: 'Control', color: 'primary', icon: 'ri:remote-control-line' }
+}
+
+const renderLogDetails = (row: LogType) => {
+  const logActionType = logActionTypeObj[row.action]
+
+  // console.log(logActionType.color)
+  switch (row.action) {
+    case 'edit':
+      const detailsEdit = row.details as DetailsEdit
+
+      return (
+        <TimelineItem>
+          <TimelineSeparator>
+            <CustomTimelineDot skin='light' color={logActionType.color}>
+              <Icon icon={logActionType.icon} fontSize={20} />
+            </CustomTimelineDot>
+            <TimelineConnector />
+          </TimelineSeparator>
+          <TimelineContent sx={{ '& svg': { verticalAlign: 'bottom', mx: 4 } }}>
+            <Box
+              sx={{ mb: 2, display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between' }}
+            >
+              <Typography variant='body2' sx={{ mr: 2, fontWeight: 600, color: 'text.primary' }}>
+                Update the name of the device
+              </Typography>
+              <Typography variant='caption'>Wednesday</Typography>
+            </Box>
+            <Typography variant='body2' sx={{ color: 'text.primary' }}>
+              <span>{detailsEdit.oldName}</span> <Icon icon='bx:right-arrow-alt' fontSize={20} />{' '}
+              <span>{detailsEdit.newName}</span>
+            </Typography>
+            <Box sx={{ pt: 4, pb: 2 }}>
+              <Box sx={{ display: 'flex' }}>
+                <Typography variant='inherit' sx={{ mr: 2, fontWeight: 500, color: 'text.secondary' }}>
+                  Time stamp:
+                </Typography>
+                <Typography variant='subtitle2' sx={{ color: 'text.secondary', textTransform: 'capitalize' }}>
+                  {row.timestamp}
+                </Typography>
+              </Box>
+              <Box sx={{ display: 'flex' }}>
+                <Typography variant='inherit' sx={{ mr: 2, fontWeight: 500, color: 'text.secondary' }}>
+                  User:
+                </Typography>
+                <Typography variant='subtitle2' sx={{ color: 'text.secondary' }}>
+                  @{row.userName}
+                </Typography>
+              </Box>
+              <Box sx={{ display: 'flex' }}>
+                <Typography variant='inherit' sx={{ mr: 2, fontWeight: 500, color: 'text.secondary' }}>
+                  Device ID:
+                </Typography>
+                <Typography variant='subtitle2' sx={{ color: 'text.secondary' }}>
+                  #{row.deviceId}
+                </Typography>
+              </Box>
+              <Box sx={{ display: 'flex', mb: 2 }}>
+                <Typography variant='inherit' sx={{ mr: 2, fontWeight: 500, color: 'text.secondary' }}>
+                  Action:
+                </Typography>
+                <CustomChip
+                  rounded
+                  skin='light'
+                  size='small'
+                  label={logActionType.title}
+                  sx={{ fontWeight: 500 }}
+                  color={logActionType.color}
+                />
+              </Box>
+              <Box sx={{ display: 'flex', mb: 2 }}>
+                <Typography variant='inherit' sx={{ mr: 2, fontWeight: 500, color: 'text.secondary' }}>
+                  Result:
+                </Typography>
+                <CustomChip
+                  rounded
+                  skin='light'
+                  size='small'
+                  label={row.result}
+                  sx={{ fontWeight: 500 }}
+                  color={row.result as ThemeColor}
+                />
+              </Box>
+            </Box>
+            <Divider sx={{ my: theme => `${theme.spacing(3)} !important` }} />
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+              <Box sx={{ mr: 2, display: 'flex', alignItems: 'center' }}></Box>
+              <Typography variant='subtitle2' sx={{ fontWeight: 600 }}>
+                Due Date: 15th Jan
+              </Typography>
+            </Box>
+          </TimelineContent>
+        </TimelineItem>
+      )
+    case 'add':
+      const addDetails = row.details as DetailsAdd
+
+      return (
+        <TimelineItem>
+          <TimelineSeparator>
+            <CustomTimelineDot skin='light' color={logActionType.color}>
+              <Icon icon={logActionType.icon} fontSize={20} />
+            </CustomTimelineDot>
+            <TimelineConnector />
+          </TimelineSeparator>
+          <TimelineContent sx={{ '& svg': { verticalAlign: 'bottom', mx: 4 } }}>
+            <Box
+              sx={{ mb: 2, display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between' }}
+            >
+              <Typography variant='body2' sx={{ mr: 2, fontWeight: 600, color: 'text.primary' }}>
+                Added a device to the system
+              </Typography>
+              <Typography variant='caption'>Wednesday</Typography>
+            </Box>
+
+            <Box sx={{ m: 2 }}>
+              <Typography variant='subtitle1' gutterBottom component='div'>
+                Added device:
+              </Typography>
+              <Table size='small' aria-label='add device'>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Device ID</TableCell>
+                    <TableCell>Name</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  <TableRow key={row._id}>
+                    <TableCell component='th' scope='row'>
+                      #{row.deviceId}
+                    </TableCell>
+                    <TableCell>{row.deviceName}</TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </Box>
+            <Box sx={{ pt: 4, pb: 2 }}>
+              <Box sx={{ display: 'flex' }}>
+                <Typography variant='inherit' sx={{ mr: 2, fontWeight: 500, color: 'text.secondary' }}>
+                  Time stamp:
+                </Typography>
+                <Typography variant='subtitle2' sx={{ color: 'text.secondary', textTransform: 'capitalize' }}>
+                  {row.timestamp}
+                </Typography>
+              </Box>
+              <Box sx={{ display: 'flex' }}>
+                <Typography variant='inherit' sx={{ mr: 2, fontWeight: 500, color: 'text.secondary' }}>
+                  User:
+                </Typography>
+                <Typography variant='subtitle2' sx={{ color: 'text.secondary' }}>
+                  @{row.userName}
+                </Typography>
+              </Box>
+              <Box sx={{ display: 'flex' }}>
+                <Typography variant='inherit' sx={{ mr: 2, fontWeight: 500, color: 'text.secondary' }}>
+                  Device ID:
+                </Typography>
+                <Typography variant='subtitle2' sx={{ color: 'text.secondary' }}>
+                  #{addDetails.objId}
+                </Typography>
+              </Box>
+              <Box sx={{ display: 'flex', mb: 2 }}>
+                <Typography variant='inherit' sx={{ mr: 2, fontWeight: 500, color: 'text.secondary' }}>
+                  Action:
+                </Typography>
+                <CustomChip
+                  rounded
+                  skin='light'
+                  size='small'
+                  label={logActionType.title}
+                  sx={{ fontWeight: 500 }}
+                  color={logActionType.color}
+                />
+              </Box>
+              <Box sx={{ display: 'flex', mb: 2 }}>
+                <Typography variant='inherit' sx={{ mr: 2, fontWeight: 500, color: 'text.secondary' }}>
+                  Result:
+                </Typography>
+                <CustomChip
+                  rounded
+                  skin='light'
+                  size='small'
+                  label={row.result}
+                  sx={{ fontWeight: 500 }}
+                  color={row.result as ThemeColor}
+                />
+              </Box>
+            </Box>
+            <Divider sx={{ my: theme => `${theme.spacing(3)} !important` }} />
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+              <Box sx={{ mr: 2, display: 'flex', alignItems: 'center' }}></Box>
+              <Typography variant='subtitle2' sx={{ fontWeight: 600 }}>
+                Due Date: 15th Jan
+              </Typography>
+            </Box>
+          </TimelineContent>
+        </TimelineItem>
+      )
+    case 'delete':
+      const deleteDetails = row.details as DetailsDelete
+
+      return (
+        <TimelineItem>
+          <TimelineSeparator>
+            <CustomTimelineDot skin='light' color={logActionType.color}>
+              <Icon icon={logActionType.icon} fontSize={20} />
+            </CustomTimelineDot>
+            <TimelineConnector />
+          </TimelineSeparator>
+          <TimelineContent sx={{ '& svg': { verticalAlign: 'bottom', mx: 4 } }}>
+            <Box
+              sx={{ mb: 2, display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between' }}
+            >
+              <Typography variant='body2' sx={{ mr: 2, fontWeight: 600, color: 'text.primary' }}>
+                Delete the device from the system
+              </Typography>
+              <Typography variant='caption'>Wednesday</Typography>
+            </Box>
+            <Box sx={{ m: 2 }}>
+              <Typography variant='subtitle1' gutterBottom component='div'>
+                Deleted device:
+              </Typography>
+              <Table size='small' aria-label='delete device'>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Device ID</TableCell>
+                    <TableCell>Name</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  <TableRow key={row._id}>
+                    <TableCell component='th' scope='row'>
+                      #{row.deviceId}
+                    </TableCell>
+                    <TableCell>{row.deviceName}</TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </Box>
+            <Box sx={{ pt: 4, pb: 2 }}>
+              <Box sx={{ display: 'flex' }}>
+                <Typography variant='inherit' sx={{ mr: 2, fontWeight: 500, color: 'text.secondary' }}>
+                  Time stamp:
+                </Typography>
+                <Typography variant='subtitle2' sx={{ color: 'text.secondary', textTransform: 'capitalize' }}>
+                  {row.timestamp}
+                </Typography>
+              </Box>
+              <Box sx={{ display: 'flex' }}>
+                <Typography variant='inherit' sx={{ mr: 2, fontWeight: 500, color: 'text.secondary' }}>
+                  User:
+                </Typography>
+                <Typography variant='subtitle2' sx={{ color: 'text.secondary' }}>
+                  @{row.userName}
+                </Typography>
+              </Box>
+              <Box sx={{ display: 'flex' }}>
+                <Typography variant='inherit' sx={{ mr: 2, fontWeight: 500, color: 'text.secondary' }}>
+                  Device ID:
+                </Typography>
+                <Typography variant='subtitle2' sx={{ color: 'text.secondary' }}>
+                  #{deleteDetails.objId}
+                </Typography>
+              </Box>
+              <Box sx={{ display: 'flex', mb: 2 }}>
+                <Typography variant='inherit' sx={{ mr: 2, fontWeight: 500, color: 'text.secondary' }}>
+                  Action:
+                </Typography>
+                <CustomChip
+                  rounded
+                  skin='light'
+                  size='small'
+                  label={logActionType.title}
+                  sx={{ fontWeight: 500 }}
+                  color={logActionType.color}
+                />
+              </Box>
+              <Box sx={{ display: 'flex', mb: 2 }}>
+                <Typography variant='inherit' sx={{ mr: 2, fontWeight: 500, color: 'text.secondary' }}>
+                  Result:
+                </Typography>
+                <CustomChip
+                  rounded
+                  skin='light'
+                  size='small'
+                  label={row.result}
+                  sx={{ fontWeight: 500 }}
+                  color={row.result as ThemeColor}
+                />
+              </Box>
+            </Box>
+            <Divider sx={{ my: theme => `${theme.spacing(3)} !important` }} />
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+              <Box sx={{ mr: 2, display: 'flex', alignItems: 'center' }}></Box>
+              <Typography variant='subtitle2' sx={{ fontWeight: 600 }}>
+                Due Date: 15th Jan
+              </Typography>
+            </Box>
+          </TimelineContent>
+        </TimelineItem>
+      )
+    case 'control':
+      const controlDetails = row.details as DetailsControl
+
+      return (
+        <TimelineItem>
+          <TimelineSeparator>
+            <CustomTimelineDot skin='light' color={logActionType.color}>
+              <Icon icon={logActionType.icon} fontSize={20} />
+            </CustomTimelineDot>
+            <TimelineConnector />
+          </TimelineSeparator>
+          <TimelineContent sx={{ '& svg': { verticalAlign: 'bottom', mx: 4 } }}>
+            <Box
+              sx={{ mb: 2, display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between' }}
+            >
+              <Typography variant='body2' sx={{ mr: 2, fontWeight: 600, color: 'text.primary' }}>
+                Control device
+              </Typography>
+              <Typography variant='caption'>Wednesday</Typography>
+            </Box>
+
+            <Box sx={{ m: 2 }}>
+              <Typography variant='subtitle1' gutterBottom component='div'>
+                Added device:
+              </Typography>
+              <Table size='small' aria-label='control device'>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Device ID</TableCell>
+                    <TableCell>Type</TableCell>
+                    <TableCell>Control Time (s)</TableCell>
+                    <TableCell>Period Time (s)</TableCell>
+                    <TableCell>Pause Time (s)</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  <TableRow key={row._id}>
+                    <TableCell component='th' scope='row'>
+                      #{row.deviceId}
+                    </TableCell>
+                    <TableCell component='th' scope='row'>
+                      {controlDetails.type}
+                    </TableCell>
+                    <TableCell component='th' scope='row'>
+                      {controlDetails.controlTime}
+                    </TableCell>
+                    <TableCell component='th' scope='row'>
+                      {controlDetails.periodTime}
+                    </TableCell>
+                    <TableCell>{controlDetails.pauseTime}</TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </Box>
+            <Box sx={{ pt: 4, pb: 2 }}>
+              <Box sx={{ display: 'flex' }}>
+                <Typography variant='inherit' sx={{ mr: 2, fontWeight: 500, color: 'text.secondary' }}>
+                  Time stamp:
+                </Typography>
+                <Typography variant='subtitle2' sx={{ color: 'text.secondary', textTransform: 'capitalize' }}>
+                  {row.timestamp}
+                </Typography>
+              </Box>
+              <Box sx={{ display: 'flex' }}>
+                <Typography variant='inherit' sx={{ mr: 2, fontWeight: 500, color: 'text.secondary' }}>
+                  User:
+                </Typography>
+                <Typography variant='subtitle2' sx={{ color: 'text.secondary' }}>
+                  @{row.userName}
+                </Typography>
+              </Box>
+              <Box sx={{ display: 'flex' }}>
+                <Typography variant='inherit' sx={{ mr: 2, fontWeight: 500, color: 'text.secondary' }}>
+                  Device ID:
+                </Typography>
+                <Typography variant='subtitle2' sx={{ color: 'text.secondary' }}>
+                  #{controlDetails.objId}
+                </Typography>
+              </Box>
+              <Box sx={{ display: 'flex', mb: 2 }}>
+                <Typography variant='inherit' sx={{ mr: 2, fontWeight: 500, color: 'text.secondary' }}>
+                  Action:
+                </Typography>
+                <CustomChip
+                  rounded
+                  skin='light'
+                  size='small'
+                  label={logActionType.title}
+                  sx={{ fontWeight: 500 }}
+                  color={logActionType.color}
+                />
+              </Box>
+              <Box sx={{ display: 'flex', mb: 2 }}>
+                <Typography variant='inherit' sx={{ mr: 2, fontWeight: 500, color: 'text.secondary' }}>
+                  Result:
+                </Typography>
+                <CustomChip
+                  rounded
+                  skin='light'
+                  size='small'
+                  label={row.result}
+                  sx={{ fontWeight: 500 }}
+                  color={row.result as ThemeColor}
+                />
+              </Box>
+            </Box>
+            <Divider sx={{ my: theme => `${theme.spacing(3)} !important` }} />
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+              <Box sx={{ mr: 2, display: 'flex', alignItems: 'center' }}></Box>
+              <Typography variant='subtitle2' sx={{ fontWeight: 600 }}>
+                Due Date: 15th Jan
+              </Typography>
+            </Box>
+          </TimelineContent>
+        </TimelineItem>
+      )
+    default:
+      break
   }
 }
 
-const Row = (props: { row: ReturnType<typeof createData> }) => {
+const renderAvatar = (name: string) => {
+  const stateNum = Math.floor(Math.random() * 6)
+  const states = ['success', 'error', 'warning', 'info', 'primary', 'secondary']
+  const color = states[stateNum]
+
+  return (
+    <CustomAvatar
+      skin='light'
+      color={color as ThemeColor}
+      sx={{ mr: 3, fontSize: '.8rem', width: '1.875rem', height: '1.875rem' }}
+    >
+      {getInitials(name ? name : 'Device default')}
+    </CustomAvatar>
+  )
+}
+const Row = ({ row }: RowProps) => {
   // ** Props
-  const { row } = props
 
   // ** State
   const [open, setOpen] = useState<boolean>(false)
+  const logActionType = logActionTypeObj[row.action]
 
   return (
     <Fragment>
@@ -57,42 +511,52 @@ const Row = (props: { row: ReturnType<typeof createData> }) => {
           </IconButton>
         </TableCell>
         <TableCell component='th' scope='row'>
-          {row.name}
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            {renderAvatar(row.userName)}
+            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+              <Typography noWrap variant='body2' sx={{ color: 'text.primary', fontWeight: 500 }}>
+                {row.userName}
+              </Typography>
+            </Box>
+          </Box>
         </TableCell>
-        <TableCell align='right'>{row.calories}</TableCell>
-        <TableCell align='right'>{row.fat}</TableCell>
-        <TableCell align='right'>{row.carbs}</TableCell>
-        <TableCell align='right'>{row.protein}</TableCell>
+        <TableCell>
+          <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+            <Typography noWrap variant='body2' sx={{ color: 'text.primary', fontWeight: 500 }}>
+              {row.deviceName}
+            </Typography>
+            <Typography noWrap variant='subtitle2' sx={{ color: 'text.disable' }}>
+              #{row.deviceId}
+            </Typography>
+          </Box>
+        </TableCell>
+        <TableCell>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <CustomAvatar
+              skin='light'
+              color={logActionType.color}
+              sx={{ mr: 3, fontSize: '.8rem', width: '1.875rem', height: '1.875rem' }}
+            >
+              <Icon icon={logActionType.icon} fontSize={20} />
+            </CustomAvatar>
+            <Typography noWrap variant='body2' sx={{ color: 'text.primary', fontWeight: 500 }}>
+              {logActionType.title}
+            </Typography>
+          </Box>
+        </TableCell>
+        <TableCell>{row.timestamp}</TableCell>
+        <TableCell>
+          <CustomChip rounded size='small' skin='light' color={row.result as ThemeColor} label={row.result} />
+        </TableCell>
       </TableRow>
       <TableRow>
         <TableCell colSpan={6} sx={{ py: '0 !important' }}>
           <Collapse in={open} timeout='auto' unmountOnExit>
             <Box sx={{ m: 2 }}>
               <Typography variant='h6' gutterBottom component='div'>
-                History
+                Details
               </Typography>
-              <Table size='small' aria-label='purchases'>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Date</TableCell>
-                    <TableCell>Customer</TableCell>
-                    <TableCell align='right'>Amount</TableCell>
-                    <TableCell align='right'>Total price ($)</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {row.history.map(historyRow => (
-                    <TableRow key={historyRow.date}>
-                      <TableCell component='th' scope='row'>
-                        {historyRow.date}
-                      </TableCell>
-                      <TableCell>{historyRow.customerId}</TableCell>
-                      <TableCell align='right'>{historyRow.amount}</TableCell>
-                      <TableCell align='right'>{Math.round(historyRow.amount * row.price * 100) / 100}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+              <Timeline>{renderLogDetails(row)}</Timeline>
             </Box>
           </Collapse>
         </TableCell>
@@ -100,19 +564,6 @@ const Row = (props: { row: ReturnType<typeof createData> }) => {
     </Fragment>
   )
 }
-
-const rows = [
-  createData('Frozen yoghurt', 159, 6.0, 24, 4.0, 3.99),
-  createData('Ice cream sandwich', 237, 9.0, 37, 4.3, 4.99),
-  createData('Eclair', 262, 16.0, 24, 6.0, 3.79),
-  createData('Cupcake', 305, 3.7, 67, 4.3, 2.5),
-  createData('Gingerbread', 356, 16.0, 49, 3.9, 1.5),
-  createData('Frozen yoghurt', 159, 6.0, 24, 4.0, 3.99),
-  createData('Ice cream sandwich', 237, 9.0, 37, 4.3, 4.99),
-  createData('Eclair', 262, 16.0, 24, 6.0, 3.79),
-  createData('Cupcake', 305, 3.7, 67, 4.3, 2.5),
-  createData('Gingerbread', 356, 16.0, 49, 3.9, 1.5)
-]
 
 const TableCollapsible = () => {
   const [page, setPage] = useState<number>(0)
@@ -128,22 +579,22 @@ const TableCollapsible = () => {
   }
 
   return (
-    <>
+    <Card>
       <TableContainer component={Paper}>
         <Table aria-label='collapsible table'>
           <TableHead>
             <TableRow>
               <TableCell />
-              <TableCell>Dessert (100g serving)</TableCell>
-              <TableCell align='right'>Calories</TableCell>
-              <TableCell align='right'>Fat (g)</TableCell>
-              <TableCell align='right'>Carbs (g)</TableCell>
-              <TableCell align='right'>Protein (g)</TableCell>
+              <TableCell>User</TableCell>
+              <TableCell>Device</TableCell>
+              <TableCell>Action</TableCell>
+              <TableCell>Time stamp</TableCell>
+              <TableCell>Result</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.map(row => (
-              <Row key={row.name} row={row} />
+            {logs.map(row => (
+              <Row key={row.deviceId} row={row} />
             ))}
           </TableBody>
         </Table>
@@ -151,13 +602,13 @@ const TableCollapsible = () => {
       <TablePagination
         page={page}
         component='div'
-        count={rows.length}
+        count={logs.length}
         rowsPerPage={rowsPerPage}
         onPageChange={handleChangePage}
         rowsPerPageOptions={[5, 10, 25]}
         onRowsPerPageChange={handleChangeRowsPerPage}
       />
-    </>
+    </Card>
   )
 }
 

@@ -35,3 +35,36 @@ export type DeviceStoreType = {
   totalDevices: number
   totalActiveDevices: number
 }
+
+export type DetailsEdit = {
+  objId: string
+  oldName: string
+  newName: string
+}
+
+export type DetailsAdd = {
+  objId: string
+}
+
+export type DetailsDelete = {
+  objId: string
+}
+
+export type DetailsControl = {
+  objId: string
+  type: string
+  controlTime: number
+  periodTime: number
+  pauseTime: number
+}
+
+export type LogType = {
+  _id: string
+  userName: string
+  deviceId: number
+  deviceName: string
+  action: string
+  details: DetailsEdit | DetailsAdd | DetailsDelete | DetailsControl
+  result: string
+  timestamp: string
+}
