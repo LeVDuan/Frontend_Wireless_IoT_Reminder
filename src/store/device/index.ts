@@ -4,7 +4,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 // ** Axios Imports
 
 import axios from 'axios'
-import { DeviceTypes } from 'src/@core/utils/types'
+import { DeviceType } from 'src/@core/utils/types'
 
 const URL = 'http://localhost:5000/devices'
 
@@ -25,7 +25,7 @@ export const fetchActiveDevices = createAsyncThunk('device/fetchActiveDevices', 
   try {
     const response = await axios.get(`${URL}/activeDevices`)
 
-    // console.log('ActiveDevices:', response.data)
+    console.log('ActiveDevices:', response.data)
 
     return response
   } catch (error) {
@@ -49,8 +49,8 @@ export const deleteDevice = createAsyncThunk('device/deleteDevice', async (id: s
 export const deviceSlice = createSlice({
   name: 'device',
   initialState: {
-    devices: [] as DeviceTypes[],
-    activeDevices: [] as DeviceTypes[],
+    devices: [] as DeviceType[],
+    activeDevices: [] as DeviceType[],
     totalDevices: 0,
     totalActiveDevices: 0
   },

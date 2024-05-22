@@ -16,26 +16,29 @@ import QuickSearchToolbar from 'src/views/table/QuickSearchToolbar'
 
 // ** Types Imports
 import { ThemeColor } from 'src/@core/layouts/types'
-import { DeviceTypes } from 'src/@core/utils/types'
+import { DeviceType } from 'src/@core/utils/types'
 
 // ** Data Import
 import DialogRenameDevice from '../components/dialogs/DialogRenameDevice'
 import DialogDeleteConfirm from '../components/dialogs/DialogDeleteConfirm'
-import DialogViewDevice from '../components/dialogs/DialogViewDevice'
+
+// import DialogViewDevice from '../components/dialogs/DialogViewDevice'
 import CustomAvatar from 'src/@core/components/mui/avatar'
 import { formatTimestamp, getColorFromBatteryValue } from 'src/utils/format'
-import { Grid } from '@mui/material'
+import { Grid, IconButton } from '@mui/material'
 
 // import AddDeviceDrawer from 'src/views/components/drawer/AddDeviceDrawer'
 import Tooltip from '@mui/material/Tooltip'
 import { DeviceStoreType } from 'src/@core/utils/types'
+import Link from 'next/link'
+import Icon from 'src/@core/components/icon'
 
 interface DeviceListTableProps {
   store: DeviceStoreType
 }
 
 interface CellType {
-  row: DeviceTypes
+  row: DeviceType
 }
 
 interface StatusObj {
@@ -141,7 +144,10 @@ const columns: GridColDef[] = [
       return (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <Tooltip title='View'>
-            <DialogViewDevice device={row} />
+            {/* <DialogViewDevice device={row} /> */}
+            <IconButton size='small' component={Link} href={`/device/${row.deviceId}`}>
+              <Icon icon='bx:show' fontSize={20} />
+            </IconButton>
           </Tooltip>
           <Tooltip title='Rename'>
             <DialogRenameDevice device={row} />
@@ -157,10 +163,10 @@ const columns: GridColDef[] = [
 
 const DeviceListTable = ({ store }: DeviceListTableProps) => {
   const [searchText, setSearchText] = useState<string>('')
-  const [filteredData, setFilteredData] = useState<DeviceTypes[]>(store.devices ? store.devices : [])
+  const [filteredData, setFilteredData] = useState<DeviceType[]>(store.devices ? store.devices : [])
 
   // const [value, setValue] = useState<DeviceGridRowType[]>([])
-  const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 7 })
+  const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 5 })
 
   const handleSearch = (searchValue: string) => {
     setSearchText(searchValue)
