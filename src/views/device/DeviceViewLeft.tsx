@@ -1,4 +1,5 @@
 // ** React Imports
+import { ElementType, useState, ChangeEvent } from 'react'
 
 // ** MUI Imports
 import Box from '@mui/material/Box'
@@ -19,8 +20,9 @@ import CustomAvatar from 'src/@core/components/mui/avatar'
 import { ThemeColor } from 'src/@core/layouts/types'
 
 // ** Utils Import
-import { getInitials } from 'src/@core/utils/get-initials'
 import { DeviceType } from 'src/@core/utils/types'
+import Button, { ButtonProps } from '@mui/material/Button'
+import { styled } from '@mui/material/styles'
 
 interface StatusObj {
   [key: string]: {
@@ -38,33 +40,58 @@ const statusObj: StatusObj = {
   true: { title: 'Active', color: 'success' }
 }
 
-const renderAvatar = (name: string) => {
-  const stateNum = Math.floor(Math.random() * 6)
-  const states = ['success', 'error', 'warning', 'info', 'primary', 'secondary']
-  const color = states[stateNum]
+const ButtonStyled = styled(Button)<ButtonProps & { component?: ElementType; htmlFor?: string }>(({ theme }) => ({
+  [theme.breakpoints.down('sm')]: {
+    width: '100%',
+    textAlign: 'center'
+  }
+}))
 
-  return (
-    <CustomAvatar
-      skin='light'
-      color={color as ThemeColor}
-      variant='rounded'
-      sx={{ width: 110, height: 110, fontWeight: 600, mb: 6, fontSize: '3rem' }}
-    >
-      {getInitials(name ? name : 'Device default')}
-    </CustomAvatar>
-  )
-}
+const ResetButtonStyled = styled(Button)<ButtonProps>(({ theme }) => ({
+  marginLeft: theme.spacing(3),
+  [theme.breakpoints.down('sm')]: {
+    width: '100%',
+    marginLeft: 0,
+    textAlign: 'center',
+    marginTop: theme.spacing(4)
+  }
+}))
 
 const DeviceViewLeft = ({ deviceData }: DeviceViewLeftProps) => {
   // const isActive = deviceData.isActive.toString()
   const status = statusObj['true']
+  const [imgSrc, setImgSrc] = useState<string>(`/images/avatars/${deviceData.deviceId}.png`)
+  const [inputValue, setInputValue] = useState<string>('')
+
+  const handleInputImageChange = (file: ChangeEvent) => {
+    const reader = new FileReader()
+    const { files } = file.target as HTMLInputElement
+    if (files && files.length !== 0) {
+      reader.onload = () => setImgSrc(reader.result as string)
+      reader.readAsDataURL(files[0])
+
+      if (reader.result !== null) {
+        setInputValue(reader.result as string)
+      }
+    }
+  }
+  const handleInputImageReset = () => {
+    setInputValue('')
+    setImgSrc(`/images/avatars/${deviceData.deviceId}.png`)
+  }
+
   if (deviceData) {
     return (
       <Grid container spacing={6}>
         <Grid item xs={12}>
           <Card>
             <CardContent sx={{ pt: 12, display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
-              {renderAvatar(deviceData.name)}
+              <CustomAvatar
+                src={imgSrc}
+                skin='light'
+                variant='rounded'
+                sx={{ width: 110, height: 110, fontWeight: 600, mb: 6, fontSize: '3rem' }}
+              />
 
               <Typography variant='h5' sx={{ mb: 2.5, fontSize: '1.375rem !important' }}>
                 {deviceData.name}
@@ -78,7 +105,24 @@ const DeviceViewLeft = ({ deviceData }: DeviceViewLeftProps) => {
                 color={status.color}
               />
             </CardContent>
-
+            <CardContent sx={{ pt: 12, display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
+              <div>
+                <ButtonStyled component='label' variant='contained' htmlFor='account-settings-upload-image'>
+                  Upload New Photo
+                  <input
+                    hidden
+                    type='file'
+                    value={inputValue}
+                    accept='image/png, image/jpeg'
+                    onChange={handleInputImageChange}
+                    id='account-settings-upload-image'
+                  />
+                </ButtonStyled>
+                <ResetButtonStyled color='secondary' variant='outlined' onClick={handleInputImageReset}>
+                  Reset
+                </ResetButtonStyled>
+              </div>
+            </CardContent>
             <CardContent sx={{ mt: 6, mb: 3 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Box sx={{ mr: 8, display: 'flex', alignItems: 'center' }}>

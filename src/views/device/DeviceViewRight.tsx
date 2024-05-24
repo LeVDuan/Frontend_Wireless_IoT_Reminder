@@ -272,16 +272,11 @@ const DeviceViewRight = ({ deviceData }: DeviceViewLeftProps) => {
         <Grid item xs={6}>
           <Card>
             <CardHeader
-              title='Sales Stats'
-              action={
-                <OptionsMenu
-                  iconButtonProps={{ size: 'small' }}
-                  options={['Last 28 Days', 'Last Month', 'Last Year']}
-                />
-              }
+              title='Battery'
+              action={<OptionsMenu iconButtonProps={{ size: 'small' }} options={['refresh']} />}
             />
             <CardContent>
-              <ReactApexcharts type='radialBar' height={302} options={options1} series={[38]} />
+              <ReactApexcharts type='radialBar' height={302} options={options1} series={[deviceData.batteryStatus]} />
               <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-around' }}>
                 <Box
                   sx={{ mr: 2.5, display: 'flex', alignItems: 'center', '& svg': { mr: 1.5, color: 'success.main' } }}

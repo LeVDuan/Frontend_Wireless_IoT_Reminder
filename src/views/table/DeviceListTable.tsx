@@ -8,7 +8,6 @@ import Typography from '@mui/material/Typography'
 import CardHeader from '@mui/material/CardHeader'
 import { DataGrid, GridColDef } from '@mui/x-data-grid'
 import LinearProgress from '@mui/material/LinearProgress'
-import { getInitials } from 'src/@core/utils/get-initials'
 
 // ** Custom Components
 import CustomChip from 'src/@core/components/mui/chip'
@@ -57,32 +56,37 @@ const escapeRegExp = (value: string) => {
   return value.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')
 }
 
-const renderAvatar = (name: string) => {
-  const stateNum = Math.floor(Math.random() * 6)
-  const states = ['success', 'error', 'warning', 'info', 'primary', 'secondary']
-  const color = states[stateNum]
+const renderAvatar = (deviceId: number) => {
+  // const stateNum = Math.floor(Math.random() * 6)
+  // const states = ['success', 'error', 'warning', 'info', 'primary', 'secondary']
+  // const color = states[stateNum]
 
-  return (
-    <CustomAvatar
-      skin='light'
-      color={color as ThemeColor}
-      sx={{ mr: 3, fontSize: '.8rem', width: '1.875rem', height: '1.875rem' }}
-    >
-      {getInitials(name ? name : 'Device default')}
-    </CustomAvatar>
-  )
+  // if (row.avatar.length) {
+  //   return <CustomAvatar src={`/images/avatars/${row.avatar}`} sx={{ mr: 3, width: '1.875rem', height: '1.875rem' }} />
+  // } else
+  // return (
+  // <CustomAvatar
+  //   skin='light'
+  //   color={color as ThemeColor}
+  //   sx={{ mr: 3, fontSize: '.8rem', width: '1.875rem', height: '1.875rem' }}
+  // >
+  //   {getInitials(name ? name : 'Device default')}
+  // </CustomAvatar>
+  return <CustomAvatar src={`/images/avatars/${deviceId}.png`} sx={{ mr: 3, width: '1.875rem', height: '1.875rem' }} />
+
+  // )
 }
 
 const columns: GridColDef[] = [
   {
-    flex: 0.25,
+    flex: 0.3,
     minWidth: 250,
     field: 'name',
     headerName: 'Name',
     renderCell: ({ row }: CellType) => {
       return (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          {renderAvatar(row.name)}
+          {renderAvatar(row.deviceId)}
           <Box sx={{ display: 'flex', flexDirection: 'column' }}>
             <Typography noWrap variant='body2' sx={{ color: 'text.primary', fontWeight: 500 }}>
               {row.name}
@@ -96,7 +100,7 @@ const columns: GridColDef[] = [
     }
   },
   {
-    flex: 0.2,
+    flex: 0.3,
     minWidth: 180,
     field: 'date',
     headerName: 'Last status update',
@@ -107,7 +111,7 @@ const columns: GridColDef[] = [
     )
   },
   {
-    flex: 0.25,
+    flex: 0.3,
     minWidth: 250,
     headerName: 'Battery status',
     field: 'batteryValue',
@@ -135,7 +139,7 @@ const columns: GridColDef[] = [
     }
   },
   {
-    flex: 0.1,
+    flex: 0.2,
     minWidth: 130,
     sortable: false,
     field: 'actions',

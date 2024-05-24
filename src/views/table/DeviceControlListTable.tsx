@@ -23,7 +23,7 @@ import { usePort } from 'src/context/PortContext'
 import Icon from 'src/@core/components/icon'
 import DialogSendControlSignal from '../components/dialogs/DialogSendControlSignal'
 import LinearProgress from '@mui/material/LinearProgress'
-import { DeviceTypes } from 'src/@core/utils/types'
+import { DeviceType } from 'src/@core/utils/types'
 import { formatTimestamp, getColorFromBatteryValue } from 'src/utils/format'
 import { getInitials } from 'src/@core/utils/get-initials'
 import CustomAvatar from 'src/@core/components/mui/avatar'
@@ -31,7 +31,7 @@ import QuickSearchToolbar from './QuickSearchToolbar'
 import { DeviceStoreType } from 'src/@core/utils/types'
 
 interface CellType {
-  row: DeviceTypes
+  row: DeviceType
 }
 
 interface StatusObj {
@@ -71,8 +71,8 @@ interface DeviceControlListTableProps {
 
 const columns: GridColDef[] = [
   {
-    flex: 0.25,
-    minWidth: 250,
+    flex: 0.3,
+    minWidth: 200,
     field: 'name',
     headerName: 'Name',
     renderCell: ({ row }: CellType) => {
@@ -92,10 +92,10 @@ const columns: GridColDef[] = [
     }
   },
   {
-    flex: 0.2,
+    flex: 0.3,
     minWidth: 180,
     field: 'date',
-    headerName: 'Last status update',
+    headerName: 'Last updated',
     renderCell: ({ row }: CellType) => (
       <Typography variant='body2' sx={{ color: 'text.primary' }}>
         {formatTimestamp(row.lastUpdated)}
@@ -103,7 +103,7 @@ const columns: GridColDef[] = [
     )
   },
   {
-    flex: 0.25,
+    flex: 0.3,
     minWidth: 250,
     headerName: 'Battery status',
     field: 'batteryValue',
@@ -144,7 +144,7 @@ const columns: GridColDef[] = [
 const DeviceControlListTable = ({ store }: DeviceControlListTableProps) => {
   // ** State
   const [searchText, setSearchText] = useState<string>('')
-  const [filteredData, setFilteredData] = useState<DeviceTypes[]>(store.activeDevices ? store.activeDevices : [])
+  const [filteredData, setFilteredData] = useState<DeviceType[]>(store.activeDevices ? store.activeDevices : [])
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 7 })
 
   const handleSearch = (searchValue: string) => {
@@ -182,8 +182,8 @@ const DeviceControlListTable = ({ store }: DeviceControlListTableProps) => {
       <CardHeader
         title='List of active devices: '
         action={
-          <Button size='small' variant='contained' endIcon={<Icon icon='bx:refresh' />} onClick={updateDevices}>
-            Update
+          <Button size='small' variant='contained' startIcon={<Icon icon='bx:refresh' />} onClick={updateDevices}>
+            Update status
           </Button>
         }
       />

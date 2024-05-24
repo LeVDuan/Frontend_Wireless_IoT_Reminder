@@ -29,8 +29,6 @@ import MuiTimeline, { TimelineProps } from '@mui/lab/Timeline'
 import { styled } from '@mui/material/styles'
 import CustomAvatar from 'src/@core/components/mui/avatar'
 
-import { getInitials } from 'src/@core/utils/get-initials'
-
 interface RowProps {
   row: LogType
 }
@@ -484,19 +482,11 @@ const renderLogDetails = (row: LogType) => {
 }
 
 const renderAvatar = (name: string) => {
-  const stateNum = Math.floor(Math.random() * 6)
-  const states = ['success', 'error', 'warning', 'info', 'primary', 'secondary']
-  const color = states[stateNum]
-
-  return (
-    <CustomAvatar
-      skin='light'
-      color={color as ThemeColor}
-      sx={{ mr: 3, fontSize: '.8rem', width: '1.875rem', height: '1.875rem' }}
-    >
-      {getInitials(name ? name : 'Device default')}
-    </CustomAvatar>
-  )
+  if (name == 'Duan LV') {
+    return <CustomAvatar src={`/images/avatars/DuanLV.jpg`} sx={{ mr: 3, width: '1.875rem', height: '1.875rem' }} />
+  } else {
+    return <CustomAvatar src={`/images/avatars/1.png`} sx={{ mr: 3, width: '1.875rem', height: '1.875rem' }} />
+  }
 }
 const Row = ({ row }: RowProps) => {
   // ** Props

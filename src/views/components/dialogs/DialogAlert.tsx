@@ -8,7 +8,6 @@ import DialogTitle from '@mui/material/DialogTitle'
 import DialogContent from '@mui/material/DialogContent'
 import DialogActions from '@mui/material/DialogActions'
 import DialogContentText from '@mui/material/DialogContentText'
-import Icon from 'src/@core/components/icon'
 import { usePort } from 'src/context/PortContext'
 import toast from 'react-hot-toast'
 
@@ -33,13 +32,7 @@ const DialogAlert = () => {
 
   return (
     <Fragment>
-      <Button
-        size='small'
-        variant='contained'
-        className='demo-space-x'
-        onClick={handleClickOpen}
-        startIcon={<Icon icon='ic:sharp-usb' style={{ fontSize: 20, verticalAlign: 'center', marginBottom: '13px' }} />}
-      >
+      <Button size='medium' variant='contained' className='demo-space-x' onClick={handleClickOpen}>
         Open Port
       </Button>
       <Dialog

@@ -12,12 +12,20 @@ import { UserDataType } from 'src/context/types'
 
 const users: UserDataType[] = [
   {
-    id: 1,
+    id: 3,
     role: 'admin',
     password: 'admin',
     fullName: 'John Doe',
     username: 'johndoe',
     email: 'admin@sneat.com'
+  },
+  {
+    id: 1,
+    role: 'admin',
+    password: 'duanlv0308',
+    fullName: 'Duan Le',
+    username: 'duanle',
+    email: 'duanlv194508@sis.hust.edu.vn'
   },
   {
     id: 2,
