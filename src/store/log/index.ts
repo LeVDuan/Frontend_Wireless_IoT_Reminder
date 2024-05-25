@@ -21,6 +21,18 @@ export const fetchLogs = createAsyncThunk('log/fetchLogs', async () => {
   }
 })
 
+export const fetchAnalytics = createAsyncThunk('log/fetchAnalytics', async () => {
+  try {
+    const response = await axios.get(URL)
+
+    // console.log('logs:', response.data)
+
+    return response
+  } catch (error) {
+    throw error
+  }
+})
+
 //* Add logs
 export const addLogs = createAsyncThunk('log/addLogs', async (newLogs: any, { dispatch }: any) => {
   try {

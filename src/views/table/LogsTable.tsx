@@ -448,6 +448,14 @@ const renderLogDetails = (row: LogType) => {
                   skin='light'
                   size='small'
                   label={logActionType.title}
+                  sx={{ fontWeight: 500, mr: 2 }}
+                  color={logActionType.color}
+                />
+                <CustomChip
+                  rounded
+                  skin='light'
+                  size='small'
+                  label={controlDetails.type}
                   sx={{ fontWeight: 500 }}
                   color={logActionType.color}
                 />

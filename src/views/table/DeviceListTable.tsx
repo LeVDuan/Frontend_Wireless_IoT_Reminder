@@ -31,6 +31,7 @@ import Tooltip from '@mui/material/Tooltip'
 import { DeviceStoreType } from 'src/@core/utils/types'
 import Link from 'next/link'
 import Icon from 'src/@core/components/icon'
+import DialogAddDevice from '../components/dialogs/DialogAddDevice'
 
 interface DeviceListTableProps {
   store: DeviceStoreType
@@ -188,13 +189,19 @@ const DeviceListTable = ({ store }: DeviceListTableProps) => {
     }
   }
 
-  // const toggleAddDeviceDrawer = () => setAddDeviceOpen(!addDeviceOpen)
-
   return (
     <Grid container spacing={6}>
       <Grid item xs={12}>
         <Card>
-          <CardHeader title={`Number of devices in the system: ${store.totalDevices} devices.`} />
+          <CardHeader
+            title={`Number of devices in the system: ${store.totalDevices} devices.`}
+            action={
+              <div>
+                <DialogAddDevice store={store} />
+              </div>
+            }
+          />
+
           <DataGrid
             autoHeight
             columns={columns}
@@ -217,8 +224,6 @@ const DeviceListTable = ({ store }: DeviceListTableProps) => {
           />
         </Card>
       </Grid>
-
-      {/* <AddDeviceDrawer open={addDeviceOpen} toggle={toggleAddDeviceDrawer} /> */}
     </Grid>
   )
 }
