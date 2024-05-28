@@ -20,6 +20,9 @@ import Icon from 'src/@core/components/icon'
 // ** Custom Components Imports
 import toast from 'react-hot-toast'
 import { DeviceStoreType } from 'src/@core/utils/types'
+import { useDispatch } from 'react-redux'
+import { AppDispatch } from 'src/store'
+import { addDevice } from 'src/store/device'
 
 interface DialogAddDeviceProps {
   store: DeviceStoreType
@@ -37,28 +40,25 @@ const DialogAddDevice = ({ store }: DialogAddDeviceProps) => {
   const [name, setName] = useState<string>('')
   const [show, setShow] = useState<boolean>(false)
   const [deviceId, setDeviceId] = useState<number>()
+  const dispatch = useDispatch<AppDispatch>()
 
   const handleSubmit = () => {
-    if (name === '' || deviceId === undefined) {
-      setShow(false)
+    setShow(false)
 
+    if (name === '' || deviceId === undefined) {
       return toast.error('Please fill in all fields in the form.')
     }
     const isInvalidDeviceId = store.devices.find(device => device.deviceId === deviceId)
     if (isInvalidDeviceId) {
-      setShow(false)
-
       return toast.error(`Device ID ${deviceId} already exists!`)
     }
     const isInvalidName = store.devices.find(device => device.name === name)
     if (isInvalidName) {
-      setShow(false)
-
       return toast.error(`Device name ${name} already exists!`)
     }
 
     // dispatch(addUser({ ...data, role, currentPlan: plan }))
-    console.log('call api Add User.')
+    dispatch(addDevice({ deviceId: deviceId, name: name }))
 
     return toast.success('Successfully')
   }

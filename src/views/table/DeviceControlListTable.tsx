@@ -25,7 +25,6 @@ import DialogSendControlSignal from '../components/dialogs/DialogSendControlSign
 import LinearProgress from '@mui/material/LinearProgress'
 import { DeviceType } from 'src/@core/utils/types'
 import { formatTimestamp, getColorFromBatteryValue } from 'src/utils/format'
-import { getInitials } from 'src/@core/utils/get-initials'
 import CustomAvatar from 'src/@core/components/mui/avatar'
 import QuickSearchToolbar from './QuickSearchToolbar'
 import { DeviceStoreType } from 'src/@core/utils/types'
@@ -50,21 +49,6 @@ const escapeRegExp = (value: string) => {
   return value.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')
 }
 
-const renderAvatar = (name: string) => {
-  const stateNum = Math.floor(Math.random() * 6)
-  const states = ['success', 'error', 'warning', 'info', 'primary', 'secondary']
-  const color = states[stateNum]
-
-  return (
-    <CustomAvatar
-      skin='light'
-      color={color as ThemeColor}
-      sx={{ mr: 3, fontSize: '.8rem', width: '1.875rem', height: '1.875rem' }}
-    >
-      {getInitials(name ? name : 'Device default')}
-    </CustomAvatar>
-  )
-}
 interface DeviceControlListTableProps {
   store: DeviceStoreType
 }
@@ -78,7 +62,10 @@ const columns: GridColDef[] = [
     renderCell: ({ row }: CellType) => {
       return (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          {renderAvatar(row.name)}
+          <CustomAvatar
+            src={`/images/avatars/${row.deviceId}.png`}
+            sx={{ mr: 3, width: '1.875rem', height: '1.875rem' }}
+          />
           <Box sx={{ display: 'flex', flexDirection: 'column' }}>
             <Typography noWrap variant='body2' sx={{ color: 'text.primary', fontWeight: 500 }}>
               {row.name}

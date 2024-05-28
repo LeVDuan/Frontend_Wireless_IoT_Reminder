@@ -33,6 +33,22 @@ export const fetchActiveDevices = createAsyncThunk('device/fetchActiveDevices', 
   }
 })
 
+export const addDevice = createAsyncThunk(
+  'device/addDevice',
+  async (device: { deviceId: number; name: string }, { dispatch }: any) => {
+    try {
+      const response = await axios.post(`${URL}`, device)
+
+      await dispatch(fetchDevices())
+      console.log('added res: ', response.data)
+
+      return response
+    } catch (error) {
+      throw error
+    }
+  }
+)
+
 export const deleteDevice = createAsyncThunk('device/deleteDevice', async (id: string, { dispatch }: any) => {
   try {
     const response = await axios.delete(`${URL}/${id}`)

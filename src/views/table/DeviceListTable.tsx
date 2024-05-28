@@ -57,27 +57,6 @@ const escapeRegExp = (value: string) => {
   return value.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')
 }
 
-const renderAvatar = (deviceId: number) => {
-  // const stateNum = Math.floor(Math.random() * 6)
-  // const states = ['success', 'error', 'warning', 'info', 'primary', 'secondary']
-  // const color = states[stateNum]
-
-  // if (row.avatar.length) {
-  //   return <CustomAvatar src={`/images/avatars/${row.avatar}`} sx={{ mr: 3, width: '1.875rem', height: '1.875rem' }} />
-  // } else
-  // return (
-  // <CustomAvatar
-  //   skin='light'
-  //   color={color as ThemeColor}
-  //   sx={{ mr: 3, fontSize: '.8rem', width: '1.875rem', height: '1.875rem' }}
-  // >
-  //   {getInitials(name ? name : 'Device default')}
-  // </CustomAvatar>
-  return <CustomAvatar src={`/images/avatars/${deviceId}.png`} sx={{ mr: 3, width: '1.875rem', height: '1.875rem' }} />
-
-  // )
-}
-
 const columns: GridColDef[] = [
   {
     flex: 0.3,
@@ -87,7 +66,10 @@ const columns: GridColDef[] = [
     renderCell: ({ row }: CellType) => {
       return (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          {renderAvatar(row.deviceId)}
+          <CustomAvatar
+            src={`/images/avatars/${row.deviceId}.png`}
+            sx={{ mr: 3, width: '1.875rem', height: '1.875rem' }}
+          />
           <Box sx={{ display: 'flex', flexDirection: 'column' }}>
             <Typography noWrap variant='body2' sx={{ color: 'text.primary', fontWeight: 500 }}>
               {row.name}
