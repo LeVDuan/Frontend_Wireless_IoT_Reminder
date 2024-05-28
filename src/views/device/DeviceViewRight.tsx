@@ -20,10 +20,10 @@ import ReactApexcharts from 'src/@core/components/react-apexcharts'
 import { ThemeColor } from 'src/@core/layouts/types'
 
 // ** Utils Import
-import { DeviceType } from 'src/@core/utils/types'
+import { DeviceType, LogType } from 'src/@core/utils/types'
 import { useTheme } from '@emotion/react'
 import { ApexOptions } from 'apexcharts'
-import { ReactNode } from 'react'
+import { ReactNode, useEffect, useState } from 'react'
 import { hexToRGBA } from 'src/@core/utils/hex-to-rgba'
 import { Avatar, AvatarGroup, Tooltip } from '@mui/material'
 import { styled } from '@mui/material/styles'
@@ -33,6 +33,9 @@ import TimelineDot from '@mui/lab/TimelineDot'
 import TimelineConnector from '@mui/lab/TimelineConnector'
 import TimelineContent from '@mui/lab/TimelineContent'
 import MuiTimeline, { TimelineProps } from '@mui/lab/Timeline'
+import { getColorFromBatteryValue } from 'src/utils/format'
+import axios from 'axios'
+import Link from 'next/link'
 
 interface DeviceViewLeftProps {
   deviceData: DeviceType
@@ -40,35 +43,10 @@ interface DeviceViewLeftProps {
 
 interface DataType {
   title: string
-  subtitle: string
   avatarIcon: ReactNode
-  amount: string | number
+  amount: number
   avatarColor: ThemeColor
 }
-
-const data: DataType[] = [
-  {
-    amount: '82.5k',
-    title: 'Electronic',
-    avatarColor: 'primary',
-    subtitle: 'Mobile, Earbuds, TV',
-    avatarIcon: <Icon icon='bx:mobile-alt' />
-  },
-  {
-    amount: '23.8k',
-    title: 'Fashion',
-    avatarColor: 'success',
-    subtitle: 'Tshirt, Jeans, Shoes',
-    avatarIcon: <Icon icon='bx:closet' />
-  },
-  {
-    amount: 849,
-    title: 'Decor',
-    avatarColor: 'info',
-    subtitle: 'Fine Art, Dining',
-    avatarIcon: <Icon icon='bx:home' />
-  }
-]
 
 const Timeline = styled(MuiTimeline)<TimelineProps>(({ theme }) => ({
   margin: 0,
@@ -84,11 +62,44 @@ const Timeline = styled(MuiTimeline)<TimelineProps>(({ theme }) => ({
   }
 }))
 
+const LinkStyled = styled(Link)(({ theme }) => ({
+  textDecoration: 'none',
+  color: theme.palette.secondary.main,
+  mb: 2
+}))
 const DeviceViewRight = ({ deviceData }: DeviceViewLeftProps) => {
-  // const status = statusObj['true']
   const theme = useTheme()
-
-  const options: ApexOptions = {
+  const [recentHistory, setRecentHistory] = useState<LogType[]>([])
+  const totalControl = deviceData.VBRCount + deviceData.LGTCount + deviceData.VLGCount
+  let VBRRatio = 0,
+    LGTRatio = 0,
+    VLGRatio = 0
+  if (totalControl != 0) {
+    VBRRatio = (deviceData.VBRCount * 100) / totalControl
+    LGTRatio = (deviceData.LGTCount * 100) / totalControl
+    VLGRatio = (deviceData.VLGCount * 100) / totalControl
+  }
+  const data: DataType[] = [
+    {
+      amount: deviceData.VBRCount,
+      title: 'Vibrate',
+      avatarColor: 'primary',
+      avatarIcon: <Icon icon='lucide:vibrate' />
+    },
+    {
+      amount: deviceData.LGTCount,
+      title: 'Light Up',
+      avatarColor: 'success',
+      avatarIcon: <Icon icon='heroicons-outline:light-bulb' />
+    },
+    {
+      amount: deviceData.VLGCount,
+      title: 'Vibrate and Light Up',
+      avatarColor: 'info',
+      avatarIcon: <Icon icon='radix-icons:mix' />
+    }
+  ]
+  const optionsDonut: ApexOptions = {
     chart: {
       sparkline: { enabled: true },
       animations: { enabled: false }
@@ -100,13 +111,8 @@ const DeviceViewRight = ({ deviceData }: DeviceViewLeftProps) => {
     legend: { show: false },
     tooltip: { enabled: false },
     dataLabels: { enabled: false },
-    labels: ['Fashion', 'Electronic', 'Sports', 'Decor'],
-    colors: [
-      theme.palette.success.main,
-      theme.palette.primary.main,
-      theme.palette.secondary.main,
-      theme.palette.info.main
-    ],
+    labels: ['Vibrate', 'Light Up', 'Both'],
+    colors: [theme.palette.primary.main, theme.palette.success.main, theme.palette.info.main],
     grid: {
       padding: {
         top: -7,
@@ -142,9 +148,9 @@ const DeviceViewRight = ({ deviceData }: DeviceViewLeftProps) => {
             },
             total: {
               show: true,
-              label: 'Weekly',
+              label: 'Total',
               fontSize: '14px',
-              formatter: () => '38%',
+              formatter: () => '100%',
               color: theme.palette.text.disabled,
               fontFamily: theme.typography.fontFamily
             }
@@ -153,11 +159,11 @@ const DeviceViewRight = ({ deviceData }: DeviceViewLeftProps) => {
       }
     }
   }
-  const options1: ApexOptions = {
+  const optionsRadial: ApexOptions = {
     chart: {
       sparkline: { enabled: true }
     },
-    labels: ['Sales'],
+    labels: [''],
     stroke: { lineCap: 'round' },
     colors: [hexToRGBA(theme.palette.success.main, 1)],
     states: {
@@ -204,6 +210,20 @@ const DeviceViewRight = ({ deviceData }: DeviceViewLeftProps) => {
       }
     }
   }
+
+  useEffect(() => {
+    axios
+      .get('http://localhost:5000/logs/recentActivity', { params: { deviceId: deviceData.deviceId } })
+      .then(res => {
+        setRecentHistory(res.data)
+      })
+      .catch(error => {
+        console.log(error)
+      })
+  }, [deviceData.deviceId])
+
+  console.log('Logs: ', recentHistory)
+
   if (deviceData) {
     return (
       <Grid container spacing={6}>
@@ -211,20 +231,25 @@ const DeviceViewRight = ({ deviceData }: DeviceViewLeftProps) => {
           <Card>
             <CardHeader
               sx={{ pb: 2.5 }}
-              title='Order Statistics'
-              subheader='42.82k Total Sales'
+              title='Control statistics'
               subheaderTypographyProps={{ sx: { color: 'text.disabled' } }}
-              action={<OptionsMenu iconButtonProps={{ size: 'small' }} options={['Share', 'Refresh', 'Edit']} />}
+              action={<OptionsMenu iconButtonProps={{ size: 'small' }} options={['Share', 'Refresh']} />}
             />
             <CardContent>
               <Box sx={{ mb: 7.5, display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between' }}>
                 <Box sx={{ mt: 7, display: 'flex', flexDirection: 'column' }}>
                   <Typography variant='h4' sx={{ mb: 0.5 }}>
-                    8,258
+                    {totalControl}
                   </Typography>
-                  <Typography sx={{ color: 'text.secondary' }}>Total Orders</Typography>
+                  <Typography sx={{ color: 'text.secondary' }}>Total Controls</Typography>
                 </Box>
-                <ReactApexcharts type='donut' width={110} height={125} options={options} series={[45, 80, 20, 40]} />
+                <ReactApexcharts
+                  type='donut'
+                  width={110}
+                  height={125}
+                  options={optionsDonut}
+                  series={[VBRRatio, LGTRatio, VLGRatio]}
+                />
               </Box>
               {data.map((item: DataType, index: number) => {
                 return (
@@ -255,9 +280,6 @@ const DeviceViewRight = ({ deviceData }: DeviceViewLeftProps) => {
                     >
                       <Box sx={{ mr: 2, display: 'flex', flexDirection: 'column' }}>
                         <Typography sx={{ fontWeight: 500 }}>{item.title}</Typography>
-                        <Typography variant='body2' sx={{ color: 'text.disabled' }}>
-                          {item.subtitle}
-                        </Typography>
                       </Box>
                       <Typography variant='body2' sx={{ fontWeight: 500 }}>
                         {item.amount}
@@ -276,102 +298,76 @@ const DeviceViewRight = ({ deviceData }: DeviceViewLeftProps) => {
               action={<OptionsMenu iconButtonProps={{ size: 'small' }} options={['refresh']} />}
             />
             <CardContent>
-              <ReactApexcharts type='radialBar' height={302} options={options1} series={[deviceData.batteryStatus]} />
+              <ReactApexcharts
+                type='radialBar'
+                height={260}
+                options={optionsRadial}
+                series={[deviceData.batteryStatus]}
+              />
               <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-around' }}>
                 <Box
-                  sx={{ mr: 2.5, display: 'flex', alignItems: 'center', '& svg': { mr: 1.5, color: 'success.main' } }}
+                  sx={{
+                    mr: 2.5,
+                    display: 'flex',
+                    alignItems: 'center',
+                    '& svg': { mr: 1.5, color: `${getColorFromBatteryValue(deviceData.batteryStatus)}.main` }
+                  }}
                 >
                   <Icon icon='bxs:circle' fontSize={14} />
-                  <Typography sx={{ color: 'text.secondary' }}>Conversion Ratio</Typography>
-                </Box>
-                <Box
-                  sx={{ display: 'flex', alignItems: 'center', '& svg': { mr: 1.5, color: 'customColors.trackBg' } }}
-                >
-                  <Icon icon='bxs:circle' fontSize={14} />
-                  <Typography sx={{ color: 'text.secondary' }}>Total requirements</Typography>
+                  <Typography sx={{ color: 'text.secondary' }}>The remaining battery percentage</Typography>
                 </Box>
               </Box>
             </CardContent>
           </Card>
         </Grid>
-
+        {}
         <Grid item xs={12}>
           <Card>
             <CardHeader
-              title='Activity Timeline'
-              action={
-                <OptionsMenu
-                  iconButtonProps={{ size: 'small' }}
-                  options={['Share timeline', 'Suggest edits', 'Report bug']}
-                />
-              }
+              title='Recent activity history'
+              action={<OptionsMenu iconButtonProps={{ size: 'small' }} options={['Share', 'Refresh']} />}
             />
-            <CardContent sx={{ alignContent: 'left', pb: theme => `${theme.spacing(3.75)} !important` }}>
-              <Timeline sx={{ my: 0, py: 0, textAlign: 'left' }}>
-                <TimelineItem>
-                  <TimelineSeparator>
-                    <TimelineDot color='primary' />
-                    <TimelineConnector />
-                  </TimelineSeparator>
-                  <TimelineContent sx={{ mt: 0, mb: theme => `${theme.spacing(6)} !important` }}>
-                    <Box
-                      sx={{
-                        mb: 1,
-                        display: 'flex',
-                        flexWrap: 'wrap',
-                        alignItems: 'center',
-                        justifyContent: 'space-between'
-                      }}
-                    >
-                      <Typography sx={{ mr: 2, fontWeight: 500 }}>12 Invoices have been paid</Typography>
-                      <Typography variant='body2' sx={{ color: 'text.disabled' }}>
-                        12 min ago
-                      </Typography>
-                    </Box>
-                    <Typography sx={{ mb: 2.5, color: 'text.secondary' }}>
-                      Invoices have been paid to the company
-                    </Typography>
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                      <img width={24} height={24} alt='invoice.pdf' src='/images/icons/file-icons/pdf.png' />
-                      <Typography sx={{ ml: 3, fontWeight: 500 }}>Invoices.pdf</Typography>
-                    </Box>
-                  </TimelineContent>
-                </TimelineItem>
-
-                <TimelineItem>
-                  <TimelineSeparator>
-                    <TimelineDot color='warning' />
-                    <TimelineConnector />
-                  </TimelineSeparator>
-                  <TimelineContent sx={{ mt: 0, mb: theme => `${theme.spacing(6)} !important` }}>
-                    <Box
-                      sx={{
-                        mb: 1,
-                        display: 'flex',
-                        flexWrap: 'wrap',
-                        alignItems: 'center',
-                        justifyContent: 'space-between'
-                      }}
-                    >
-                      <Typography sx={{ mr: 2, fontWeight: 500 }}>Client Meeting</Typography>
-                      <Typography variant='body2' sx={{ color: 'text.disabled' }}>
-                        45 min ago
-                      </Typography>
-                    </Box>
-                    <Typography sx={{ mb: 2, color: 'text.secondary' }}>Project meeting with john @10:15am</Typography>
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                      <Avatar src='/images/avatars/3.png' sx={{ mr: 2.25, width: 38, height: 38 }} />
-                      <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                        <Typography sx={{ fontWeight: 500 }}>Steven Nash (Client)</Typography>
-                        <Typography sx={{ color: 'text.secondary' }}>CEO of ThemeSelection</Typography>
-                      </Box>
-                    </Box>
-                  </TimelineContent>
-                </TimelineItem>
-
+            <CardContent sx={{ pb: theme => `${theme.spacing(3.75)} !important` }}>
+              <Timeline sx={{ my: 0, py: 0 }}>
+                {recentHistory.map(log => {
+                  return (
+                    <TimelineItem key={log._id} sx={{ minHeight: 0 }}>
+                      <TimelineSeparator>
+                        <TimelineDot color='warning' />
+                        <TimelineConnector />
+                      </TimelineSeparator>
+                      <TimelineContent sx={{ mt: 0, mb: theme => `${theme.spacing(6)} !important` }}>
+                        <Box
+                          sx={{
+                            mb: 1,
+                            display: 'flex',
+                            flexWrap: 'wrap',
+                            alignItems: 'center',
+                            justifyContent: 'space-between'
+                          }}
+                        >
+                          <Typography sx={{ mr: 2, fontWeight: 500 }}>Client Meeting</Typography>
+                          <Typography variant='body2' sx={{ color: 'text.disabled' }}>
+                            45 min ago
+                          </Typography>
+                        </Box>
+                        <Typography sx={{ mb: 2, color: 'text.secondary' }}>
+                          Project meeting with john @10:15am
+                        </Typography>
+                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                          <Avatar src='/images/avatars/3.png' sx={{ mr: 2.25, width: 38, height: 38 }} />
+                          <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                            <Typography sx={{ fontWeight: 500 }}>Steven Nash (Client)</Typography>
+                            <Typography sx={{ color: 'text.secondary' }}>CEO of ThemeSelection</Typography>
+                          </Box>
+                        </Box>
+                      </TimelineContent>
+                    </TimelineItem>
+                  )
+                })}
                 <TimelineItem sx={{ minHeight: 0 }}>
                   <TimelineSeparator>
-                    <TimelineDot color='info' />
+                    <TimelineDot color='success' />
                   </TimelineSeparator>
                   <TimelineContent sx={{ mt: 0 }}>
                     <Box
@@ -383,29 +379,12 @@ const DeviceViewRight = ({ deviceData }: DeviceViewLeftProps) => {
                         justifyContent: 'space-between'
                       }}
                     >
-                      <Typography sx={{ mr: 2, fontWeight: 500 }}>Create a new project for client</Typography>
+                      <Typography sx={{ mr: 2, fontWeight: 500 }}>Most recent activities.</Typography>
                       <Typography variant='body2' sx={{ color: 'text.disabled' }}>
-                        2 days ago
+                        ...
                       </Typography>
                     </Box>
-                    <Typography sx={{ mb: 2, color: 'text.secondary' }}>5 team members in a project</Typography>
-                    <AvatarGroup className='pull-up'>
-                      <Tooltip title='Howard Lloyd'>
-                        <Avatar alt='Howard Lloyd' src='/images/avatars/5.png' sx={{ width: 34, height: 34 }} />
-                      </Tooltip>
-                      <Tooltip title='Katie Lane'>
-                        <Avatar alt='Katie Lane' src='/images/avatars/12.png' sx={{ width: 34, height: 34 }} />
-                      </Tooltip>
-                      <Tooltip title='George Allen'>
-                        <Avatar alt='George Allen' src='/images/avatars/9.png' sx={{ width: 34, height: 34 }} />
-                      </Tooltip>
-                      <Tooltip title='Alice Cobb'>
-                        <Avatar alt='Alice Cobb' src='/images/avatars/6.png' sx={{ width: 34, height: 34 }} />
-                      </Tooltip>
-                      <Tooltip title='Jeffery Warner'>
-                        <Avatar alt='Jeffery Warner' src='/images/avatars/14.png' sx={{ width: 34, height: 34 }} />
-                      </Tooltip>
-                    </AvatarGroup>
+                    <LinkStyled href='/activity-history/'>Read more</LinkStyled>
                   </TimelineContent>
                 </TimelineItem>
               </Timeline>

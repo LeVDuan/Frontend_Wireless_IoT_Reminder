@@ -23,6 +23,8 @@ import { ThemeColor } from 'src/@core/layouts/types'
 import { DeviceType } from 'src/@core/utils/types'
 import Button, { ButtonProps } from '@mui/material/Button'
 import { styled } from '@mui/material/styles'
+import { CardActions } from '@mui/material'
+import { formatDate } from 'src/@core/utils/format'
 
 interface StatusObj {
   [key: string]: {
@@ -59,7 +61,7 @@ const ResetButtonStyled = styled(Button)<ButtonProps>(({ theme }) => ({
 
 const DeviceViewLeft = ({ deviceData }: DeviceViewLeftProps) => {
   // const isActive = deviceData.isActive.toString()
-  const status = statusObj['true']
+  const status = statusObj[deviceData.isActive.toString()]
   const [imgSrc, setImgSrc] = useState<string>(`/images/avatars/${deviceData.deviceId}.png`)
   const [inputValue, setInputValue] = useState<string>('')
 
@@ -78,6 +80,10 @@ const DeviceViewLeft = ({ deviceData }: DeviceViewLeftProps) => {
   const handleInputImageReset = () => {
     setInputValue('')
     setImgSrc(`/images/avatars/${deviceData.deviceId}.png`)
+  }
+
+  const handleUpdateStatus = () => {
+    return
   }
 
   if (deviceData) {
@@ -127,24 +133,24 @@ const DeviceViewLeft = ({ deviceData }: DeviceViewLeftProps) => {
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Box sx={{ mr: 8, display: 'flex', alignItems: 'center' }}>
                   <CustomAvatar skin='light' variant='rounded' sx={{ mr: 4 }}>
-                    <Icon icon='bx:check' />
+                    <Icon icon='lucide:vibrate' />
                   </CustomAvatar>
                   <div>
                     <Typography variant='h6' sx={{ fontSize: '1.125rem !important' }}>
-                      1.23k
+                      {deviceData.VBRCount + deviceData.VLGCount}
                     </Typography>
-                    <Typography sx={{ color: 'text.secondary' }}>Task Done</Typography>
+                    <Typography sx={{ color: 'text.secondary' }}>Vibrations</Typography>
                   </div>
                 </Box>
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
                   <CustomAvatar skin='light' variant='rounded' sx={{ mr: 4 }}>
-                    <Icon icon='bx:customize' />
+                    <Icon icon='heroicons-outline:light-bulb' />
                   </CustomAvatar>
                   <div>
                     <Typography variant='h6' sx={{ fontSize: '1.125rem !important' }}>
-                      568
+                      {deviceData.LGTCount + deviceData.VLGCount}
                     </Typography>
-                    <Typography sx={{ color: 'text.secondary' }}>Project Done</Typography>
+                    <Typography sx={{ color: 'text.secondary' }}>Light up</Typography>
                   </div>
                 </Box>
               </Box>
@@ -155,12 +161,12 @@ const DeviceViewLeft = ({ deviceData }: DeviceViewLeftProps) => {
               <Divider sx={{ mt: theme => `${theme.spacing(1)} !important` }} />
               <Box sx={{ pt: 4, pb: 2 }}>
                 <Box sx={{ display: 'flex', mb: 4 }}>
-                  <Typography sx={{ mr: 2, fontWeight: 700, color: 'text.secondary' }}>Username:</Typography>
+                  <Typography sx={{ mr: 2, fontWeight: 700, color: 'text.secondary' }}>Device Name:</Typography>
                   <Typography sx={{ color: 'text.secondary' }}>@{deviceData.name}</Typography>
                 </Box>
                 <Box sx={{ display: 'flex', mb: 4 }}>
-                  <Typography sx={{ mr: 2, fontWeight: 700, color: 'text.secondary' }}>Billing Email:</Typography>
-                  <Typography sx={{ color: 'text.secondary' }}>{deviceData._id}</Typography>
+                  <Typography sx={{ mr: 2, fontWeight: 700, color: 'text.secondary' }}>Physical ID:</Typography>
+                  <Typography sx={{ color: 'text.secondary' }}>#{deviceData.deviceId}</Typography>
                 </Box>
                 <Box sx={{ display: 'flex', mb: 4 }}>
                   <Typography sx={{ mr: 2, fontWeight: 700, color: 'text.secondary' }}>Status:</Typography>
@@ -174,29 +180,23 @@ const DeviceViewLeft = ({ deviceData }: DeviceViewLeftProps) => {
                   />
                 </Box>
                 <Box sx={{ display: 'flex', mb: 4 }}>
-                  <Typography sx={{ mr: 2, fontWeight: 700, color: 'text.secondary' }}>Role:</Typography>
+                  <Typography sx={{ mr: 2, fontWeight: 700, color: 'text.secondary' }}>Battery:</Typography>
                   <Typography sx={{ color: 'text.secondary', textTransform: 'capitalize' }}>
-                    {deviceData.batteryStatus}
+                    {deviceData.batteryStatus}%
                   </Typography>
                 </Box>
                 <Box sx={{ display: 'flex', mb: 4 }}>
-                  <Typography sx={{ mr: 2, fontWeight: 700, color: 'text.secondary' }}>Tax ID:</Typography>
-                  <Typography sx={{ color: 'text.secondary' }}>Tax-8894</Typography>
-                </Box>
-                <Box sx={{ display: 'flex', mb: 4 }}>
-                  <Typography sx={{ mr: 2, fontWeight: 700, color: 'text.secondary' }}>Contact:</Typography>
-                  <Typography sx={{ color: 'text.secondary' }}>+1 {deviceData.lastUpdated}</Typography>
-                </Box>
-                <Box sx={{ display: 'flex', mb: 4 }}>
-                  <Typography sx={{ mr: 2, fontWeight: 700, color: 'text.secondary' }}>Language:</Typography>
-                  <Typography sx={{ color: 'text.secondary' }}>English</Typography>
-                </Box>
-                <Box sx={{ display: 'flex' }}>
-                  <Typography sx={{ mr: 2, fontWeight: 700, color: 'text.secondary' }}>Country:</Typography>
-                  <Typography sx={{ color: 'text.secondary' }}>{deviceData.deviceId}</Typography>
+                  <Typography sx={{ mr: 2, fontWeight: 700, color: 'text.secondary' }}>Last updated:</Typography>
+                  <Typography sx={{ color: 'text.secondary' }}>{formatDate(deviceData.lastUpdated)}</Typography>
                 </Box>
               </Box>
             </CardContent>
+
+            <CardActions sx={{ display: 'flex', justifyContent: 'center' }}>
+              <Button variant='contained' disabled={!deviceData.isActive} sx={{ mr: 2 }} onClick={handleUpdateStatus}>
+                Update status
+              </Button>
+            </CardActions>
           </Card>
         </Grid>
       </Grid>

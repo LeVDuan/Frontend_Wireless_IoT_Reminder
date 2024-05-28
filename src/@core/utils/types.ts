@@ -27,6 +27,9 @@ export type DeviceType = {
   lastUpdated: string
   batteryStatus: number
   isActive: boolean
+  VBRCount: number
+  LGTCount: number
+  VLGCount: number
 }
 
 export type DeviceStoreType = {
