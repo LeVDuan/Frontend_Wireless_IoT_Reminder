@@ -20,12 +20,12 @@ import ReactApexcharts from 'src/@core/components/react-apexcharts'
 import { ThemeColor } from 'src/@core/layouts/types'
 
 // ** Utils Import
-import { DeviceType, LogType } from 'src/@core/utils/types'
+import { DetailsControl, DetailsEdit, DeviceType, LogType } from 'src/@core/utils/types'
 import { useTheme } from '@emotion/react'
 import { ApexOptions } from 'apexcharts'
 import { ReactNode, useEffect, useState } from 'react'
 import { hexToRGBA } from 'src/@core/utils/hex-to-rgba'
-import { Avatar, AvatarGroup, Tooltip } from '@mui/material'
+import { Avatar } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import TimelineItem from '@mui/lab/TimelineItem'
 import TimelineSeparator from '@mui/lab/TimelineSeparator'
@@ -33,7 +33,7 @@ import TimelineDot from '@mui/lab/TimelineDot'
 import TimelineConnector from '@mui/lab/TimelineConnector'
 import TimelineContent from '@mui/lab/TimelineContent'
 import MuiTimeline, { TimelineProps } from '@mui/lab/Timeline'
-import { getColorFromBatteryValue } from 'src/utils/format'
+import { getColorFromBatteryValue, timeDifference } from 'src/utils/format'
 import axios from 'axios'
 import Link from 'next/link'
 
@@ -46,6 +46,21 @@ interface DataType {
   avatarIcon: ReactNode
   amount: number
   avatarColor: ThemeColor
+}
+
+interface ColorAction {
+  [key: string]: {
+    title: string
+    color: ThemeColor
+  }
+}
+
+const colorAction: ColorAction = {
+  edit: { title: 'Rename', color: 'warning' },
+  add: { title: 'Add', color: 'secondary' },
+  vibrate: { title: 'Vibrate', color: 'primary' },
+  light: { title: 'Light up', color: 'success' },
+  'vibrate and light': { title: 'Vibrate and light up', color: 'info' }
 }
 
 const Timeline = styled(MuiTimeline)<TimelineProps>(({ theme }) => ({
@@ -64,9 +79,10 @@ const Timeline = styled(MuiTimeline)<TimelineProps>(({ theme }) => ({
 
 const LinkStyled = styled(Link)(({ theme }) => ({
   textDecoration: 'none',
-  color: theme.palette.secondary.main,
+  color: theme.palette.primary.main,
   mb: 2
 }))
+
 const DeviceViewRight = ({ deviceData }: DeviceViewLeftProps) => {
   const theme = useTheme()
   const [recentHistory, setRecentHistory] = useState<LogType[]>([])
@@ -330,40 +346,124 @@ const DeviceViewRight = ({ deviceData }: DeviceViewLeftProps) => {
             <CardContent sx={{ pb: theme => `${theme.spacing(3.75)} !important` }}>
               <Timeline sx={{ my: 0, py: 0 }}>
                 {recentHistory.map(log => {
-                  return (
-                    <TimelineItem key={log._id} sx={{ minHeight: 0 }}>
-                      <TimelineSeparator>
-                        <TimelineDot color='warning' />
-                        <TimelineConnector />
-                      </TimelineSeparator>
-                      <TimelineContent sx={{ mt: 0, mb: theme => `${theme.spacing(6)} !important` }}>
-                        <Box
-                          sx={{
-                            mb: 1,
-                            display: 'flex',
-                            flexWrap: 'wrap',
-                            alignItems: 'center',
-                            justifyContent: 'space-between'
-                          }}
-                        >
-                          <Typography sx={{ mr: 2, fontWeight: 500 }}>Client Meeting</Typography>
-                          <Typography variant='body2' sx={{ color: 'text.disabled' }}>
-                            45 min ago
-                          </Typography>
-                        </Box>
-                        <Typography sx={{ mb: 2, color: 'text.secondary' }}>
-                          Project meeting with john @10:15am
-                        </Typography>
-                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                          <Avatar src='/images/avatars/3.png' sx={{ mr: 2.25, width: 38, height: 38 }} />
-                          <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                            <Typography sx={{ fontWeight: 500 }}>Steven Nash (Client)</Typography>
-                            <Typography sx={{ color: 'text.secondary' }}>CEO of ThemeSelection</Typography>
+                  if (log.action == 'edit') {
+                    const logAction = colorAction[log.action]
+                    const editDetails = log.details as DetailsEdit
+
+                    return (
+                      <TimelineItem key={log._id} sx={{ minHeight: 0 }}>
+                        <TimelineSeparator>
+                          <TimelineDot color={logAction.color} />
+                          <TimelineConnector />
+                        </TimelineSeparator>
+                        <TimelineContent sx={{ mt: 0, mb: theme => `${theme.spacing(6)} !important` }}>
+                          <Box
+                            sx={{
+                              mb: 1,
+                              display: 'flex',
+                              flexWrap: 'wrap',
+                              alignItems: 'center',
+                              justifyContent: 'space-between'
+                            }}
+                          >
+                            <Typography sx={{ mr: 2, fontWeight: 500 }}>
+                              {log.userName} {logAction.title} this device
+                            </Typography>
+                            <Typography variant='body2' sx={{ color: 'text.disabled' }}>
+                              {timeDifference(log.timestamp)}
+                            </Typography>
                           </Box>
-                        </Box>
-                      </TimelineContent>
-                    </TimelineItem>
-                  )
+                          <Typography sx={{ mb: 2, color: 'text.secondary' }}>
+                            <span>{editDetails.oldName}</span> <Icon icon='bx:right-arrow-alt' fontSize={20} />{' '}
+                            <span>{editDetails.newName}</span>
+                          </Typography>
+                          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                            <Avatar src='/images/avatars/DuanLV.jpg' sx={{ mr: 2.25, width: 38, height: 38 }} />
+                            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                              <Typography sx={{ fontWeight: 500 }}>{log.userName}</Typography>
+                              <Typography sx={{ color: 'text.secondary' }}>Admin</Typography>
+                            </Box>
+                          </Box>
+                        </TimelineContent>
+                      </TimelineItem>
+                    )
+                  } else if (log.action == 'add') {
+                    const logAction = colorAction[log.action]
+
+                    return (
+                      <TimelineItem key={log._id} sx={{ minHeight: 0 }}>
+                        <TimelineSeparator>
+                          <TimelineDot color={logAction.color} />
+                          <TimelineConnector />
+                        </TimelineSeparator>
+                        <TimelineContent sx={{ mt: 0, mb: theme => `${theme.spacing(6)} !important` }}>
+                          <Box
+                            sx={{
+                              mb: 1,
+                              display: 'flex',
+                              flexWrap: 'wrap',
+                              alignItems: 'center',
+                              justifyContent: 'space-between'
+                            }}
+                          >
+                            <Typography sx={{ mr: 2, fontWeight: 500 }}>
+                              {log.userName} {logAction.title}
+                            </Typography>
+                            <Typography variant='body2' sx={{ color: 'text.disabled' }}>
+                              {timeDifference(log.timestamp)}
+                            </Typography>
+                          </Box>
+                          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                            <Avatar src='/images/avatars/DuanLV.jpg' sx={{ mr: 2.25, width: 38, height: 38 }} />
+                            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                              <Typography sx={{ fontWeight: 500 }}>{log.userName}</Typography>
+                              <Typography sx={{ color: 'text.secondary' }}>Admin</Typography>
+                            </Box>
+                          </Box>
+                        </TimelineContent>
+                      </TimelineItem>
+                    )
+                  } else if (log.action == 'control') {
+                    const details = log.details as DetailsControl
+                    const logAction = colorAction[details.type]
+
+                    return (
+                      <TimelineItem key={log._id} sx={{ minHeight: 0 }}>
+                        <TimelineSeparator>
+                          <TimelineDot color={logAction.color} />
+                          <TimelineConnector />
+                        </TimelineSeparator>
+                        <TimelineContent sx={{ mt: 0, mb: theme => `${theme.spacing(6)} !important` }}>
+                          <Box
+                            sx={{
+                              mb: 1,
+                              display: 'flex',
+                              flexWrap: 'wrap',
+                              alignItems: 'center',
+                              justifyContent: 'space-between'
+                            }}
+                          >
+                            <Typography sx={{ mr: 2, fontWeight: 500 }}>
+                              {log.userName} {logAction.title} this device
+                            </Typography>
+                            <Typography variant='body2' sx={{ color: 'text.disabled' }}>
+                              {timeDifference(log.timestamp)}
+                            </Typography>
+                          </Box>
+                          <Typography sx={{ mb: 2, color: 'text.secondary' }}>
+                            {logAction.title} in {details.controlTime} seconds.
+                          </Typography>
+                          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                            <Avatar src='/images/avatars/DuanLV.jpg' sx={{ mr: 2.25, width: 38, height: 38 }} />
+                            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                              <Typography sx={{ fontWeight: 500 }}>{log.userName}</Typography>
+                              <Typography sx={{ color: 'text.secondary' }}>Admin</Typography>
+                            </Box>
+                          </Box>
+                        </TimelineContent>
+                      </TimelineItem>
+                    )
+                  }
                 })}
                 <TimelineItem sx={{ minHeight: 0 }}>
                   <TimelineSeparator>

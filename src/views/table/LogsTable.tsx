@@ -13,7 +13,7 @@ import TableCell from '@mui/material/TableCell'
 import Typography from '@mui/material/Typography'
 import IconButton from '@mui/material/IconButton'
 import TableContainer from '@mui/material/TableContainer'
-import { DetailsAdd, DetailsControl, DetailsDelete, DetailsEdit, LogStoreType, LogType } from 'src/@core/utils/types'
+import { DetailsAddDelete, DetailsControl, DetailsEdit, LogStoreType, LogType } from 'src/@core/utils/types'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
@@ -28,6 +28,7 @@ import TimelineContent from '@mui/lab/TimelineContent'
 import MuiTimeline, { TimelineProps } from '@mui/lab/Timeline'
 import { styled } from '@mui/material/styles'
 import CustomAvatar from 'src/@core/components/mui/avatar'
+import { formatTimestamp } from 'src/utils/format'
 
 interface RowProps {
   row: LogType
@@ -154,7 +155,7 @@ const renderLogDetails = (row: LogType) => {
         </TimelineItem>
       )
     case 'add':
-      const addDetails = row.details as DetailsAdd
+      const addDetails = row.details as DetailsAddDelete
 
       return (
         <TimelineItem>
@@ -258,7 +259,7 @@ const renderLogDetails = (row: LogType) => {
         </TimelineItem>
       )
     case 'delete':
-      const deleteDetails = row.details as DetailsDelete
+      const deleteDetails = row.details as DetailsAddDelete
 
       return (
         <TimelineItem>
@@ -383,7 +384,7 @@ const renderLogDetails = (row: LogType) => {
 
             <Box sx={{ m: 2 }}>
               <Typography variant='subtitle1' gutterBottom component='div'>
-                Added device:
+                Control device:
               </Typography>
               <Table size='small' aria-label='control device'>
                 <TableHead>
@@ -545,7 +546,7 @@ const Row = ({ row }: RowProps) => {
             </Typography>
           </Box>
         </TableCell>
-        <TableCell>{row.timestamp}</TableCell>
+        <TableCell>{formatTimestamp(row.timestamp)}</TableCell>
         <TableCell>
           <CustomChip rounded size='small' skin='light' color={row.result as ThemeColor} label={row.result} />
         </TableCell>

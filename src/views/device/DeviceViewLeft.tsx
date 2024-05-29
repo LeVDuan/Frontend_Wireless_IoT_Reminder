@@ -25,6 +25,8 @@ import Button, { ButtonProps } from '@mui/material/Button'
 import { styled } from '@mui/material/styles'
 import { CardActions } from '@mui/material'
 import { formatDate } from 'src/@core/utils/format'
+import { usePort } from 'src/context/PortContext'
+import toast from 'react-hot-toast'
 
 interface StatusObj {
   [key: string]: {
@@ -64,6 +66,7 @@ const DeviceViewLeft = ({ deviceData }: DeviceViewLeftProps) => {
   const status = statusObj[deviceData.isActive.toString()]
   const [imgSrc, setImgSrc] = useState<string>(`/images/avatars/${deviceData.deviceId}.png`)
   const [inputValue, setInputValue] = useState<string>('')
+  const { port, sendToPort, requestOpenPort } = usePort()
 
   const handleInputImageChange = (file: ChangeEvent) => {
     const reader = new FileReader()
@@ -82,8 +85,20 @@ const DeviceViewLeft = ({ deviceData }: DeviceViewLeftProps) => {
     setImgSrc(`/images/avatars/${deviceData.deviceId}.png`)
   }
 
-  const handleUpdateStatus = () => {
-    return
+  const handleUpdateStatus = async () => {
+    if (!port) {
+      await requestOpenPort()
+      toast.success('Connected successfully!\nPlease press update status again.')
+    } else {
+      if (!port.writable) {
+        toast.error('Update failed!')
+      } else {
+        await sendToPort('REQ')
+
+        //all api: dispatch()
+        toast.success('Update successfully!')
+      }
+    }
   }
 
   if (deviceData) {

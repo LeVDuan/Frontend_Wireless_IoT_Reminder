@@ -50,11 +50,7 @@ export type DetailsEdit = {
   newName: string
 }
 
-export type DetailsAdd = {
-  objId: string
-}
-
-export type DetailsDelete = {
+export type DetailsAddDelete = {
   objId: string
 }
 
@@ -72,7 +68,7 @@ export type LogType = {
   deviceId: number
   deviceName: string
   action: string
-  details: DetailsEdit | DetailsAdd | DetailsDelete | DetailsControl
+  details: DetailsEdit | DetailsAddDelete | DetailsControl
   result: string
   timestamp: string
 }
