@@ -9,13 +9,16 @@ import { ApexOptions } from 'apexcharts'
 
 // ** Custom Components Imports
 import ReactApexcharts from 'src/@core/components/react-apexcharts'
+import { AnalyticsType } from 'src/@core/utils/types'
 
 const series = [{ data: [30, 70, 35, 55, 45, 70] }]
-
-const AnalyticsOrder = () => {
+interface AnalyticsOrderProps {
+  data: AnalyticsType
+}
+const AnalyticsOrder = ({ data }: AnalyticsOrderProps) => {
   // ** Hook
   const theme = useTheme()
-
+  const sum = data.LGT + data.VBR + data.VLG
   const options: ApexOptions = {
     chart: {
       parentHeightOffset: 0,
@@ -96,8 +99,8 @@ const AnalyticsOrder = () => {
   return (
     <Card>
       <CardContent sx={{ p: theme => `${theme.spacing(3.5, 5, 0)} !important` }}>
-        <Typography sx={{ fontWeight: 600, color: 'text.secondary' }}>Order</Typography>
-        <Typography variant='h5'>276k</Typography>
+        <Typography sx={{ fontWeight: 600, color: 'text.secondary' }}>Total controls</Typography>
+        <Typography variant='h5'>{sum}</Typography>
       </CardContent>
       <ReactApexcharts type='area' height={110} options={options} series={series} />
     </Card>

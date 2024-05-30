@@ -132,7 +132,7 @@ const DeviceControlListTable = ({ store }: DeviceControlListTableProps) => {
   // ** State
   const [searchText, setSearchText] = useState<string>('')
   const [filteredData, setFilteredData] = useState<DeviceType[]>(store.activeDevices ? store.activeDevices : [])
-  const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 7 })
+  const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 5 })
 
   const handleSearch = (searchValue: string) => {
     setSearchText(searchValue)
@@ -167,7 +167,7 @@ const DeviceControlListTable = ({ store }: DeviceControlListTableProps) => {
   return (
     <Card>
       <CardHeader
-        title='List of active devices: '
+        title={`List of active devices: ${store.totalActiveDevices}`}
         action={
           <Button size='small' variant='contained' startIcon={<Icon icon='bx:refresh' />} onClick={updateDevices}>
             Update status
@@ -179,7 +179,7 @@ const DeviceControlListTable = ({ store }: DeviceControlListTableProps) => {
         rows={filteredData.length ? filteredData : store.activeDevices}
         getRowId={row => row.deviceId}
         columns={columns}
-        pageSizeOptions={[7, 10, 25, 50]}
+        pageSizeOptions={[5, 10, 25, 50]}
         paginationModel={paginationModel}
         onPaginationModelChange={setPaginationModel}
         slots={{ toolbar: QuickSearchToolbar }}

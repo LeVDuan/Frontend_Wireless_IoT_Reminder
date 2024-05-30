@@ -1,12 +1,9 @@
 // ** React Imports
-import { MouseEvent, useState } from 'react'
 
 // ** MUI Import
 import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
-import Menu from '@mui/material/Menu'
 import Button from '@mui/material/Button'
-import MenuItem from '@mui/material/MenuItem'
 import Typography from '@mui/material/Typography'
 import CardContent from '@mui/material/CardContent'
 import Grid, { GridProps } from '@mui/material/Grid'
@@ -23,17 +20,15 @@ import CustomAvatar from 'src/@core/components/mui/avatar'
 import ReactApexcharts from 'src/@core/components/react-apexcharts'
 
 // ** Hook Import
-import { useSettings } from 'src/@core/hooks/useSettings'
 
 // ** Util Import
 import { hexToRGBA } from 'src/@core/utils/hex-to-rgba'
+import { AnalyticsType } from 'src/@core/utils/types'
+import { getCategoriesLast7days } from 'src/utils/format'
 
-const yearOptions = [new Date().getFullYear() - 1, new Date().getFullYear() - 2, new Date().getFullYear() - 3]
-
-const series = [
-  { name: `${new Date().getFullYear() - 1}`, data: [18, 7, 15, 29, 18, 12, 9] },
-  { name: `${new Date().getFullYear() - 2}`, data: [-13, -18, -9, -14, -5, -17, -15] }
-]
+interface AnalyticsTotalRevenueProps {
+  data: AnalyticsType
+}
 
 const StyledGrid = styled(Grid)<GridProps>(({ theme }) => ({
   [theme.breakpoints.down('sm')]: {
@@ -44,22 +39,22 @@ const StyledGrid = styled(Grid)<GridProps>(({ theme }) => ({
   }
 }))
 
-const AnalyticsTotalRevenue = () => {
+const AnalyticsTotalControlLastWeek = ({ data }: AnalyticsTotalRevenueProps) => {
   // ** State
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
+  const operatingRatio = Math.round((data.deviceActiveCount / data.deviceCount) * 100)
+  const dateLastWeek = getCategoriesLast7days()
+
+  const value = data ? data.controlLastWeek.map((item: any) => item.count) : []
+  const series = [{ name: 'Last week', data: value }]
+
+  console.log('data: ', data)
+
+  const sum = value.reduce((sum, index) => sum + index, 0)
+
+  // console.log('sum: ', sum)
 
   // ** Hooks & Var
   const theme = useTheme()
-  const { settings } = useSettings()
-  const { direction } = settings
-
-  const handleClick = (event: MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget)
-  }
-
-  const handleClose = () => {
-    setAnchorEl(null)
-  }
 
   const barOptions: ApexOptions = {
     chart: {
@@ -120,7 +115,7 @@ const AnalyticsTotalRevenue = () => {
       axisTicks: { show: false },
       crosshairs: { opacity: 0 },
       axisBorder: { show: false },
-      categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+      categories: dateLastWeek,
       labels: {
         style: {
           fontSize: '14px',
@@ -178,7 +173,7 @@ const AnalyticsTotalRevenue = () => {
     chart: {
       sparkline: { enabled: true }
     },
-    labels: ['Growth'],
+    labels: ['Active'],
     stroke: { dashArray: 5 },
     colors: [hexToRGBA(theme.palette.primary.main, 1)],
     states: {
@@ -264,57 +259,30 @@ const AnalyticsTotalRevenue = () => {
           sx={{ '& .apexcharts-series[rel="2"]': { transform: 'translateY(-10px)' } }}
         >
           <CardContent sx={{ p: `${theme.spacing(5, 6, 0)} !important` }}>
-            <Typography variant='h6'>Total Revenue</Typography>
+            <Typography variant='h6'>Controls in the last 7 days</Typography>
           </CardContent>
-          <ReactApexcharts type='bar' height={312} options={barOptions} series={series} />
+          <ReactApexcharts type='bar' height={340} options={barOptions} series={series} />
         </StyledGrid>
         <Grid item xs={12} sm={5} xl={4}>
           <CardContent sx={{ p: `${theme.spacing(8, 6, 7.5)} !important` }}>
             <Box sx={{ textAlign: 'center' }}>
-              <Button
-                size='small'
-                variant='outlined'
-                aria-haspopup='true'
-                onClick={handleClick}
-                sx={{ '& svg': { ml: 0.5 } }}
-              >
+              <Button size='medium' variant='outlined' aria-haspopup='true' sx={{ '& svg': { ml: 0.5 } }}>
                 {new Date().getFullYear()}
-                <Icon icon='bx:chevron-down' />
               </Button>
-              <Menu
-                keepMounted
-                anchorEl={anchorEl}
-                onClose={handleClose}
-                open={Boolean(anchorEl)}
-                anchorOrigin={{ vertical: 'bottom', horizontal: direction === 'ltr' ? 'right' : 'left' }}
-                transformOrigin={{ vertical: 'top', horizontal: direction === 'ltr' ? 'right' : 'left' }}
-              >
-                {yearOptions.map((year: number) => (
-                  <MenuItem key={year} onClick={handleClose}>
-                    {year}
-                  </MenuItem>
-                ))}
-              </Menu>
-              <ReactApexcharts type='radialBar' height={200} series={[78]} options={radialBarOptions} />
-              <Typography sx={{ mb: 7.5, fontWeight: 600, color: 'text.secondary' }}>62% Company Growth</Typography>
+
+              <ReactApexcharts type='radialBar' height={200} series={[operatingRatio]} options={radialBarOptions} />
+              <Typography sx={{ mb: 7.5, fontWeight: 600, color: 'text.secondary' }}>
+                {data.deviceActiveCount}/{data.deviceCount} devices active now
+              </Typography>
             </Box>
             <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
               <Box sx={{ mr: 4, display: 'flex', alignItems: 'center' }}>
                 <CustomAvatar skin='light' variant='rounded' sx={{ mr: 2.5, width: 38, height: 38 }}>
-                  <Icon icon='bx:dollar' />
+                  <Icon icon='ri:remote-control-line' />
                 </CustomAvatar>
                 <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                  <Typography variant='body2'>{new Date().getFullYear()}</Typography>
-                  <Typography sx={{ fontWeight: 500 }}>$32.5k</Typography>
-                </Box>
-              </Box>
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <CustomAvatar skin='light' color='info' variant='rounded' sx={{ mr: 2.5, width: 38, height: 38 }}>
-                  <Icon icon='bx:wallet' />
-                </CustomAvatar>
-                <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                  <Typography variant='body2'>{new Date().getFullYear() - 1}</Typography>
-                  <Typography sx={{ fontWeight: 500 }}>$41.2k</Typography>
+                  <Typography variant='body2'>Last week</Typography>
+                  <Typography sx={{ fontWeight: 500 }}>{sum} controls</Typography>
                 </Box>
               </Box>
             </Box>
@@ -325,4 +293,4 @@ const AnalyticsTotalRevenue = () => {
   )
 }
 
-export default AnalyticsTotalRevenue
+export default AnalyticsTotalControlLastWeek

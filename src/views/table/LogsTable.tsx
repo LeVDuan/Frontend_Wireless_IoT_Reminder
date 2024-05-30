@@ -13,7 +13,7 @@ import TableCell from '@mui/material/TableCell'
 import Typography from '@mui/material/Typography'
 import IconButton from '@mui/material/IconButton'
 import TableContainer from '@mui/material/TableContainer'
-import { DetailsAddDelete, DetailsControl, DetailsEdit, LogStoreType, LogType } from 'src/@core/utils/types'
+import { DetailsControl, DetailsEdit, LogStoreType, LogType } from 'src/@core/utils/types'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
@@ -28,7 +28,8 @@ import TimelineContent from '@mui/lab/TimelineContent'
 import MuiTimeline, { TimelineProps } from '@mui/lab/Timeline'
 import { styled } from '@mui/material/styles'
 import CustomAvatar from 'src/@core/components/mui/avatar'
-import { formatTimestamp } from 'src/utils/format'
+import { formatTimestamp, timeDifference } from 'src/utils/format'
+import { formatDate } from 'src/@core/utils/format'
 
 interface RowProps {
   row: LogType
@@ -86,7 +87,7 @@ const renderLogDetails = (row: LogType) => {
               <Typography variant='body2' sx={{ mr: 2, fontWeight: 600, color: 'text.primary' }}>
                 Update the name of the device
               </Typography>
-              <Typography variant='caption'>Wednesday</Typography>
+              <Typography variant='caption'>{timeDifference(row.timestamp)}</Typography>
             </Box>
             <Typography variant='body2' sx={{ color: 'text.primary' }}>
               <span>{detailsEdit.oldName}</span> <Icon icon='bx:right-arrow-alt' fontSize={20} />{' '}
@@ -98,7 +99,7 @@ const renderLogDetails = (row: LogType) => {
                   Time stamp:
                 </Typography>
                 <Typography variant='subtitle2' sx={{ color: 'text.secondary', textTransform: 'capitalize' }}>
-                  {row.timestamp}
+                  {formatDate(row.timestamp)}
                 </Typography>
               </Box>
               <Box sx={{ display: 'flex' }}>
@@ -148,15 +149,13 @@ const renderLogDetails = (row: LogType) => {
             <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-start', justifyContent: 'space-between' }}>
               <Box sx={{ mr: 2, display: 'flex', alignItems: 'center' }}></Box>
               <Typography variant='subtitle2' sx={{ fontWeight: 600 }}>
-                Due Date: 15th Jan
+                Created Date: {formatTimestamp(row.timestamp)}
               </Typography>
             </Box>
           </TimelineContent>
         </TimelineItem>
       )
     case 'add':
-      const addDetails = row.details as DetailsAddDelete
-
       return (
         <TimelineItem>
           <TimelineSeparator>
@@ -172,7 +171,7 @@ const renderLogDetails = (row: LogType) => {
               <Typography variant='body2' sx={{ mr: 2, fontWeight: 600, color: 'text.primary' }}>
                 Added a device to the system
               </Typography>
-              <Typography variant='caption'>Wednesday</Typography>
+              <Typography variant='caption'>{timeDifference(row.timestamp)}</Typography>
             </Box>
 
             <Box sx={{ m: 2 }}>
@@ -202,7 +201,7 @@ const renderLogDetails = (row: LogType) => {
                   Time stamp:
                 </Typography>
                 <Typography variant='subtitle2' sx={{ color: 'text.secondary', textTransform: 'capitalize' }}>
-                  {row.timestamp}
+                  {formatDate(row.timestamp)}
                 </Typography>
               </Box>
               <Box sx={{ display: 'flex' }}>
@@ -218,7 +217,7 @@ const renderLogDetails = (row: LogType) => {
                   Device ID:
                 </Typography>
                 <Typography variant='subtitle2' sx={{ color: 'text.secondary' }}>
-                  #{addDetails.objId}
+                  #{row.deviceId}
                 </Typography>
               </Box>
               <Box sx={{ display: 'flex', mb: 2 }}>
@@ -252,15 +251,13 @@ const renderLogDetails = (row: LogType) => {
             <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-start', justifyContent: 'space-between' }}>
               <Box sx={{ mr: 2, display: 'flex', alignItems: 'center' }}></Box>
               <Typography variant='subtitle2' sx={{ fontWeight: 600 }}>
-                Due Date: 15th Jan
+                Created Date: {formatTimestamp(row.timestamp)}
               </Typography>
             </Box>
           </TimelineContent>
         </TimelineItem>
       )
     case 'delete':
-      const deleteDetails = row.details as DetailsAddDelete
-
       return (
         <TimelineItem>
           <TimelineSeparator>
@@ -276,7 +273,7 @@ const renderLogDetails = (row: LogType) => {
               <Typography variant='body2' sx={{ mr: 2, fontWeight: 600, color: 'text.primary' }}>
                 Delete the device from the system
               </Typography>
-              <Typography variant='caption'>Wednesday</Typography>
+              <Typography variant='caption'>{timeDifference(row.timestamp)}</Typography>
             </Box>
             <Box sx={{ m: 2 }}>
               <Typography variant='subtitle1' gutterBottom component='div'>
@@ -305,7 +302,7 @@ const renderLogDetails = (row: LogType) => {
                   Time stamp:
                 </Typography>
                 <Typography variant='subtitle2' sx={{ color: 'text.secondary', textTransform: 'capitalize' }}>
-                  {row.timestamp}
+                  {formatDate(row.timestamp)}
                 </Typography>
               </Box>
               <Box sx={{ display: 'flex' }}>
@@ -321,7 +318,7 @@ const renderLogDetails = (row: LogType) => {
                   Device ID:
                 </Typography>
                 <Typography variant='subtitle2' sx={{ color: 'text.secondary' }}>
-                  #{deleteDetails.objId}
+                  #{row.deviceId}
                 </Typography>
               </Box>
               <Box sx={{ display: 'flex', mb: 2 }}>
@@ -355,7 +352,7 @@ const renderLogDetails = (row: LogType) => {
             <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-start', justifyContent: 'space-between' }}>
               <Box sx={{ mr: 2, display: 'flex', alignItems: 'center' }}></Box>
               <Typography variant='subtitle2' sx={{ fontWeight: 600 }}>
-                Due Date: 15th Jan
+                Created Date: {formatTimestamp(row.timestamp)}
               </Typography>
             </Box>
           </TimelineContent>
@@ -379,7 +376,7 @@ const renderLogDetails = (row: LogType) => {
               <Typography variant='body2' sx={{ mr: 2, fontWeight: 600, color: 'text.primary' }}>
                 Control device
               </Typography>
-              <Typography variant='caption'>Wednesday</Typography>
+              <Typography variant='caption'>{timeDifference(row.timestamp)}</Typography>
             </Box>
 
             <Box sx={{ m: 2 }}>
@@ -421,7 +418,7 @@ const renderLogDetails = (row: LogType) => {
                   Time stamp:
                 </Typography>
                 <Typography variant='subtitle2' sx={{ color: 'text.secondary', textTransform: 'capitalize' }}>
-                  {row.timestamp}
+                  {formatDate(row.timestamp)}
                 </Typography>
               </Box>
               <Box sx={{ display: 'flex' }}>
@@ -437,7 +434,7 @@ const renderLogDetails = (row: LogType) => {
                   Device ID:
                 </Typography>
                 <Typography variant='subtitle2' sx={{ color: 'text.secondary' }}>
-                  #{controlDetails.objId}
+                  #{row.deviceId}
                 </Typography>
               </Box>
               <Box sx={{ display: 'flex', mb: 2 }}>
@@ -479,7 +476,7 @@ const renderLogDetails = (row: LogType) => {
             <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-start', justifyContent: 'space-between' }}>
               <Box sx={{ mr: 2, display: 'flex', alignItems: 'center' }}></Box>
               <Typography variant='subtitle2' sx={{ fontWeight: 600 }}>
-                Due Date: 15th Jan
+                Created date: {formatTimestamp(row.timestamp)}
               </Typography>
             </Box>
           </TimelineContent>

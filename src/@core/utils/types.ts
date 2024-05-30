@@ -72,3 +72,24 @@ export type LogType = {
   result: string
   timestamp: string
 }
+
+export type LogAnalyticsType = {
+  _id: {
+    year: number
+    month: number
+    day: number
+  }
+  count: number
+}
+
+export type AnalyticsType = {
+  VBR: number
+  LGT: number
+  VLG: number
+  deviceCount: number
+  deviceActiveCount: number
+  controlLastWeek: LogAnalyticsType[]
+  VBRLastWeek: LogAnalyticsType[]
+  LGTLastWeek: LogAnalyticsType[]
+  VLGLastWeek: LogAnalyticsType[]
+}

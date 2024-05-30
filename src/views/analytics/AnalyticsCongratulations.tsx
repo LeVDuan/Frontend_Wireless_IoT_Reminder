@@ -34,12 +34,14 @@ const AnalyticsCongratulations = () => {
     <Card sx={{ position: 'relative' }}>
       <CardContent sx={{ py: theme => `${theme.spacing(5)} !important` }}>
         <Grid container spacing={6}>
-          <Grid item xs={12} sm={6} sx={{ textAlign: ['center', 'start'] }}>
+          <Grid item xs={12} sm={6} sx={{ textAlign: ['center', 'start'], minHeight: 162 }}>
             <Typography variant='h5' sx={{ mb: 4, color: 'primary.main' }}>
-              Congratulations John! 🎉
+              Welcome back Duan Le! 🐱‍🏍
             </Typography>
-            <Typography sx={{ color: 'text.secondary' }}>You have done 72% more sales today.</Typography>
-            <Typography sx={{ mb: 3, color: 'text.secondary' }}>Check your new badge in your profile.</Typography>
+            <Typography sx={{ color: 'text.secondary' }}>Have a great day.</Typography>
+            <Typography sx={{ mb: 3, color: 'text.secondary' }}>
+              Check your system's analysis and statistics.
+            </Typography>
             <Button size='small' variant='outlined'>
               View Badges
             </Button>

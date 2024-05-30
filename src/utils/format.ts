@@ -1,3 +1,5 @@
+import { LogAnalyticsType } from 'src/@core/utils/types'
+
 export const formatTimestamp = (timestamp: string) => {
   const date = new Date(timestamp)
   const formatter = new Intl.DateTimeFormat('en-US', {
@@ -48,4 +50,36 @@ export const getColorFromBatteryValue = (batteryValue: number) => {
   if (batteryValue < 80 && batteryValue >= 40) return 'info'
   if (batteryValue < 40 && batteryValue >= 20) return 'warning'
   if (batteryValue < 40) return 'error'
+}
+export const getCategoriesLast7days = () => {
+  const today = new Date()
+  const dateLastWeek: string[] = []
+
+  for (let i = 6; i >= 0; i--) {
+    const day = new Date(today)
+    day.setDate(today.getDate() - i)
+    const formattedDate = day.toLocaleString('en-US', {
+      month: 'long',
+      day: 'numeric'
+    })
+    dateLastWeek.push(formattedDate)
+  }
+
+  return dateLastWeek
+}
+
+export const getSeries = (catagories: string[], value: LogAnalyticsType[]) => {
+  const resultArray = catagories.map(date => {
+    const matchingItem = value.find(item => {
+      const { year, month, day } = item._id
+
+      const formattedDate = new Date(year, month - 1, day)
+
+      return date === formattedDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+    })
+
+    return matchingItem ? matchingItem.count : 0
+  })
+
+  return resultArray
 }

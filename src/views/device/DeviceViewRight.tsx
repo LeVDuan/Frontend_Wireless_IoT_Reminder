@@ -21,12 +21,11 @@ import { ThemeColor } from 'src/@core/layouts/types'
 
 // ** Utils Import
 import { DetailsControl, DetailsEdit, DeviceType, LogType } from 'src/@core/utils/types'
-import { useTheme } from '@emotion/react'
 import { ApexOptions } from 'apexcharts'
 import { ReactNode, useEffect, useState } from 'react'
 import { hexToRGBA } from 'src/@core/utils/hex-to-rgba'
 import { Avatar } from '@mui/material'
-import { styled } from '@mui/material/styles'
+import { styled, useTheme } from '@mui/material/styles'
 import TimelineItem from '@mui/lab/TimelineItem'
 import TimelineSeparator from '@mui/lab/TimelineSeparator'
 import TimelineDot from '@mui/lab/TimelineDot'
@@ -238,7 +237,7 @@ const DeviceViewRight = ({ deviceData }: DeviceViewLeftProps) => {
       })
   }, [deviceData.deviceId])
 
-  console.log('Logs: ', recentHistory)
+  // console.log('Logs: ', recentHistory)
 
   if (deviceData) {
     return (
@@ -336,7 +335,6 @@ const DeviceViewRight = ({ deviceData }: DeviceViewLeftProps) => {
             </CardContent>
           </Card>
         </Grid>
-        {}
         <Grid item xs={12}>
           <Card>
             <CardHeader

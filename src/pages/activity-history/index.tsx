@@ -1,7 +1,6 @@
 // ** MUI Imports
 import { Typography } from '@mui/material'
 import Grid from '@mui/material/Grid'
-import axios from 'axios'
 import { useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { useDispatch } from 'react-redux'
@@ -24,11 +23,6 @@ const ActivityHistory = () => {
   }, [dispatch])
 
   console.log('Logs store: ', store)
-  const getAnalytics = async (dayAgo: number) => {
-    const res = await axios.get(`http://localhost:5000/logs/analytics?dayAgo=${dayAgo}`)
-    console.log('analytics', res)
-  }
-  getAnalytics(7)
 
   return (
     <Grid container spacing={6} className='match-height' justifyItems='center'>
