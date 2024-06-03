@@ -1,10 +1,10 @@
 // ** MUI Imports
 import Card from '@mui/material/Card'
-import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
 import CardContent from '@mui/material/CardContent'
 import Grid, { GridProps } from '@mui/material/Grid'
 import { styled, useTheme } from '@mui/material/styles'
+import { useAuth } from 'src/hooks/useAuth'
 
 // Styled Grid component
 const StyledGrid = styled(Grid)<GridProps>(({ theme }) => ({
@@ -29,6 +29,7 @@ const Img = styled('img')(({ theme }) => ({
 const AnalyticsCongratulations = () => {
   // ** Hook
   const theme = useTheme()
+  const { user } = useAuth()
 
   return (
     <Card sx={{ position: 'relative' }}>
@@ -36,15 +37,12 @@ const AnalyticsCongratulations = () => {
         <Grid container spacing={6}>
           <Grid item xs={12} sm={6} sx={{ textAlign: ['center', 'start'], minHeight: 162 }}>
             <Typography variant='h5' sx={{ mb: 4, color: 'primary.main' }}>
-              Welcome back Duan Le! 🐱‍🏍
+              Welcome back {user?.fullName}! 🐱‍🏍
             </Typography>
             <Typography sx={{ color: 'text.secondary' }}>Have a great day.</Typography>
             <Typography sx={{ mb: 3, color: 'text.secondary' }}>
               Check your system's analysis and statistics.
             </Typography>
-            <Button size='small' variant='outlined'>
-              View Badges
-            </Button>
           </Grid>
           <StyledGrid item xs={12} sm={6}>
             <Img alt='Congratulations John' src={`/images/cards/illustration-john-${theme.palette.mode}.png`} />

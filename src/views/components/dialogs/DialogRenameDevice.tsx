@@ -12,31 +12,24 @@ import Typography from '@mui/material/Typography'
 import Fade, { FadeProps } from '@mui/material/Fade'
 import DialogContent from '@mui/material/DialogContent'
 import DialogActions from '@mui/material/DialogActions'
+import Tooltip from '@mui/material/Tooltip'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
 
 // ** Custom Components Imports
-import { DeviceType } from 'src/@core/utils/types'
-import { ThemeColor } from 'src/@core/layouts/types'
+import { DeviceStoreType, DeviceType } from 'src/@core/utils/types'
 import toast from 'react-hot-toast'
+import { useDispatch } from 'react-redux'
+import { AppDispatch, RootState } from 'src/store'
+import { useSelector } from 'react-redux'
+import { fetchDevices } from 'src/store/device'
+import axios from 'axios'
 
 // import { renameDevice } from 'src/api/devices'
 
 interface DialogRenameDeviceProps {
   device: DeviceType
-}
-
-interface StatusObj {
-  [key: string]: {
-    title: string
-    color: ThemeColor
-  }
-}
-
-const statusObj: StatusObj = {
-  true: { title: 'Active', color: 'success' },
-  false: { title: 'Inactive', color: 'error' }
 }
 
 const Transition = forwardRef(function Transition(
@@ -48,50 +41,53 @@ const Transition = forwardRef(function Transition(
 
 const DialogRenameDevice = ({ device }: DialogRenameDeviceProps) => {
   // ** States
-  const [response, setResponse] = useState<string>('')
   const [show, setShow] = useState<boolean>(false)
-  const [name, setName] = useState<string>(device.name)
-  const status = statusObj[device.isActive.toString()]
-
-  const updatedDevice = { name, status }
-
-  const handleApply = () => {
+  const [newName, setNewName] = useState<string>('')
+  const dispatch = useDispatch<AppDispatch>()
+  const store: DeviceStoreType = useSelector((state: RootState) => state.device)
+  const handleApply = async () => {
     setShow(false)
+    if (newName == device.name) {
+      setNewName('')
 
-    // if (name != device.name) {
-    //   const update = async () => {
-    //     try {
-    //       const res = await renameDevice(device._id, updatedDevice)
-    //       setResponse(res)
-    //     } catch (error) {
-    //       console.error('Error fetching devices', error)
-    //     }
-    //   }
-    //   update()
-    // } else {
-    //   setResponse('success')
-    // }
-    const promiseToast = new Promise((resolve, reject) => {
-      setShow(false)
-      if (response === 'success') {
-        reject('fox')
-      } else {
-        resolve('foo')
-      }
-    })
+      return toast.error('The new name is the same as the current name!')
+    } else if (newName == '') {
+      return
+    }
 
-    return toast.promise(promiseToast, {
-      loading: 'Loading ...',
-      success: 'Apply successfully!',
-      error: 'Failed!'
-    })
+    const isInvalidName = store.devices.find(device => device.name === newName)
+    if (isInvalidName) {
+      setNewName('')
+
+      return toast.error(`Device name ${newName} already exists!`)
+    } else {
+      // dispatch(renameDevice({ id: device._id, newName }))
+      const response = await axios.patch(`http://localhost:5000/devices/${device._id}`, { newName })
+      await dispatch(fetchDevices())
+      const promiseToast = new Promise((resolve, reject) => {
+        if (response.data.result == 'Success!') {
+          resolve('OK')
+        } else {
+          reject('failed!')
+        }
+      })
+      setNewName('')
+
+      return toast.promise(promiseToast, {
+        loading: 'Loading ...',
+        success: 'Apply successfully!',
+        error: 'Failed!'
+      })
+    }
   }
 
   return (
     <Fragment>
-      <IconButton size='small' onClick={() => setShow(true)}>
-        <Icon icon='bx:pencil' fontSize={20} />
-      </IconButton>
+      <Tooltip title='Rename'>
+        <IconButton size='small' onClick={() => setShow(true)}>
+          <Icon icon='bx:pencil' fontSize={20} />
+        </IconButton>
+      </Tooltip>
       <Dialog
         fullWidth
         open={show}
@@ -124,13 +120,7 @@ const DialogRenameDevice = ({ device }: DialogRenameDeviceProps) => {
           </Box>
           <Grid container spacing={6} mt={10}>
             <Grid item sm={5} xs={12}>
-              <TextField
-                fullWidth
-                defaultValue={device.name}
-                label='Current Name'
-                InputProps={{ readOnly: true }}
-                onChange={e => setName(e.target.value)}
-              />
+              <TextField fullWidth defaultValue={device.name} label='Current Name' InputProps={{ readOnly: true }} />
             </Grid>
             <Grid item sm={2} xs={12}>
               <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: 'row' }}>
@@ -140,7 +130,7 @@ const DialogRenameDevice = ({ device }: DialogRenameDeviceProps) => {
               </Box>
             </Grid>
             <Grid item sm={5} xs={12}>
-              <TextField fullWidth label='New Name' placeholder='Duan LV' onChange={e => setName(e.target.value)} />
+              <TextField fullWidth label='New Name' placeholder='Duan LV' onChange={e => setNewName(e.target.value)} />
             </Grid>
           </Grid>
         </DialogContent>
@@ -154,7 +144,14 @@ const DialogRenameDevice = ({ device }: DialogRenameDeviceProps) => {
           <Button variant='contained' sx={{ mr: 1 }} onClick={handleApply}>
             Apply
           </Button>
-          <Button variant='outlined' color='secondary' onClick={() => setShow(false)}>
+          <Button
+            variant='outlined'
+            color='secondary'
+            onClick={() => {
+              setNewName('')
+              setShow(false)
+            }}
+          >
             Discard
           </Button>
         </DialogActions>

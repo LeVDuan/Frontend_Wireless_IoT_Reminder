@@ -24,7 +24,7 @@ import ReactApexcharts from 'src/@core/components/react-apexcharts'
 // ** Util Import
 import { hexToRGBA } from 'src/@core/utils/hex-to-rgba'
 import { AnalyticsType } from 'src/@core/utils/types'
-import { getCategoriesLast7days } from 'src/utils/format'
+import { getCategoriesLast7days, getSeries } from 'src/utils'
 
 interface AnalyticsTotalRevenueProps {
   data: AnalyticsType
@@ -44,14 +44,9 @@ const AnalyticsTotalControlLastWeek = ({ data }: AnalyticsTotalRevenueProps) => 
   const operatingRatio = Math.round((data.deviceActiveCount / data.deviceCount) * 100)
   const dateLastWeek = getCategoriesLast7days()
 
-  const value = data ? data.controlLastWeek.map((item: any) => item.count) : []
-  const series = [{ name: 'Last week', data: value }]
+  const series = [{ name: 'Last week', data: getSeries(dateLastWeek, data.controlLastWeek) }]
 
-  console.log('data: ', data)
-
-  const sum = value.reduce((sum, index) => sum + index, 0)
-
-  // console.log('sum: ', sum)
+  const sum = data.controlLastWeek.reduce((sum, index) => sum + index.count, 0)
 
   // ** Hooks & Var
   const theme = useTheme()
@@ -175,7 +170,7 @@ const AnalyticsTotalControlLastWeek = ({ data }: AnalyticsTotalRevenueProps) => 
     },
     labels: ['Active'],
     stroke: { dashArray: 5 },
-    colors: [hexToRGBA(theme.palette.primary.main, 1)],
+    colors: [hexToRGBA(theme.palette.success.main, 1)],
     states: {
       hover: {
         filter: { type: 'none' }
@@ -193,7 +188,7 @@ const AnalyticsTotalControlLastWeek = ({ data }: AnalyticsTotalRevenueProps) => 
         shadeIntensity: 0.5,
         stops: [30, 70, 100],
         inverseColors: false,
-        gradientToColors: [theme.palette.primary.main]
+        gradientToColors: [theme.palette.success.main]
       }
     },
     plotOptions: {
@@ -259,7 +254,7 @@ const AnalyticsTotalControlLastWeek = ({ data }: AnalyticsTotalRevenueProps) => 
           sx={{ '& .apexcharts-series[rel="2"]': { transform: 'translateY(-10px)' } }}
         >
           <CardContent sx={{ p: `${theme.spacing(5, 6, 0)} !important` }}>
-            <Typography variant='h6'>Controls in the last 7 days</Typography>
+            <Typography variant='h6'>Controls last week</Typography>
           </CardContent>
           <ReactApexcharts type='bar' height={340} options={barOptions} series={series} />
         </StyledGrid>

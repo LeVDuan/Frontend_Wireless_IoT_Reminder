@@ -21,7 +21,7 @@ import axios from 'axios'
 import { DetailsControl, DetailsEdit, LogType } from 'src/@core/utils/types'
 import { ThemeColor } from 'src/@core/layouts/types'
 import Link from 'next/link'
-import { timeDifference } from 'src/utils/format'
+import { timeDifference } from 'src/utils'
 
 interface ColorAction {
   [key: string]: {
@@ -34,9 +34,9 @@ const colorAction: ColorAction = {
   edit: { title: 'Rename', color: 'warning' },
   add: { title: 'Add', color: 'secondary' },
   delete: { title: 'Delete', color: 'error' },
-  vibrate: { title: 'Vibrate', color: 'primary' },
-  light: { title: 'Light up', color: 'success' },
-  'vibrate and light': { title: 'Vibrate and light up', color: 'info' }
+  VBR: { title: 'Vibrate', color: 'primary' },
+  LGT: { title: 'Light up', color: 'success' },
+  VLG: { title: 'Vibrate & light up', color: 'info' }
 }
 
 // Styled Timeline component

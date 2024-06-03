@@ -24,10 +24,13 @@ import Icon from 'src/@core/components/icon'
 import DialogSendControlSignal from '../components/dialogs/DialogSendControlSignal'
 import LinearProgress from '@mui/material/LinearProgress'
 import { DeviceType } from 'src/@core/utils/types'
-import { formatTimestamp, getColorFromBatteryValue } from 'src/utils/format'
+import { delay, formatTimestamp, getColorFromBatteryValue, parseToJSON } from 'src/utils'
 import CustomAvatar from 'src/@core/components/mui/avatar'
 import QuickSearchToolbar from './QuickSearchToolbar'
 import { DeviceStoreType } from 'src/@core/utils/types'
+import { useDispatch } from 'react-redux'
+import { AppDispatch } from 'src/store'
+import { updateStatusDevices } from 'src/store/device'
 
 interface CellType {
   row: DeviceType
@@ -123,7 +126,7 @@ const columns: GridColDef[] = [
     field: 'actions',
     headerName: 'Actions',
     renderCell: ({ row }: CellType) => {
-      return <DialogSendControlSignal id={row.deviceId} name={row.name} />
+      return <DialogSendControlSignal device={row} />
     }
   }
 ]
@@ -133,6 +136,8 @@ const DeviceControlListTable = ({ store }: DeviceControlListTableProps) => {
   const [searchText, setSearchText] = useState<string>('')
   const [filteredData, setFilteredData] = useState<DeviceType[]>(store.activeDevices ? store.activeDevices : [])
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 5 })
+  const [isDisable, setIsDisable] = useState<boolean>(false)
+  const dispatch = useDispatch<AppDispatch>()
 
   const handleSearch = (searchValue: string) => {
     setSearchText(searchValue)
@@ -150,14 +155,39 @@ const DeviceControlListTable = ({ store }: DeviceControlListTableProps) => {
     }
   }
 
-  const { port, sendToPort } = usePort()
+  const { port, sendToPort, readFromPort } = usePort()
   const updateDevices = async () => {
     if (port) {
-      if (!port || !port.writable) {
-        toast.error('Update failed!')
+      if (!port.writable) {
+        toast.error("Can't not write to COM port!")
       } else {
-        await sendToPort('BRD')
-        toast.success('Update successfully!')
+        await sendToPort('BRD\n')
+        setIsDisable(true)
+        await delay(3000)
+        await sendToPort('REQ\n')
+        setIsDisable(false)
+
+        const responseFromPort = await readFromPort()
+
+        console.log('REQ res:', responseFromPort)
+        if (responseFromPort.startsWith('REQ:') && responseFromPort.endsWith('\r\n')) {
+          if (responseFromPort.startsWith('REQ:Failed')) {
+            toast.error('Update failed!')
+          } else if (responseFromPort.startsWith('REQ:-1')) {
+            console.log('Has no device active')
+          } else {
+            const update = parseToJSON(responseFromPort)
+            console.log({ update })
+            try {
+              dispatch(updateStatusDevices({ update }))
+              toast.success('Update successfully!')
+            } catch (error) {
+              toast.error('Update failed!')
+            }
+          }
+        } else {
+          toast.error('Error receiving data from transmitter, please try again!')
+        }
       }
     } else {
       toast.error('Please connect the COM port first')
@@ -169,9 +199,17 @@ const DeviceControlListTable = ({ store }: DeviceControlListTableProps) => {
       <CardHeader
         title={`List of active devices: ${store.totalActiveDevices}`}
         action={
-          <Button size='small' variant='contained' startIcon={<Icon icon='bx:refresh' />} onClick={updateDevices}>
-            Update status
-          </Button>
+          <>
+            <Button
+              disabled={isDisable}
+              size='small'
+              variant='contained'
+              startIcon={<Icon icon='bx:refresh' />}
+              onClick={updateDevices}
+            >
+              Update status
+            </Button>
+          </>
         }
       />
       <DataGrid

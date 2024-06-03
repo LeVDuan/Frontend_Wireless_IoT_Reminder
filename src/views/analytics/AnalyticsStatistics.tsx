@@ -41,7 +41,7 @@ const AnalyticsStatistics = ({ data }: AnalyticsTransactionsProps) => {
     },
     {
       amount: data.VLG,
-      title: 'Vibrate and Light Up',
+      title: 'Vibrate & Light Up',
       avatarColor: 'info',
       avatarIcon: <Icon icon='radix-icons:mix' />
     },

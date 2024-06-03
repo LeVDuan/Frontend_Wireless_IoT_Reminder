@@ -23,7 +23,7 @@ import DialogDeleteConfirm from '../components/dialogs/DialogDeleteConfirm'
 
 // import DialogViewDevice from '../components/dialogs/DialogViewDevice'
 import CustomAvatar from 'src/@core/components/mui/avatar'
-import { formatTimestamp, getColorFromBatteryValue } from 'src/utils/format'
+import { formatTimestamp, getColorFromBatteryValue } from 'src/utils'
 import { Grid, IconButton } from '@mui/material'
 
 // import AddDeviceDrawer from 'src/views/components/drawer/AddDeviceDrawer'
@@ -131,17 +131,12 @@ const columns: GridColDef[] = [
       return (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <Tooltip title='View'>
-            {/* <DialogViewDevice device={row} /> */}
             <IconButton size='small' component={Link} href={`/device/${row.deviceId}`}>
               <Icon icon='bx:show' fontSize={20} />
             </IconButton>
           </Tooltip>
-          <Tooltip title='Rename'>
-            <DialogRenameDevice device={row} />
-          </Tooltip>
-          <Tooltip title='Delete'>
-            <DialogDeleteConfirm device={row} />
-          </Tooltip>
+          <DialogRenameDevice device={row} />
+          <DialogDeleteConfirm device={row} />
         </Box>
       )
     }

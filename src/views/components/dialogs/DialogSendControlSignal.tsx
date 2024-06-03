@@ -25,10 +25,12 @@ import Icon from 'src/@core/components/icon'
 import CustomAvatar from 'src/@core/components/mui/avatar'
 import { usePort } from 'src/context/PortContext'
 import toast from 'react-hot-toast'
+import { useAuth } from 'src/hooks/useAuth'
+import { DeviceType } from 'src/@core/utils/types'
+import axios from 'axios'
 
 interface DialogSendControlSignalProps {
-  id: number
-  name: string
+  device: DeviceType
 }
 
 const Transition = forwardRef(function Transition(
@@ -38,15 +40,15 @@ const Transition = forwardRef(function Transition(
   return <Fade ref={ref} {...props} />
 })
 
-const DialogSendControlSignal: React.FC<DialogSendControlSignalProps> = ({ id, name }) => {
+const DialogSendControlSignal = ({ device }: DialogSendControlSignalProps) => {
   // ** States
   const [show, setShow] = useState<boolean>(false)
   const [type, setType] = useState<string>('VBR')
-  const [timeControl, setTimeControl] = useState<string>('')
-  const [periodTime, setPeriodTime] = useState<string>('')
-  const [pauseTime, setPauseTime] = useState<string>('')
+  const [controlTime, setControlTime] = useState<number>()
+  const [periodTime, setPeriodTime] = useState<number>()
+  const [pauseTime, setPauseTime] = useState<number>()
   const { port, sendToPort } = usePort()
-
+  const { user } = useAuth()
   const handleControl = async () => {
     if (port) {
       setShow(true)
@@ -59,11 +61,32 @@ const DialogSendControlSignal: React.FC<DialogSendControlSignalProps> = ({ id, n
     if (!port.writable) {
       toast.error("Can't write to COM port!")
     } else {
-      const cmd = type + ' ' + id + ' ' + timeControl + ' ' + periodTime + ' ' + pauseTime
-      console.log(cmd)
-      sendToPort(cmd)
+      const ctrlSignal = type + ' ' + device.deviceId + ' ' + controlTime + ' ' + periodTime + ' ' + pauseTime
+      console.log(ctrlSignal)
+      sendToPort(ctrlSignal)
       toast.success('Send control signal successfully!')
+
+      // "objId": "66421d39472d7402c217b87f",
+      // "controlTime": 10,
+      // "pauseTime": 1,
+      // "periodTime": 1,
+      // "type": "VBR"
+      const details = { objId: device._id, controlTime, pauseTime, periodTime, type }
+      const log = {
+        userName: user?.fullName,
+        deviceId: device.deviceId,
+        deviceName: device.name,
+        action: 'control',
+        details,
+        result: 'success'
+      }
+      const res = await axios.post('http://localhost:5000/logs/', { log })
+
+      console.log('create log: ', res.data)
     }
+    setControlTime(undefined)
+    setPeriodTime(undefined)
+    setPauseTime(undefined)
     setShow(false)
   }
 
@@ -98,7 +121,7 @@ const DialogSendControlSignal: React.FC<DialogSendControlSignalProps> = ({ id, n
           </IconButton>
           <Box sx={{ mb: 8, textAlign: 'center' }}>
             <Typography variant='h5' sx={{ mb: 3 }}>
-              Device control options for {name}
+              Device control options for {device.name}
             </Typography>
             <Typography variant='body2'>Select the options you want to control on the device.</Typography>
           </Box>
@@ -172,18 +195,23 @@ const DialogSendControlSignal: React.FC<DialogSendControlSignalProps> = ({ id, n
                 >
                   <MenuItem value='VBR'>Vibrate</MenuItem>
                   <MenuItem value='LGT'>Light</MenuItem>
-                  <MenuItem value='VLG'>Vibrate and light</MenuItem>
+                  <MenuItem value='VLG'>Vibrate & light</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
             <Grid item sm={3} xs={12}>
-              <TextField fullWidth label='Control time(s)' onChange={e => setTimeControl(e.target.value)} />
+              <TextField
+                fullWidth
+                label='Control time(s)'
+                type='number'
+                onChange={e => setControlTime(Number(e.target.value))}
+              />
             </Grid>
             <Grid item sm={3} xs={12}>
-              <TextField fullWidth label='Period time(s)' onChange={e => setPeriodTime(e.target.value)} />
+              <TextField fullWidth label='Period time(s)' onChange={e => setPeriodTime(Number(e.target.value))} />
             </Grid>
             <Grid item sm={3} xs={12}>
-              <TextField fullWidth label='Pause time(s)' onChange={e => setPauseTime(e.target.value)} />
+              <TextField fullWidth label='Pause time(s)' onChange={e => setPauseTime(Number(e.target.value))} />
             </Grid>
           </Grid>
         </DialogContent>

@@ -27,7 +27,7 @@ const DeviceView = ({ id }: DeviceViewProps) => {
         setData(null)
         setError(true)
       })
-  }, [id])
+  }, [data, id])
   console.log('res:', data)
 
   if (data) {

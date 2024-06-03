@@ -26,7 +26,7 @@ import Icon from 'src/@core/components/icon'
 // ** Custom Components Imports
 import { DeviceType } from 'src/@core/utils/types'
 import { ThemeColor } from 'src/@core/layouts/types'
-import { formatTimestamp, getColorFromBatteryValue } from 'src/utils/format'
+import { formatTimestamp, getColorFromBatteryValue } from 'src/utils'
 
 interface DialogViewDeviceProps {
   device: DeviceType

@@ -59,7 +59,7 @@ export const getCategoriesLast7days = () => {
     const day = new Date(today)
     day.setDate(today.getDate() - i)
     const formattedDate = day.toLocaleString('en-US', {
-      month: 'long',
+      month: 'short',
       day: 'numeric'
     })
     dateLastWeek.push(formattedDate)
@@ -69,17 +69,39 @@ export const getCategoriesLast7days = () => {
 }
 
 export const getSeries = (catagories: string[], value: LogAnalyticsType[]) => {
-  const resultArray = catagories.map(date => {
-    const matchingItem = value.find(item => {
-      const { year, month, day } = item._id
+  if (value.length === 0) {
+    return Array(catagories.length).fill(0)
+  } else {
+    const resultArray = catagories.map(date => {
+      const matchingItem = value.find(item => {
+        const { year, month, day } = item._id
+        const formattedDate = new Date(year, month - 1, day)
 
-      const formattedDate = new Date(year, month - 1, day)
+        return date === formattedDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+      })
 
-      return date === formattedDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+      return matchingItem ? matchingItem.count : 0
     })
 
-    return matchingItem ? matchingItem.count : 0
-  })
+    return resultArray
+  }
+}
 
-  return resultArray
+export const delay = async (ms: number): Promise<void> => {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
+
+export const parseToJSON = (res: string): any[] => {
+  const parts = res.replace(/-\r\n/g, '').substring(4).split('-')
+  const result = []
+
+  for (const part of parts) {
+    const [deviceId, batteryStatus] = part.split(':')
+    result.push({
+      deviceId: parseInt(deviceId),
+      batteryStatus: parseInt(batteryStatus)
+    })
+  }
+
+  return result
 }

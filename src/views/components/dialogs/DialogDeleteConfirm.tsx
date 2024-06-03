@@ -13,9 +13,11 @@ import IconButton from '@mui/material/IconButton'
 import Icon from 'src/@core/components/icon'
 import { useDispatch } from 'react-redux'
 import { AppDispatch } from 'src/store'
-import { deleteDevice } from 'src/store/device'
+import { fetchDevices } from 'src/store/device'
+import Tooltip from '@mui/material/Tooltip'
 
 import toast from 'react-hot-toast'
+import axios from 'axios'
 
 interface DialogDeleteConfirmProps {
   device: DeviceType
@@ -26,11 +28,30 @@ const DialogDeleteConfirm = ({ device }: DialogDeleteConfirmProps) => {
   const [open, setOpen] = useState<boolean>(false)
   const dispatch = useDispatch<AppDispatch>()
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     setOpen(false)
-    dispatch(deleteDevice(device._id))
+    try {
+      const response = await axios.delete(`http://localhost:5000/devices/${device._id}`)
 
-    return toast.success('Successfully!')
+      await dispatch(fetchDevices())
+      console.log('deleted res: ', response.data)
+
+      const promiseToast = new Promise((resolve, reject) => {
+        if (response.data.result == 'Success!') {
+          resolve('OK')
+        } else {
+          reject('failed!')
+        }
+      })
+
+      return toast.promise(promiseToast, {
+        loading: 'Loading ...',
+        success: 'Successfully!',
+        error: 'Failed!'
+      })
+    } catch (error) {
+      throw error
+    }
   }
   const handleClickOpen = () => setOpen(true)
 
@@ -38,9 +59,11 @@ const DialogDeleteConfirm = ({ device }: DialogDeleteConfirmProps) => {
 
   return (
     <Fragment>
-      <IconButton size='small' onClick={handleClickOpen}>
-        <Icon icon='bx:trash-alt' fontSize={20} />
-      </IconButton>
+      <Tooltip title='Delete'>
+        <IconButton size='small' onClick={handleClickOpen}>
+          <Icon icon='bx:trash-alt' fontSize={20} />
+        </IconButton>
+      </Tooltip>
       <Dialog
         open={open}
         disableEscapeKeyDown

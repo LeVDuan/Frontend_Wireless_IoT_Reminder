@@ -28,7 +28,7 @@ import TimelineContent from '@mui/lab/TimelineContent'
 import MuiTimeline, { TimelineProps } from '@mui/lab/Timeline'
 import { styled } from '@mui/material/styles'
 import CustomAvatar from 'src/@core/components/mui/avatar'
-import { formatTimestamp, timeDifference } from 'src/utils/format'
+import { formatTimestamp, timeDifference } from 'src/utils/index'
 import { formatDate } from 'src/@core/utils/format'
 
 interface RowProps {
@@ -488,7 +488,7 @@ const renderLogDetails = (row: LogType) => {
 }
 
 const renderAvatar = (name: string) => {
-  if (name == 'Duan LV') {
+  if (name == 'Duan Le') {
     return <CustomAvatar src={`/images/avatars/DuanLV.jpg`} sx={{ mr: 3, width: '1.875rem', height: '1.875rem' }} />
   } else {
     return <CustomAvatar src={`/images/avatars/1.png`} sx={{ mr: 3, width: '1.875rem', height: '1.875rem' }} />
@@ -566,7 +566,7 @@ const Row = ({ row }: RowProps) => {
 
 const LogsTable = ({ store }: LogsTableProps) => {
   const [page, setPage] = useState<number>(0)
-  const [rowsPerPage, setRowsPerPage] = useState<number>(10)
+  const [rowsPerPage, setRowsPerPage] = useState<number>(5)
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage)
@@ -599,7 +599,7 @@ const LogsTable = ({ store }: LogsTableProps) => {
         </Table>
       </TableContainer>
       <TablePagination
-        rowsPerPageOptions={[10, 25, 100]}
+        rowsPerPageOptions={[5, 10, 25]}
         component='div'
         count={store.total}
         rowsPerPage={rowsPerPage}

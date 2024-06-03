@@ -33,28 +33,41 @@ export const fetchActiveDevices = createAsyncThunk('device/fetchActiveDevices', 
   }
 })
 
-export const addDevice = createAsyncThunk(
-  'device/addDevice',
-  async (device: { deviceId: number; name: string }, { dispatch }: any) => {
-    try {
-      const response = await axios.post(`${URL}`, device)
+// export const addDevice = createAsyncThunk(
+//   'device/addDevice',
+//   async (device: { deviceId: number; name: string }, { dispatch }: any) => {
+//     try {
+//       const response = await axios.post(`${URL}`, device)
 
-      await dispatch(fetchDevices())
-      console.log('added res: ', response.data)
+//       await dispatch(fetchDevices())
+//       console.log('added res: ', response.data)
 
-      return response
-    } catch (error) {
-      throw error
-    }
-  }
-)
+//       return response
+//     } catch (error) {
+//       throw error
+//     }
+//   }
+// )
 
-export const deleteDevice = createAsyncThunk('device/deleteDevice', async (id: string, { dispatch }: any) => {
+// export const deleteDevice = createAsyncThunk('device/deleteDevice', async (id: string, { dispatch }: any) => {
+//   try {
+//     const response = await axios.delete(`${URL}/${id}`)
+
+//     await dispatch(fetchDevices())
+//     console.log('deleted res: ', response.data)
+
+//     return response
+//   } catch (error) {
+//     throw error
+//   }
+// })
+
+export const updateStatusDevices = createAsyncThunk('device/updateDevices', async (update: any, { dispatch }: any) => {
   try {
-    const response = await axios.delete(`${URL}/${id}`)
+    const response = await axios.patch(`${URL}/updateStatus/all`, update)
 
-    await dispatch(fetchDevices())
-    console.log('deleted res: ', response.data)
+    await dispatch(fetchActiveDevices())
+    console.log('updated res: ', response.data)
 
     return response
   } catch (error) {

@@ -33,21 +33,6 @@ export const fetchAnalytics = createAsyncThunk('log/fetchAnalytics', async () =>
   }
 })
 
-//* Add logs
-export const addLogs = createAsyncThunk('log/addLogs', async (newLogs: any, { dispatch }: any) => {
-  try {
-    const response = await axios.post(URL, newLogs)
-
-    dispatch(fetchLogs())
-
-    // console.log('added res: ', response.data)
-
-    return response
-  } catch (error) {
-    throw error
-  }
-})
-
 export const logSlice = createSlice({
   name: 'log',
   initialState: {

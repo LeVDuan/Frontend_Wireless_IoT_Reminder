@@ -14,16 +14,20 @@ import toast from 'react-hot-toast'
 const DialogAlert = () => {
   // ** State
   const [open, setOpen] = useState<boolean>(false)
-  const { port, requestOpenPort } = usePort()
+  const { requestOpenPort } = usePort()
+  const [message, setMessage] = useState<string>('')
 
   const handleClickOpen = async () => {
     try {
       await requestOpenPort()
       toast.success('Connected successfully!')
     } catch (err) {
-      if (port) {
-        toast.success('Update COM port successfully!')
-      } else {
+      if (err instanceof Error) {
+        if (err.message.indexOf('The port is already open.') != -1) {
+          setMessage('The port is already open.')
+        } else if (err.message.indexOf('No port selected by the user.') != -1) {
+          setMessage('No port selected by the user.')
+        }
         setOpen(true)
       }
     }
@@ -41,9 +45,9 @@ const DialogAlert = () => {
         aria-labelledby='alert-dialog-title'
         aria-describedby='alert-dialog-description'
       >
-        <DialogTitle id='alert-dialog-title'>You haven't selected a COM port to connect to?</DialogTitle>
+        <DialogTitle id='alert-dialog-title'>Operation error when Open Port!</DialogTitle>
         <DialogContent>
-          <DialogContentText id='alert-dialog-description'>Please select the correct COM port.</DialogContentText>
+          <DialogContentText id='alert-dialog-description'>{message}</DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button variant='contained' onClick={handleClose}>

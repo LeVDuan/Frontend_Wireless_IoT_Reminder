@@ -22,7 +22,8 @@ import toast from 'react-hot-toast'
 import { DeviceStoreType } from 'src/@core/utils/types'
 import { useDispatch } from 'react-redux'
 import { AppDispatch } from 'src/store'
-import { addDevice } from 'src/store/device'
+import { fetchDevices } from 'src/store/device'
+import axios from 'axios'
 
 interface DialogAddDeviceProps {
   store: DeviceStoreType
@@ -42,7 +43,7 @@ const DialogAddDevice = ({ store }: DialogAddDeviceProps) => {
   const [deviceId, setDeviceId] = useState<number>()
   const dispatch = useDispatch<AppDispatch>()
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     setShow(false)
 
     if (name === '' || deviceId === undefined) {
@@ -50,17 +51,43 @@ const DialogAddDevice = ({ store }: DialogAddDeviceProps) => {
     }
     const isInvalidDeviceId = store.devices.find(device => device.deviceId === deviceId)
     if (isInvalidDeviceId) {
+      setName('')
+      setDeviceId(undefined)
+
       return toast.error(`Device ID ${deviceId} already exists!`)
     }
     const isInvalidName = store.devices.find(device => device.name === name)
     if (isInvalidName) {
+      setName('')
+      setDeviceId(undefined)
+
       return toast.error(`Device name ${name} already exists!`)
+    } else {
+      try {
+        const response = await axios.post(`http://localhost:5000/devices`, { deviceId, name })
+
+        await dispatch(fetchDevices())
+
+        setName('')
+        setDeviceId(undefined)
+
+        const promiseToast = new Promise((resolve, reject) => {
+          if (response.data.result == 'Success!') {
+            resolve('OK')
+          } else {
+            reject('failed!')
+          }
+        })
+
+        return toast.promise(promiseToast, {
+          loading: 'Loading ...',
+          success: 'Successfully!',
+          error: 'Failed!'
+        })
+      } catch (error) {
+        throw error
+      }
     }
-
-    // dispatch(addUser({ ...data, role, currentPlan: plan }))
-    dispatch(addDevice({ deviceId: deviceId, name: name }))
-
-    return toast.success('Successfully')
   }
 
   const handleCancel = () => {

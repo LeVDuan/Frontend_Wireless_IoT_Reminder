@@ -27,6 +27,7 @@ import { CardActions } from '@mui/material'
 import { formatDate } from 'src/@core/utils/format'
 import { usePort } from 'src/context/PortContext'
 import toast from 'react-hot-toast'
+import DialogRenameDevice from '../components/dialogs/DialogRenameDevice'
 
 interface StatusObj {
   [key: string]: {
@@ -115,7 +116,7 @@ const DeviceViewLeft = ({ deviceData }: DeviceViewLeftProps) => {
               />
 
               <Typography variant='h5' sx={{ mb: 2.5, fontSize: '1.375rem !important' }}>
-                {deviceData.name}
+                {deviceData.name} <DialogRenameDevice device={deviceData} />
               </Typography>
               <CustomChip
                 rounded

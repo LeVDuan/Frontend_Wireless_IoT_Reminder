@@ -32,7 +32,7 @@ import TimelineDot from '@mui/lab/TimelineDot'
 import TimelineConnector from '@mui/lab/TimelineConnector'
 import TimelineContent from '@mui/lab/TimelineContent'
 import MuiTimeline, { TimelineProps } from '@mui/lab/Timeline'
-import { getColorFromBatteryValue, timeDifference } from 'src/utils/format'
+import { getColorFromBatteryValue, timeDifference } from 'src/utils'
 import axios from 'axios'
 import Link from 'next/link'
 
@@ -57,9 +57,9 @@ interface ColorAction {
 const colorAction: ColorAction = {
   edit: { title: 'Rename', color: 'warning' },
   add: { title: 'Add', color: 'secondary' },
-  vibrate: { title: 'Vibrate', color: 'primary' },
-  light: { title: 'Light up', color: 'success' },
-  'vibrate and light': { title: 'Vibrate and light up', color: 'info' }
+  VBR: { title: 'Vibrate', color: 'primary' },
+  LGT: { title: 'Light up', color: 'success' },
+  VLG: { title: 'Vibrate & light up', color: 'info' }
 }
 
 const Timeline = styled(MuiTimeline)<TimelineProps>(({ theme }) => ({
@@ -109,7 +109,7 @@ const DeviceViewRight = ({ deviceData }: DeviceViewLeftProps) => {
     },
     {
       amount: deviceData.VLGCount,
-      title: 'Vibrate and Light Up',
+      title: 'Vibrate & Light Up',
       avatarColor: 'info',
       avatarIcon: <Icon icon='radix-icons:mix' />
     }
@@ -126,7 +126,7 @@ const DeviceViewRight = ({ deviceData }: DeviceViewLeftProps) => {
     legend: { show: false },
     tooltip: { enabled: false },
     dataLabels: { enabled: false },
-    labels: ['Vibrate', 'Light Up', 'Both'],
+    labels: ['Vibrate', 'Light Up', 'Vibrate & Light Up'],
     colors: [theme.palette.primary.main, theme.palette.success.main, theme.palette.info.main],
     grid: {
       padding: {

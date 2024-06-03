@@ -23,7 +23,7 @@ import { ApexOptions } from 'apexcharts'
 import ReactApexcharts from 'src/@core/components/react-apexcharts'
 import { AnalyticsType, LogAnalyticsType } from 'src/@core/utils/types'
 import { ThemeColor } from 'src/@core/layouts/types'
-import { getCategoriesLast7days, getSeries } from 'src/utils/format'
+import { getCategoriesLast7days, getSeries } from 'src/utils/index'
 
 interface DataType {
   stats: number
@@ -56,7 +56,7 @@ const TabList = styled(MuiTabList)<TabListProps>(({ theme }) => ({
 
 const findMinMax = (logList: LogAnalyticsType[]) => {
   if (logList.length === 0) {
-    throw new Error('empty!')
+    return { min: 0, max: 0 }
   }
 
   let min = logList[0].count
@@ -79,11 +79,12 @@ const AnalyticsTabsWithChart = ({ dataAnalytics }: AnalyticsTabsWithChartProps) 
   const [value, setValue] = useState<string>('Vibrate')
 
   const dateLastWeek = getCategoriesLast7days()
+
   const VBRSeries = [{ name: 'Vibrate', data: getSeries(dateLastWeek, dataAnalytics.VBRLastWeek) }]
 
   const LGTseries = [{ name: 'Light', data: getSeries(dateLastWeek, dataAnalytics.LGTLastWeek) }]
 
-  const VLGseries = [{ name: 'Vibrate', data: getSeries(dateLastWeek, dataAnalytics.VLGLastWeek) }]
+  const VLGseries = [{ name: 'Vibrate & light', data: getSeries(dateLastWeek, dataAnalytics.VLGLastWeek) }]
 
   const VBRMinMax = findMinMax(dataAnalytics.VBRLastWeek)
   const LGTMinMax = findMinMax(dataAnalytics.LGTLastWeek)
@@ -91,11 +92,14 @@ const AnalyticsTabsWithChart = ({ dataAnalytics }: AnalyticsTabsWithChartProps) 
 
   let minCtrl = Math.min(VBRMinMax.min, LGTMinMax.min, VLGMinMax.min)
   const maxCtrl = Math.max(VBRMinMax.max, LGTMinMax.max, VLGMinMax.max)
-  const tickAmountChart = (maxCtrl - minCtrl) / minCtrl
-  minCtrl -= tickAmountChart
-  if (minCtrl < 0) minCtrl = 0
-
-  // console.log('tick: ', tickAmountChart)
+  let tickAmountChart
+  if (minCtrl == 0) {
+    tickAmountChart = 4
+  } else {
+    tickAmountChart = (maxCtrl - minCtrl) / minCtrl
+    minCtrl -= tickAmountChart
+    if (minCtrl <= 0) minCtrl = 0
+  }
 
   // ** Hook
   const theme = useTheme()
@@ -118,8 +122,8 @@ const AnalyticsTabsWithChart = ({ dataAnalytics }: AnalyticsTabsWithChartProps) 
       avatarIcon: <Icon icon='heroicons-outline:light-bulb' />,
       series: LGTseries
     },
-    'Vibrate and light up': {
-      title: 'Vibrate and light up',
+    'Vibrate & light up': {
+      title: 'Vibrate & light up',
       stats: dataAnalytics.VLG,
       avatarColor: 'info',
       avatarIcon: <Icon icon='radix-icons:mix' />,
@@ -141,9 +145,9 @@ const AnalyticsTabsWithChart = ({ dataAnalytics }: AnalyticsTabsWithChartProps) 
       strokeDashArray: 4.5,
       borderColor: theme.palette.divider,
       padding: {
-        left: 32,
+        left: 40,
         top: 0,
-        right: 8,
+        right: 32,
         bottom: 0
       }
     },
@@ -224,7 +228,7 @@ const AnalyticsTabsWithChart = ({ dataAnalytics }: AnalyticsTabsWithChartProps) 
           <TabList variant='scrollable' scrollButtons='auto' onChange={handleChange} aria-label='tab widget card'>
             <Tab value='Vibrate' label='Vibrate' />
             <Tab value='Light Up' label='Light Up' />
-            <Tab value='Vibrate and light up' label='Vibrate & light up' />
+            <Tab value='Vibrate & light up' label='Vibrate & light up' />
           </TabList>
         </CardContent>
         <TabPanel value={value} sx={{ border: 0, boxShadow: 0, p: '0 !important', backgroundColor: 'transparent' }}>
