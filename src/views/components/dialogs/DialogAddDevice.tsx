@@ -64,7 +64,7 @@ const DialogAddDevice = ({ store }: DialogAddDeviceProps) => {
       return toast.error(`Device name ${name} already exists!`)
     } else {
       try {
-        const response = await axios.post(`http://localhost:5000/devices`, { deviceId, name })
+        const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/devices`, { deviceId, name })
 
         await dispatch(fetchDevices())
 

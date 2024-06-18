@@ -18,7 +18,7 @@ const DeviceView = ({ id }: DeviceViewProps) => {
   const [data, setData] = useState<null | DeviceType>(null)
   useEffect(() => {
     axios
-      .get('http://localhost:5000/devices/device', { params: { deviceId: id } })
+      .get(`${process.env.NEXT_PUBLIC_API_URL}/devices/device`, { params: { deviceId: id } })
       .then(res => {
         setData(res.data.device[0])
         setError(false)

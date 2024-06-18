@@ -228,7 +228,7 @@ const DeviceViewRight = ({ deviceData }: DeviceViewLeftProps) => {
 
   useEffect(() => {
     axios
-      .get('http://localhost:5000/logs/recentActivity', { params: { deviceId: deviceData.deviceId } })
+      .get(`${process.env.NEXT_PUBLIC_API_URL}/logs/recentActivity`, { params: { deviceId: deviceData.deviceId } })
       .then(res => {
         setRecentHistory(res.data)
       })

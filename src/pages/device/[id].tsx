@@ -15,7 +15,7 @@ const InvoicePreview = ({ id }: InferGetStaticPropsType<typeof getStaticProps>) 
 }
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const res = await axios.get('http://localhost:5000/devices')
+  const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/devices`)
   const data: DeviceType[] = await res.data.devices
 
   const paths = data.map((item: DeviceType) => ({

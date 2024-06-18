@@ -31,7 +31,7 @@ const DialogDeleteConfirm = ({ device }: DialogDeleteConfirmProps) => {
   const handleDelete = async () => {
     setOpen(false)
     try {
-      const response = await axios.delete(`http://localhost:5000/devices/${device._id}`)
+      const response = await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/devices/${device._id}`)
 
       await dispatch(fetchDevices())
       console.log('deleted res: ', response.data)

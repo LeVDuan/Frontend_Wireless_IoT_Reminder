@@ -62,7 +62,7 @@ const AnalyticsActivityTimeline = () => {
 
   useEffect(() => {
     axios
-      .get('http://localhost:5000/logs/recentActivity')
+      .get(`${process.env.NEXT_PUBLIC_API_URL}/logs/recentActivity`)
       .then(res => {
         setRecentHistory(res.data)
       })

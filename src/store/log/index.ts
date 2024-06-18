@@ -6,7 +6,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import axios from 'axios'
 import { LogType } from 'src/@core/utils/types'
 
-const URL = 'http://localhost:5000/logs'
+const URL = `${process.env.NEXT_PUBLIC_API_URL}/logs`
 
 // ** Fetch logs
 export const fetchLogs = createAsyncThunk('log/fetchLogs', async () => {

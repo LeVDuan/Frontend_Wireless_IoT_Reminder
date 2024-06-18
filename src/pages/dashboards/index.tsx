@@ -22,7 +22,7 @@ const AnalyticsDashboard = () => {
 
   useEffect(() => {
     const getAnalytics = async () => {
-      const res = await axios.get(`http://localhost:5000/logs/analytics`)
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/logs/analytics`)
       setData(res.data)
     }
     getAnalytics()

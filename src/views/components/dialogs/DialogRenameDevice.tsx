@@ -62,7 +62,7 @@ const DialogRenameDevice = ({ device }: DialogRenameDeviceProps) => {
       return toast.error(`Device name ${newName} already exists!`)
     } else {
       // dispatch(renameDevice({ id: device._id, newName }))
-      const response = await axios.patch(`http://localhost:5000/devices/${device._id}`, { newName })
+      const response = await axios.patch(`${process.env.NEXT_PUBLIC_API_URL}/devices/${device._id}`, { newName })
       await dispatch(fetchDevices())
       const promiseToast = new Promise((resolve, reject) => {
         if (response.data.result == 'Success!') {

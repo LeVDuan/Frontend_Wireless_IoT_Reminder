@@ -80,7 +80,7 @@ const DialogSendControlSignal = ({ device }: DialogSendControlSignalProps) => {
         details,
         result: 'success'
       }
-      const res = await axios.post('http://localhost:5000/logs/', { log })
+      const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/logs/`, { log })
 
       console.log('create log: ', res.data)
     }

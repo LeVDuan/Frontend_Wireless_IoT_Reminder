@@ -6,7 +6,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import axios from 'axios'
 import { DeviceType } from 'src/@core/utils/types'
 
-const URL = 'http://localhost:5000/devices'
+const URL = `${process.env.NEXT_PUBLIC_API_URL}/devices`
 
 // ** Fetch devices
 export const fetchDevices = createAsyncThunk('device/fetchDevices', async () => {
