@@ -77,8 +77,8 @@ const schema = yup.object().shape({
 })
 
 const defaultValues = {
-  password: 'admin',
-  email: 'admin@sneat.com'
+  password: 'duanlv0308',
+  email: 'duanlv194508@sis.hust.edu.vn'
 }
 
 interface FormData {
@@ -160,7 +160,7 @@ const LoginPage = () => {
                 lineHeight: 1,
                 fontWeight: 700,
                 letterSpacing: '-0.45px',
-                textTransform: 'lowercase',
+                textTransform: 'uppercase',
                 fontSize: '1.75rem !important'
               }}
             >
@@ -175,10 +175,7 @@ const LoginPage = () => {
           </Typography>
           <Alert icon={false} sx={{ py: 3, mb: 6, ...bgColors.primaryLight, '& .MuiAlert-message': { p: 0 } }}>
             <Typography variant='caption' sx={{ mb: 2, display: 'block', color: 'primary.main' }}>
-              Admin: <strong>admin@sneat.com</strong> / Pass: <strong>admin</strong>
-            </Typography>
-            <Typography variant='caption' sx={{ display: 'block', color: 'primary.main' }}>
-              Client: <strong>client@sneat.com</strong> / Pass: <strong>client</strong>
+              Demo: <strong>duanlv194508@sis.hust.edu.vn</strong> / Pass: <strong>duanlv0308</strong>
             </Typography>
           </Alert>
           <form noValidate autoComplete='off' onSubmit={handleSubmit(onSubmit)}>
@@ -195,7 +192,7 @@ const LoginPage = () => {
                     onBlur={onBlur}
                     onChange={onChange}
                     error={Boolean(errors.email)}
-                    placeholder='admin@sneat.com'
+                    placeholder='duanlv194508@sis.hust.edu.vn'
                   />
                 )}
               />

@@ -141,7 +141,8 @@ const VerticalNavHeader = (props: Props) => {
               fontWeight: 700,
               ...menuCollapsedStyles,
               letterSpacing: '-0.45px',
-              textTransform: 'lowercase',
+
+              // textTransform: 'uppercase',
               fontSize: '1.75rem !important',
               ...(navCollapsed && !navHover ? {} : { ml: 2 }),
               transition: 'opacity .35s ease-in-out, margin .35s ease-in-out'

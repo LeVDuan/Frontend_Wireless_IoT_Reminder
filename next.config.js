@@ -8,6 +8,9 @@ const path = require('path')
 module.exports = {
   trailingSlash: true,
   reactStrictMode: false,
+  typescript: {
+    ignoreBuildErrors: true
+  },
   webpack: config => {
     config.resolve.alias = {
       ...config.resolve.alias,

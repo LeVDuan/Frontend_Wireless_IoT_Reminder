@@ -104,7 +104,7 @@ const ForgotPassword = () => {
                 lineHeight: 1,
                 fontWeight: 700,
                 letterSpacing: '-0.45px',
-                textTransform: 'lowercase',
+                textTransform: 'uppercase',
                 fontSize: '1.75rem !important'
               }}
             >
