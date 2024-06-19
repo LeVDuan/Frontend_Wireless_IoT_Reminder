@@ -19,7 +19,7 @@ import DeviceListTable from 'src/views/table/DeviceListTable'
 const DataGrid = () => {
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>()
-  const store: DeviceStoreType = useSelector((state: RootState) => state.device)
+  const store: DeviceStoreType = useSelector((state: RootState) => state.device) as DeviceStoreType
 
   useEffect(() => {
     dispatch(fetchDevices())

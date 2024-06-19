@@ -14,20 +14,17 @@ interface DeviceViewProps {
 const DeviceView = ({ id }: DeviceViewProps) => {
   console.log(id)
 
-  const [error, setError] = useState<boolean>(false)
   const [data, setData] = useState<null | DeviceType>(null)
   useEffect(() => {
     axios
       .get(`${process.env.NEXT_PUBLIC_API_URL}/devices/device`, { params: { deviceId: id } })
       .then(res => {
         setData(res.data.device[0])
-        setError(false)
       })
       .catch(() => {
         setData(null)
-        setError(true)
       })
-  }, [data, id])
+  }, [id])
   console.log('res:', data)
 
   if (data) {
@@ -41,7 +38,7 @@ const DeviceView = ({ id }: DeviceViewProps) => {
         </Grid>
       </Grid>
     )
-  } else if (error) {
+  } else {
     return (
       <Grid container spacing={6}>
         <Grid item xs={12}>
@@ -52,8 +49,6 @@ const DeviceView = ({ id }: DeviceViewProps) => {
         </Grid>
       </Grid>
     )
-  } else {
-    return null
   }
 }
 

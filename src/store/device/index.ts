@@ -75,7 +75,7 @@ export const updateStatusDevices = createAsyncThunk('device/updateDevices', asyn
   }
 })
 
-export const deviceSlice = createSlice({
+export const deviceSlice: any = createSlice({
   name: 'device',
   initialState: {
     devices: [] as DeviceType[],

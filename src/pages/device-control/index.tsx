@@ -20,7 +20,7 @@ import { fetchActiveDevices } from 'src/store/device'
 const DeviceControl = () => {
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>()
-  const store: DeviceStoreType = useSelector((state: RootState) => state.device)
+  const store: DeviceStoreType = useSelector((state: RootState) => state.device) as DeviceStoreType
 
   useEffect(() => {
     dispatch(fetchActiveDevices())

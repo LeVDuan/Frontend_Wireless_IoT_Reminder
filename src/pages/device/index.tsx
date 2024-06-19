@@ -2,7 +2,7 @@
 import View from 'src/views/device/View'
 
 const DeviceView = () => {
-  return <View id={'12'} />
+  return <View id='12' />
 }
 
 export default DeviceView

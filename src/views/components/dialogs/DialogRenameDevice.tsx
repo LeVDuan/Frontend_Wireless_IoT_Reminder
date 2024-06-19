@@ -44,7 +44,7 @@ const DialogRenameDevice = ({ device }: DialogRenameDeviceProps) => {
   const [show, setShow] = useState<boolean>(false)
   const [newName, setNewName] = useState<string>('')
   const dispatch = useDispatch<AppDispatch>()
-  const store: DeviceStoreType = useSelector((state: RootState) => state.device)
+  const store: DeviceStoreType = useSelector((state: RootState) => state.device) as DeviceStoreType
   const handleApply = async () => {
     setShow(false)
     if (newName == device.name) {
