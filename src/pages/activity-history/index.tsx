@@ -8,10 +8,7 @@ import PageHeader from 'src/@core/components/page-header'
 import { LogStoreType } from 'src/@core/utils/types'
 import { AppDispatch, RootState } from 'src/store'
 import { fetchLogs } from 'src/store/log'
-
-// ** Demo Components Imports
-// import LogsTimeline from 'src/views/components/timeline/LogsTimeline'
-import LogsTable from 'src/views/table/LogsTable'
+import LogListTable from 'src/views/table/LogListTable'
 
 const ActivityHistory = () => {
   // ** Hooks
@@ -19,7 +16,7 @@ const ActivityHistory = () => {
   const store: LogStoreType = useSelector((state: RootState) => state.log)
 
   useEffect(() => {
-    dispatch(fetchLogs())
+    dispatch(fetchLogs({ dates: [], action: '' }))
   }, [dispatch])
 
   console.log('Logs store: ', store)
@@ -32,10 +29,10 @@ const ActivityHistory = () => {
             Activity History
           </Typography>
         }
-        subtitle={<Typography variant='body2'>List of devices in the system.</Typography>}
+        subtitle={<Typography variant='body2'>List of system operation history.</Typography>}
       />
       <Grid item xs={12}>
-        <LogsTable store={store} />
+        <LogListTable store={store} />
       </Grid>
     </Grid>
   )

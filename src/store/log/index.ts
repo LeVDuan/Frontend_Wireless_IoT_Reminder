@@ -8,10 +8,15 @@ import { LogType } from 'src/@core/utils/types'
 
 const URL = `${process.env.NEXT_PUBLIC_API_URL}/logs`
 
+interface DataParams {
+  dates?: Date[]
+  action: string
+}
+
 // ** Fetch logs
-export const fetchLogs = createAsyncThunk('log/fetchLogs', async () => {
+export const fetchLogs = createAsyncThunk('log/fetchLogs', async (params: DataParams) => {
   try {
-    const response = await axios.get(URL)
+    const response = await axios.get(URL, { params })
 
     // console.log('logs:', response.data)
 

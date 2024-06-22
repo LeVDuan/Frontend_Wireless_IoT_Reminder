@@ -23,7 +23,8 @@ export const getStaticPaths: GetStaticPaths = async () => {
   // }))
   const paths = Array.from({ length: 16 }, (_, index) => ({ params: { id: String(index) } }))
   console.log(paths)
-  console.log('path', paths)
+
+  // console.log('path', paths)
 
   return {
     paths,
