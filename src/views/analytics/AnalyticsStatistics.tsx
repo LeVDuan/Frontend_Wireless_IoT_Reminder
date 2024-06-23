@@ -36,7 +36,7 @@ const AnalyticsStatistics = ({ data }: AnalyticsTransactionsProps) => {
     {
       amount: data.LGT,
       title: 'Light Up',
-      avatarColor: 'success',
+      avatarColor: 'secondary',
       avatarIcon: <Icon icon='heroicons-outline:light-bulb' />
     },
     {

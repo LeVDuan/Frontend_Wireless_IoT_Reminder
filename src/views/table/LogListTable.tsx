@@ -22,14 +22,12 @@ import { Grid, IconButton } from '@mui/material'
 
 // import AddDeviceDrawer from 'src/views/components/drawer/AddDeviceDrawer'
 import Tooltip from '@mui/material/Tooltip'
-import Link from 'next/link'
 import Icon from 'src/@core/components/icon'
-import { styled } from '@mui/material/styles'
 import { getInitials } from 'src/@core/utils/get-initials'
 import format from 'date-fns/format'
 import TextField from '@mui/material/TextField'
 import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
-import { DateType } from 'src/types/forms/reactDatepickerTypes'
+import { DateType } from 'src/@core/utils/types'
 import CardContent from '@mui/material/CardContent'
 import FormControl from '@mui/material/FormControl'
 import InputLabel from '@mui/material/InputLabel'
@@ -41,6 +39,8 @@ import { AppDispatch } from 'src/store'
 import { useDispatch } from 'react-redux'
 import { fetchLogs } from 'src/store/log'
 import { formatTimestamp } from 'src/utils'
+import DialogDeleteLogConfirm from '../components/dialogs/DialogDeleteLogConfirm'
+import ViewLogDrawer from '../components/drawers/ViewLogDrawer'
 
 interface LogListTableProps {
   store: LogStoreType
@@ -66,16 +66,9 @@ interface CellType {
   row: LogType
 }
 
-// ** Styled components
-const LinkStyled = styled(Link)(({ theme }) => ({
-  fontSize: '1rem',
-  textDecoration: 'none',
-  color: theme.palette.primary.main
-}))
-
 const logActionObj: LogActionObj = {
   edit: { title: 'Edit', color: 'info', icon: 'bx:edit' },
-  add: { title: 'Add', color: 'success', icon: 'gg:add-r' },
+  add: { title: 'Add', color: 'warning', icon: 'gg:add-r' },
   delete: { title: 'Delete', color: 'error', icon: 'bx:trash-alt' },
   control: { title: 'Control', color: 'primary', icon: 'ri:remote-control-line' }
 }
@@ -102,41 +95,6 @@ const renderClient = (row: LogType) => {
 
 const defaultColumns: GridColDef[] = [
   {
-    flex: 0.1,
-    field: 'id',
-    minWidth: 80,
-    headerName: '#ID',
-    renderCell: ({ row }: CellType) => (
-      <LinkStyled href={`//activity-history/log/view/${row._id}`}>{`#${row._id}`}</LinkStyled>
-    )
-  },
-  {
-    flex: 0.07,
-    minWidth: 80,
-    field: 'action',
-    renderHeader: () => <Icon icon='bx:trending-up' fontSize={20} />,
-    renderCell: ({ row }: CellType) => {
-      const color = logActionObj[row.action] ? logActionObj[row.action].color : 'primary'
-      const icon = logActionObj[row.action].icon
-
-      return (
-        <Tooltip
-          title={
-            <div>
-              <Typography variant='caption' sx={{ color: 'common.white', fontWeight: 600 }}>
-                {logActionObj[row.action].title}
-              </Typography>
-            </div>
-          }
-        >
-          <CustomAvatar skin='light' color={color} sx={{ width: 30, height: 30 }}>
-            <Icon fontSize='1rem' icon={icon} />
-          </CustomAvatar>
-        </Tooltip>
-      )
-    }
-  },
-  {
     flex: 0.2,
     field: 'name',
     minWidth: 120,
@@ -156,7 +114,36 @@ const defaultColumns: GridColDef[] = [
     }
   },
   {
-    flex: 0.2,
+    flex: 0.1,
+    minWidth: 180,
+    field: 'action',
+    headerName: 'Action type',
+    renderCell: ({ row }: CellType) => {
+      return (
+        <>
+          <Tooltip
+            title={
+              <div>
+                <Typography variant='caption' sx={{ color: 'common.white', fontWeight: 600 }}>
+                  {logActionObj[row.action].title}
+                </Typography>
+              </div>
+            }
+          >
+            <CustomAvatar skin='light' color={logActionObj[row.action].color} sx={{ width: 30, height: 30 }}>
+              <Icon fontSize='1rem' icon={logActionObj[row.action].icon} />
+            </CustomAvatar>
+          </Tooltip>
+          <Typography variant='inherit' sx={{ ml: 2, fontWeight: 400, color: 'text.secondary' }}>
+            {logActionObj[row.action].title.toUpperCase()}
+          </Typography>
+        </>
+      )
+    }
+  },
+
+  {
+    flex: 0.18,
     minWidth: 100,
     field: 'device',
     headerName: 'Device',
@@ -200,32 +187,6 @@ const defaultColumns: GridColDef[] = [
         />
       )
     }
-  },
-  {
-    flex: 0.1,
-    minWidth: 100,
-    sortable: false,
-    field: 'actions',
-    headerName: 'Actions',
-    renderCell: ({ row }: CellType) => (
-      <Box sx={{ display: 'flex', alignItems: 'center' }}>
-        <Tooltip title='Preview'>
-          <IconButton size='small' component={Link} href={`/activity-history/log/view/${row._id}`}>
-            <Icon icon='bx:show' fontSize={20} />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title='Delete Invoice'>
-          <IconButton
-            size='small'
-            onClick={() => {
-              return
-            }}
-          >
-            <Icon icon='bx:trash-alt' fontSize={20} />
-          </IconButton>
-        </Tooltip>
-      </Box>
-    )
   }
 ]
 /* eslint-disable */
@@ -248,9 +209,30 @@ const LogListTable = ({ store }: LogListTableProps) => {
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 })
 
   const [dates, setDates] = useState<Date[]>([])
+  const [selectedLog, setSelectedLog] = useState<LogType | null>(null)
   const [actionValue, setActionValue] = useState<string>('')
   const [endDateRange, setEndDateRange] = useState<DateType>(null)
   const [startDateRange, setStartDateRange] = useState<DateType>(null)
+
+  const [viewLogOpen, setViewLogOpen] = useState<boolean>(false)
+  const [dialogCfOpen, setDialogCfOpen] = useState<boolean>(false)
+
+  const toggleViewLogDrawer = (id: string) => {
+    const log = store.logs.find(log => log._id === id)
+    if (log) {
+      setSelectedLog(log)
+    }
+
+    setViewLogOpen(!viewLogOpen)
+  }
+  const toggleDialogCfDrawer = (id: string) => {
+    const log = store.logs.find(log => log._id === id)
+    if (log) {
+      setSelectedLog(log)
+    }
+
+    setDialogCfOpen(!dialogCfOpen)
+  }
 
   const dispatch = useDispatch<AppDispatch>()
 
@@ -289,6 +271,29 @@ const LogListTable = ({ store }: LogListTableProps) => {
     setEndDateRange(end)
     console.log('start:', new Date(start), 'end:', new Date(end))
   }
+
+  const columns: GridColDef[] = [
+    ...defaultColumns,
+    {
+      flex: 0.1,
+      minWidth: 100,
+      sortable: false,
+      field: 'actions',
+      headerName: 'Actions',
+      renderCell: ({ row }: CellType) => (
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <IconButton size='small' onClick={() => toggleViewLogDrawer(row._id)}>
+            <Icon icon='bx:show' fontSize={20} />
+          </IconButton>
+          <Tooltip title='Delete Log'>
+            <IconButton size='small' onClick={() => toggleDialogCfDrawer(row._id)}>
+              <Icon icon='bx:trash-alt' fontSize={20} />
+            </IconButton>
+          </Tooltip>
+        </Box>
+      )
+    }
+  ]
 
   return (
     <DatePickerWrapper>
@@ -345,16 +350,16 @@ const LogListTable = ({ store }: LogListTableProps) => {
         </Grid>
         <Grid item xs={12}>
           <Card>
-            <CardHeader title={`Number of devices in the system: ${store.total} logs.`} />
+            <CardHeader title={``} />
             <DataGrid
               autoHeight
-              columns={defaultColumns}
+              columns={columns}
               pageSizeOptions={[5, 10, 25, 50]}
               paginationModel={paginationModel}
               slots={{ toolbar: QuickSearchToolbar }}
               onPaginationModelChange={setPaginationModel}
               rows={filteredData.length ? filteredData : store.logs}
-              getRowId={row => row.deviceId}
+              getRowId={row => row._id}
               slotProps={{
                 baseButton: {
                   variant: 'outlined'
@@ -369,6 +374,8 @@ const LogListTable = ({ store }: LogListTableProps) => {
           </Card>
         </Grid>
       </Grid>
+      <ViewLogDrawer open={viewLogOpen} toggle={toggleViewLogDrawer} log={selectedLog} />
+      <DialogDeleteLogConfirm open={dialogCfOpen} toggle={toggleDialogCfDrawer} log={selectedLog} />
     </DatePickerWrapper>
   )
 }

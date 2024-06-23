@@ -93,3 +93,5 @@ export type AnalyticsType = {
   LGTLastWeek: LogAnalyticsType[]
   VLGLastWeek: LogAnalyticsType[]
 }
+
+export type DateType = Date | null | undefined
