@@ -6,7 +6,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import axios from 'axios'
 import { LogType } from 'src/@core/utils/types'
 
-const URL = `${process.env.NEXT_PUBLIC_API_URL}/logs`
+export const API_LOGS_URL = `${process.env.NEXT_PUBLIC_API_URL}/logs`
 
 interface DataParams {
   dates?: Date[]
@@ -16,7 +16,7 @@ interface DataParams {
 // ** Fetch logs
 export const fetchLogs = createAsyncThunk('log/fetchLogs', async (params: DataParams) => {
   try {
-    const response = await axios.get(URL, { params })
+    const response = await axios.get(API_LOGS_URL, { params })
 
     // console.log('logs:', response.data)
 
@@ -28,7 +28,7 @@ export const fetchLogs = createAsyncThunk('log/fetchLogs', async (params: DataPa
 
 export const fetchAnalytics = createAsyncThunk('log/fetchAnalytics', async () => {
   try {
-    const response = await axios.get(URL)
+    const response = await axios.get(API_LOGS_URL)
 
     // console.log('logs:', response.data)
 

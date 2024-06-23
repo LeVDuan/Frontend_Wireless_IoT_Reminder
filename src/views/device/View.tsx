@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { DeviceType } from 'src/@core/utils/types'
 import DeviceViewLeft from './DeviceViewLeft'
 import DeviceViewRight from './DeviceViewRight'
+import { API_DEVICES_URL } from 'src/store/device'
 
 interface DeviceViewProps {
   id: string | undefined
@@ -18,7 +19,7 @@ const DeviceView = ({ id }: DeviceViewProps) => {
   const [data, setData] = useState<null | DeviceType>(null)
   useEffect(() => {
     axios
-      .get(`${process.env.NEXT_PUBLIC_API_URL}/devices/device`, { params: { deviceId: id } })
+      .get(`${API_DEVICES_URL}/device`, { params: { deviceId: id } })
       .then(res => {
         if (res.data.result == 'Failed!') {
           setError(true)

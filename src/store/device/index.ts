@@ -6,12 +6,12 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import axios from 'axios'
 import { DeviceType } from 'src/@core/utils/types'
 
-const URL = `${process.env.NEXT_PUBLIC_API_URL}/devices`
+export const API_DEVICES_URL = `${process.env.NEXT_PUBLIC_API_URL}/devices`
 
 // ** Fetch devices
 export const fetchDevices = createAsyncThunk('device/fetchDevices', async () => {
   try {
-    const response = await axios.get(URL)
+    const response = await axios.get(API_DEVICES_URL)
 
     // console.log('Devices:', response.data)
 
@@ -23,7 +23,7 @@ export const fetchDevices = createAsyncThunk('device/fetchDevices', async () => 
 
 export const fetchActiveDevices = createAsyncThunk('device/fetchActiveDevices', async () => {
   try {
-    const response = await axios.get(`${URL}/activeDevices`)
+    const response = await axios.get(`${API_DEVICES_URL}/activeDevices`)
 
     console.log('ActiveDevices:', response.data)
 
@@ -64,7 +64,7 @@ export const fetchActiveDevices = createAsyncThunk('device/fetchActiveDevices', 
 
 export const updateStatusDevices = createAsyncThunk('device/updateDevices', async (update: any, { dispatch }: any) => {
   try {
-    const response = await axios.patch(`${URL}/updateStatus/all`, update)
+    const response = await axios.patch(`${API_DEVICES_URL}/updateStatus/all`, update)
 
     await dispatch(fetchActiveDevices())
     console.log('updated res: ', response.data)

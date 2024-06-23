@@ -25,7 +25,8 @@ const users: UserDataType[] = [
     password: 'duanlv0308',
     fullName: 'Duan Le',
     username: 'duanle',
-    email: 'duanlv194508@sis.hust.edu.vn'
+    email: 'duanlv194508@sis.hust.edu.vn',
+    avatar: 'DuanLV.jpg'
   },
   {
     id: 2,

@@ -16,13 +16,14 @@ import axios from 'axios'
 import { useEffect, useState } from 'react'
 import { AnalyticsType } from 'src/@core/utils/types'
 import AnalyticsControls from 'src/views/analytics/AnalyticsControls'
+import { API_LOGS_URL } from 'src/store/log'
 
 const AnalyticsDashboard = () => {
   const [data, setData] = useState<AnalyticsType>()
 
   useEffect(() => {
     const getAnalytics = async () => {
-      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/logs/analytics`)
+      const res = await axios.get(`${API_LOGS_URL}/analytics`)
       setData(res.data)
     }
     getAnalytics()

@@ -57,7 +57,7 @@ const escapeRegExp = (value: string) => {
   return value.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')
 }
 
-const columns: GridColDef[] = [
+const defaultColumns: GridColDef[] = [
   {
     flex: 0.3,
     minWidth: 250,
@@ -120,26 +120,6 @@ const columns: GridColDef[] = [
 
       return <CustomChip rounded size='small' skin='light' color={status.color} label={status.title} />
     }
-  },
-  {
-    flex: 0.2,
-    minWidth: 130,
-    sortable: false,
-    field: 'actions',
-    headerName: 'Actions',
-    renderCell: ({ row }: CellType) => {
-      return (
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <Tooltip title='View'>
-            <IconButton size='small' component={Link} href={`/device/${row.deviceId}`}>
-              <Icon icon='bx:show' fontSize={20} />
-            </IconButton>
-          </Tooltip>
-          <DialogRenameDevice device={row} />
-          <DialogDeleteConfirm device={row} />
-        </Box>
-      )
-    }
   }
 ]
 
@@ -150,6 +130,9 @@ const DeviceListTable = ({ store }: DeviceListTableProps) => {
   // const [value, setValue] = useState<DeviceGridRowType[]>([])
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 5 })
 
+  const [selectedDevice, setSelectedDevice] = useState<DeviceType | null>(null)
+  const [dialogRenameOpen, setDialogRenameOpen] = useState<boolean>(false)
+  const [dialogDelCfOpen, setDialogDelCfOpen] = useState<boolean>(false)
   const handleSearch = (searchValue: string) => {
     setSearchText(searchValue)
     const searchRegex = new RegExp(escapeRegExp(searchValue), 'i')
@@ -165,6 +148,56 @@ const DeviceListTable = ({ store }: DeviceListTableProps) => {
       setFilteredData([])
     }
   }
+
+  const toggleDialogRename = (id: string) => {
+    const device = store.devices.find(device => device._id === id)
+    if (device) {
+      setSelectedDevice(device)
+    }
+
+    setDialogRenameOpen(!dialogRenameOpen)
+  }
+
+  const toggleDialogDelCf = (id: string) => {
+    const device = store.devices.find(device => device._id === id)
+    if (device) {
+      setSelectedDevice(device)
+    }
+
+    setDialogDelCfOpen(!dialogDelCfOpen)
+  }
+
+  const columns: GridColDef[] = [
+    ...defaultColumns,
+    {
+      flex: 0.2,
+      minWidth: 130,
+      sortable: false,
+      field: 'actions',
+      headerName: 'Actions',
+      renderCell: ({ row }: CellType) => {
+        return (
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Tooltip title='View'>
+              <IconButton size='small' component={Link} href={`/device/${row.deviceId}`}>
+                <Icon icon='bx:show' fontSize={20} />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title='Rename'>
+              <IconButton size='small' onClick={() => toggleDialogRename(row._id)}>
+                <Icon icon='bx:pencil' fontSize={20} />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title='Delete'>
+              <IconButton size='small' onClick={() => toggleDialogDelCf(row._id)}>
+                <Icon icon='bx:trash-alt' fontSize={20} />
+              </IconButton>
+            </Tooltip>
+          </Box>
+        )
+      }
+    }
+  ]
 
   return (
     <Grid container spacing={6}>
@@ -201,6 +234,8 @@ const DeviceListTable = ({ store }: DeviceListTableProps) => {
           />
         </Card>
       </Grid>
+      <DialogRenameDevice open={dialogRenameOpen} toggle={toggleDialogRename} device={selectedDevice} />
+      <DialogDeleteConfirm open={dialogDelCfOpen} toggle={toggleDialogDelCf} device={selectedDevice} />
     </Grid>
   )
 }

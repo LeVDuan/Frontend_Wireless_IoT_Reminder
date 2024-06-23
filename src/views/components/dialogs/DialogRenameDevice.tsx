@@ -12,7 +12,6 @@ import Typography from '@mui/material/Typography'
 import Fade, { FadeProps } from '@mui/material/Fade'
 import DialogContent from '@mui/material/DialogContent'
 import DialogActions from '@mui/material/DialogActions'
-import Tooltip from '@mui/material/Tooltip'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
@@ -25,11 +24,16 @@ import { AppDispatch, RootState } from 'src/store'
 import { useSelector } from 'react-redux'
 import { fetchDevices } from 'src/store/device'
 import axios from 'axios'
+import { useAuth } from 'src/hooks/useAuth'
+import { API_DEVICES_URL } from 'src/store/device'
+import { API_LOGS_URL } from 'src/store/log'
 
 // import { renameDevice } from 'src/api/devices'
 
 interface DialogRenameDeviceProps {
-  device: DeviceType
+  open: boolean
+  toggle: (id: string) => void
+  device: DeviceType | null
 }
 
 const Transition = forwardRef(function Transition(
@@ -39,15 +43,16 @@ const Transition = forwardRef(function Transition(
   return <Fade ref={ref} {...props} />
 })
 
-const DialogRenameDevice = ({ device }: DialogRenameDeviceProps) => {
+const DialogRenameDevice = ({ open, toggle, device }: DialogRenameDeviceProps) => {
   // ** States
-  const [show, setShow] = useState<boolean>(false)
   const [newName, setNewName] = useState<string>('')
   const dispatch = useDispatch<AppDispatch>()
   const store: DeviceStoreType = useSelector((state: RootState) => state.device) as DeviceStoreType
+  const { user } = useAuth()
+  let log: any
   const handleApply = async () => {
-    setShow(false)
-    if (newName == device.name) {
+    toggle(device!._id)
+    if (newName == device!.name) {
       setNewName('')
 
       return toast.error('The new name is the same as the current name!')
@@ -61,16 +66,36 @@ const DialogRenameDevice = ({ device }: DialogRenameDeviceProps) => {
 
       return toast.error(`Device name ${newName} already exists!`)
     } else {
-      // dispatch(renameDevice({ id: device._id, newName }))
-      const response = await axios.patch(`${process.env.NEXT_PUBLIC_API_URL}/devices/${device._id}`, { newName })
+      const details = { objId: device!._id, oldName: device!.name, newName }
+      const response = await axios.patch(`${API_DEVICES_URL}/${device!._id}`, { newName })
       await dispatch(fetchDevices())
+
       const promiseToast = new Promise((resolve, reject) => {
         if (response.data.result == 'Success!') {
           resolve('OK')
+          log = {
+            userName: user?.fullName,
+            deviceId: device!.deviceId,
+            deviceName: newName,
+            action: 'edit',
+            details,
+            result: 'success'
+          }
         } else {
+          log = {
+            userName: user?.fullName,
+            deviceId: device!.deviceId,
+            deviceName: device!.name,
+            action: 'edit',
+            details,
+            result: 'failed'
+          }
           reject('failed!')
         }
       })
+      const res = await axios.post(`${API_LOGS_URL}`, { log })
+      console.log('create log: ', res.data)
+
       setNewName('')
 
       return toast.promise(promiseToast, {
@@ -82,81 +107,75 @@ const DialogRenameDevice = ({ device }: DialogRenameDeviceProps) => {
   }
 
   return (
-    <Fragment>
-      <Tooltip title='Rename'>
-        <IconButton size='small' onClick={() => setShow(true)}>
-          <Icon icon='bx:pencil' fontSize={20} />
-        </IconButton>
-      </Tooltip>
-      <Dialog
-        fullWidth
-        open={show}
-        maxWidth='md'
-        scroll='body'
-        onClose={() => setShow(false)}
-        TransitionComponent={Transition}
-        onBackdropClick={() => setShow(false)}
-      >
-        <DialogContent
-          sx={{
-            position: 'relative',
-            pb: theme => `${theme.spacing(8)} !important`,
-            px: theme => [`${theme.spacing(5)} !important`, `${theme.spacing(15)} !important`],
-            pt: theme => [`${theme.spacing(8)} !important`, `${theme.spacing(12.5)} !important`]
-          }}
-        >
-          <IconButton
-            size='small'
-            onClick={() => setShow(false)}
-            sx={{ position: 'absolute', right: '1rem', top: '1rem' }}
-          >
-            <Icon icon='bx:x' />
-          </IconButton>
-          <Box sx={{ mb: 8, textAlign: 'center' }}>
-            <Typography variant='h5' sx={{ mb: 3 }}>
-              Change the device's memorable name
-            </Typography>
-            <Typography variant='body2'>Rename this device, be careful not to sync with physical devices.</Typography>
-          </Box>
-          <Grid container spacing={6} mt={10}>
-            <Grid item sm={5} xs={12}>
-              <TextField fullWidth defaultValue={device.name} label='Current Name' InputProps={{ readOnly: true }} />
-            </Grid>
-            <Grid item sm={2} xs={12}>
-              <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: 'row' }}>
-                <Icon icon='material-symbols:play-arrow' fontSize={30} />
-                <Icon icon='material-symbols:play-arrow' fontSize={30} />
-                <Icon icon='material-symbols:play-arrow' fontSize={30} />
-              </Box>
-            </Grid>
-            <Grid item sm={5} xs={12}>
-              <TextField fullWidth label='New Name' placeholder='Duan LV' onChange={e => setNewName(e.target.value)} />
-            </Grid>
-          </Grid>
-        </DialogContent>
-        <DialogActions
-          sx={{
-            justifyContent: 'right',
-            px: theme => [`${theme.spacing(5)} !important`, `${theme.spacing(15)} !important`],
-            pb: theme => [`${theme.spacing(8)} !important`, `${theme.spacing(10)} !important`]
-          }}
-        >
-          <Button variant='contained' sx={{ mr: 1 }} onClick={handleApply}>
-            Apply
-          </Button>
-          <Button
-            variant='outlined'
-            color='secondary'
-            onClick={() => {
-              setNewName('')
-              setShow(false)
+    device && (
+      <Fragment>
+        <Dialog fullWidth open={open} maxWidth='md' scroll='body' onClose={toggle} TransitionComponent={Transition}>
+          <DialogContent
+            sx={{
+              position: 'relative',
+              pb: theme => `${theme.spacing(8)} !important`,
+              px: theme => [`${theme.spacing(5)} !important`, `${theme.spacing(15)} !important`],
+              pt: theme => [`${theme.spacing(8)} !important`, `${theme.spacing(12.5)} !important`]
             }}
           >
-            Discard
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </Fragment>
+            <IconButton
+              size='small'
+              onClick={() => toggle(device._id)}
+              sx={{ position: 'absolute', right: '1rem', top: '1rem' }}
+            >
+              <Icon icon='bx:x' />
+            </IconButton>
+            <Box sx={{ mb: 8, textAlign: 'center' }}>
+              <Typography variant='h5' sx={{ mb: 3 }}>
+                Change the device's memorable name
+              </Typography>
+              <Typography variant='body2'>Rename this device, be careful not to sync with physical devices.</Typography>
+            </Box>
+            <Grid container spacing={6} mt={10}>
+              <Grid item sm={5} xs={12}>
+                <TextField fullWidth defaultValue={device.name} label='Current Name' InputProps={{ readOnly: true }} />
+              </Grid>
+              <Grid item sm={2} xs={12}>
+                <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: 'row' }}>
+                  <Icon icon='material-symbols:play-arrow' fontSize={30} />
+                  <Icon icon='material-symbols:play-arrow' fontSize={30} />
+                  <Icon icon='material-symbols:play-arrow' fontSize={30} />
+                </Box>
+              </Grid>
+              <Grid item sm={5} xs={12}>
+                <TextField
+                  fullWidth
+                  label='New Name'
+                  placeholder='Duan LV'
+                  onChange={e => setNewName(e.target.value)}
+                />
+              </Grid>
+            </Grid>
+          </DialogContent>
+          <DialogActions
+            sx={{
+              justifyContent: 'right',
+              px: theme => [`${theme.spacing(5)} !important`, `${theme.spacing(15)} !important`],
+              pb: theme => [`${theme.spacing(8)} !important`, `${theme.spacing(10)} !important`]
+            }}
+          >
+            <Button variant='contained' sx={{ mr: 1 }} onClick={handleApply}>
+              Apply
+            </Button>
+            <Button
+              variant='outlined'
+              color='secondary'
+              onClick={() => {
+                setNewName('')
+                toggle(device._id)
+              }}
+            >
+              Discard
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </Fragment>
+    )
   )
 }
 

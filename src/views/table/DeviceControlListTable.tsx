@@ -56,7 +56,7 @@ interface DeviceControlListTableProps {
   store: DeviceStoreType
 }
 
-const columns: GridColDef[] = [
+const defaultColumns: GridColDef[] = [
   {
     flex: 0.3,
     minWidth: 200,
@@ -119,15 +119,6 @@ const columns: GridColDef[] = [
 
       return <CustomChip rounded size='small' skin='light' color={status.color} label={status.title} />
     }
-  },
-  {
-    flex: 0.2,
-    minWidth: 200,
-    field: 'actions',
-    headerName: 'Actions',
-    renderCell: ({ row }: CellType) => {
-      return <DialogSendControlSignal device={row} />
-    }
   }
 ]
 
@@ -138,6 +129,22 @@ const DeviceControlListTable = ({ store }: DeviceControlListTableProps) => {
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 5 })
   const [isDisable, setIsDisable] = useState<boolean>(false)
   const dispatch = useDispatch<AppDispatch>()
+
+  const [selectedDevice, setSelectedDevice] = useState<DeviceType | null>(null)
+  const [dialogOpen, setDialogOpen] = useState<boolean>(false)
+
+  const toggleDialogSendSignal = (id: string) => {
+    if (port) {
+      const device = store.devices.find(device => device._id === id)
+      if (device) {
+        setSelectedDevice(device)
+      }
+
+      setDialogOpen(!dialogOpen)
+    } else {
+      toast.error('Please connect the COM port first')
+    }
+  }
 
   const handleSearch = (searchValue: string) => {
     setSearchText(searchValue)
@@ -194,6 +201,27 @@ const DeviceControlListTable = ({ store }: DeviceControlListTableProps) => {
     }
   }
 
+  const columns: GridColDef[] = [
+    ...defaultColumns,
+    {
+      flex: 0.2,
+      minWidth: 200,
+      field: 'actions',
+      headerName: 'Actions',
+      renderCell: ({ row }: CellType) => (
+        <Button
+          size='small'
+          variant='outlined'
+          color='inherit'
+          endIcon={<Icon icon='bx:send' />}
+          onClick={() => toggleDialogSendSignal(row._id)}
+        >
+          Control
+        </Button>
+      )
+    }
+  ]
+
   return (
     <Card>
       <CardHeader
@@ -232,6 +260,7 @@ const DeviceControlListTable = ({ store }: DeviceControlListTableProps) => {
           }
         }}
       />
+      <DialogSendControlSignal open={dialogOpen} toggle={toggleDialogSendSignal} device={selectedDevice} />
     </Card>
   )
 }

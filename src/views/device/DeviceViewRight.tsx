@@ -35,6 +35,7 @@ import MuiTimeline, { TimelineProps } from '@mui/lab/Timeline'
 import { getColorFromBatteryValue, timeDifference } from 'src/utils'
 import axios from 'axios'
 import Link from 'next/link'
+import { API_LOGS_URL } from 'src/store/log'
 
 interface DeviceViewLeftProps {
   deviceData: DeviceType
@@ -228,7 +229,7 @@ const DeviceViewRight = ({ deviceData }: DeviceViewLeftProps) => {
 
   useEffect(() => {
     axios
-      .get(`${process.env.NEXT_PUBLIC_API_URL}/logs/recentActivity`, { params: { deviceId: deviceData.deviceId } })
+      .get(`${API_LOGS_URL}/recentActivity`, { params: { deviceId: deviceData.deviceId } })
       .then(res => {
         setRecentHistory(res.data)
       })

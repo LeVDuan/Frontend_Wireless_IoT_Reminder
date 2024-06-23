@@ -24,6 +24,7 @@ import { useDispatch } from 'react-redux'
 import { AppDispatch } from 'src/store'
 import { fetchDevices } from 'src/store/device'
 import axios from 'axios'
+import { API_DEVICES_URL } from 'src/store/device'
 
 interface DialogAddDeviceProps {
   store: DeviceStoreType
@@ -64,7 +65,7 @@ const DialogAddDevice = ({ store }: DialogAddDeviceProps) => {
       return toast.error(`Device name ${name} already exists!`)
     } else {
       try {
-        const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/devices`, { deviceId, name })
+        const response = await axios.post(`${API_DEVICES_URL}`, { deviceId, name })
 
         await dispatch(fetchDevices())
 
@@ -72,7 +73,7 @@ const DialogAddDevice = ({ store }: DialogAddDeviceProps) => {
         setDeviceId(undefined)
 
         const promiseToast = new Promise((resolve, reject) => {
-          if (response.data.result == 'Success!') {
+          if (response.data.result === 'Success!') {
             resolve('OK')
           } else {
             reject('failed!')
@@ -159,7 +160,7 @@ const DialogAddDevice = ({ store }: DialogAddDeviceProps) => {
         </DialogContent>
         <DialogActions
           sx={{
-            justifyContent: 'center',
+            justifyContent: 'end',
             px: theme => [`${theme.spacing(5)} !important`, `${theme.spacing(15)} !important`],
             pb: theme => [`${theme.spacing(8)} !important`, `${theme.spacing(12.5)} !important`]
           }}

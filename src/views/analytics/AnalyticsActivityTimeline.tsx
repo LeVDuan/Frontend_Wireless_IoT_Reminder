@@ -22,6 +22,7 @@ import { DetailsControl, DetailsEdit, LogType } from 'src/@core/utils/types'
 import { ThemeColor } from 'src/@core/layouts/types'
 import Link from 'next/link'
 import { timeDifference } from 'src/utils'
+import { API_LOGS_URL } from 'src/store/log'
 
 interface ColorAction {
   [key: string]: {
@@ -62,7 +63,7 @@ const AnalyticsActivityTimeline = () => {
 
   useEffect(() => {
     axios
-      .get(`${process.env.NEXT_PUBLIC_API_URL}/logs/recentActivity`)
+      .get(`${API_LOGS_URL}/recentActivity`)
       .then(res => {
         setRecentHistory(res.data)
       })

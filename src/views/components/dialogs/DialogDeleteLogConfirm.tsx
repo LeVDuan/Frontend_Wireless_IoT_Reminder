@@ -15,6 +15,7 @@ import { AppDispatch } from 'src/store'
 import toast from 'react-hot-toast'
 import axios from 'axios'
 import { fetchLogs } from 'src/store/log'
+import { API_LOGS_URL } from 'src/store/log'
 
 interface DialogDeleteConfirmProps {
   open: boolean
@@ -31,7 +32,7 @@ const DialogDeleteLogConfirm = ({ open, toggle, log }: DialogDeleteConfirmProps)
       toggle(log._id)
 
       try {
-        const response = await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/logs/${log._id}`)
+        const response = await axios.delete(`${API_LOGS_URL}/${log._id}`)
 
         await dispatch(fetchLogs({ dates: [], action: '' }))
         console.log('deleted res: ', response.data)
