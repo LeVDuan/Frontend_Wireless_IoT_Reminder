@@ -11,11 +11,8 @@ import DialogContentText from '@mui/material/DialogContentText'
 import { DeviceType } from 'src/@core/utils/types'
 import { useDispatch } from 'react-redux'
 import { AppDispatch } from 'src/store'
-import { fetchDevices } from 'src/store/device'
-import { API_DEVICES_URL } from 'src/store/device'
-
-import toast from 'react-hot-toast'
-import axios from 'axios'
+import { deleteDevice } from 'src/store/device'
+import { useAuth } from 'src/hooks/useAuth'
 
 interface DialogDeleteConfirmProps {
   open: boolean
@@ -26,31 +23,11 @@ interface DialogDeleteConfirmProps {
 const DialogDeleteConfirm = ({ open, toggle, device }: DialogDeleteConfirmProps) => {
   // ** State
   const dispatch = useDispatch<AppDispatch>()
+  const { user } = useAuth()
 
   const handleDelete = async () => {
     toggle(device!._id)
-    try {
-      const response = await axios.delete(`${API_DEVICES_URL}/${device!._id}`)
-
-      await dispatch(fetchDevices())
-      console.log('deleted res: ', response.data)
-
-      const promiseToast = new Promise((resolve, reject) => {
-        if (response.data.result == 'Success!') {
-          resolve('OK')
-        } else {
-          reject('failed!')
-        }
-      })
-
-      return toast.promise(promiseToast, {
-        loading: 'Loading ...',
-        success: 'Successfully!',
-        error: 'Failed!'
-      })
-    } catch (error) {
-      throw error
-    }
+    dispatch(deleteDevice({ id: device!._id, userName: user!.fullName }))
   }
 
   return (

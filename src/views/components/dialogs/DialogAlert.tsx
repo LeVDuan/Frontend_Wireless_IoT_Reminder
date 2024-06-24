@@ -1,5 +1,5 @@
 // ** React Imports
-import { Fragment, useState } from 'react'
+import { Fragment } from 'react'
 
 // ** MUI Imports
 import Button from '@mui/material/Button'
@@ -8,40 +8,20 @@ import DialogTitle from '@mui/material/DialogTitle'
 import DialogContent from '@mui/material/DialogContent'
 import DialogActions from '@mui/material/DialogActions'
 import DialogContentText from '@mui/material/DialogContentText'
-import { usePort } from 'src/context/PortContext'
-import toast from 'react-hot-toast'
 
-const DialogAlert = () => {
+interface DialogOpenPortAlertProps {
+  open: boolean
+  toggle: () => void
+  message: string | null
+}
+const DialogAlert = ({ open, toggle, message }: DialogOpenPortAlertProps) => {
   // ** State
-  const [open, setOpen] = useState<boolean>(false)
-  const { requestOpenPort } = usePort()
-  const [message, setMessage] = useState<string>('')
-
-  const handleClickOpen = async () => {
-    try {
-      await requestOpenPort()
-      toast.success('Connected successfully!')
-    } catch (err) {
-      if (err instanceof Error) {
-        if (err.message.indexOf('The port is already open.') != -1) {
-          setMessage('The port is already open.')
-        } else if (err.message.indexOf('No port selected by the user.') != -1) {
-          setMessage('No port selected by the user.')
-        }
-        setOpen(true)
-      }
-    }
-  }
-  const handleClose = () => setOpen(false)
 
   return (
     <Fragment>
-      <Button size='medium' variant='contained' className='demo-space-x' onClick={handleClickOpen}>
-        Open Port
-      </Button>
       <Dialog
         open={open}
-        onClose={handleClose}
+        onClose={toggle}
         aria-labelledby='alert-dialog-title'
         aria-describedby='alert-dialog-description'
       >
@@ -50,7 +30,7 @@ const DialogAlert = () => {
           <DialogContentText id='alert-dialog-description'>{message}</DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button variant='contained' onClick={handleClose}>
+          <Button variant='contained' onClick={toggle}>
             Agree
           </Button>
         </DialogActions>

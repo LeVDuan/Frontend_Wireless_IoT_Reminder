@@ -37,6 +37,7 @@ export type DeviceStoreType = {
   activeDevices: DeviceType[]
   totalDevices: number
   totalActiveDevices: number
+  device: DeviceType
 }
 
 export type LogStoreType = {

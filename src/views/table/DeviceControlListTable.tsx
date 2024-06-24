@@ -31,6 +31,7 @@ import { DeviceStoreType } from 'src/@core/utils/types'
 import { useDispatch } from 'react-redux'
 import { AppDispatch } from 'src/store'
 import { updateStatusDevices } from 'src/store/device'
+import Link from 'next/link'
 
 interface CellType {
   row: DeviceType
@@ -64,7 +65,11 @@ const defaultColumns: GridColDef[] = [
     headerName: 'Name',
     renderCell: ({ row }: CellType) => {
       return (
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+        <Box
+          component={Link}
+          href={`/device/${row._id}`}
+          sx={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}
+        >
           <CustomAvatar
             src={`/images/avatars/${row.deviceId}.png`}
             sx={{ mr: 3, width: '1.875rem', height: '1.875rem' }}

@@ -65,7 +65,11 @@ const defaultColumns: GridColDef[] = [
     headerName: 'Name',
     renderCell: ({ row }: CellType) => {
       return (
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+        <Box
+          component={Link}
+          href={`/device/${row._id}`}
+          sx={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}
+        >
           <CustomAvatar
             src={`/images/avatars/${row.deviceId}.png`}
             sx={{ mr: 3, width: '1.875rem', height: '1.875rem' }}
@@ -74,6 +78,7 @@ const defaultColumns: GridColDef[] = [
             <Typography noWrap variant='body2' sx={{ color: 'text.primary', fontWeight: 500 }}>
               {row.name}
             </Typography>
+
             <Typography noWrap variant='subtitle2' sx={{ color: 'text.disable' }}>
               #{row.deviceId}
             </Typography>
@@ -179,7 +184,7 @@ const DeviceListTable = ({ store }: DeviceListTableProps) => {
         return (
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <Tooltip title='View'>
-              <IconButton size='small' component={Link} href={`/device/${row.deviceId}`}>
+              <IconButton size='small' component={Link} href={`/device/${row._id}`}>
                 <Icon icon='bx:show' fontSize={20} />
               </IconButton>
             </Tooltip>

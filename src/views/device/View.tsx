@@ -1,59 +1,38 @@
-import { Alert, Grid } from '@mui/material'
-import axios from 'axios'
-import { useEffect, useState } from 'react'
-import Link from 'next/link'
+import { Grid } from '@mui/material'
+import { useEffect } from 'react'
 
-import { DeviceType } from 'src/@core/utils/types'
+import { DeviceStoreType } from 'src/@core/utils/types'
 import DeviceViewLeft from './DeviceViewLeft'
 import DeviceViewRight from './DeviceViewRight'
-import { API_DEVICES_URL } from 'src/store/device'
+import { fetchDevice } from 'src/store/device'
+import { useDispatch } from 'react-redux'
+import { AppDispatch, RootState } from 'src/store'
+import { useSelector } from 'react-redux'
 
 interface DeviceViewProps {
-  id: string | undefined
+  id: string
 }
 
 const DeviceView = ({ id }: DeviceViewProps) => {
-  console.log(id)
+  const dispatch = useDispatch<AppDispatch>()
+  const store: DeviceStoreType = useSelector((state: RootState) => state.device) as DeviceStoreType
 
-  const [error, setError] = useState<boolean>(false)
-  const [data, setData] = useState<null | DeviceType>(null)
   useEffect(() => {
-    axios
-      .get(`${API_DEVICES_URL}/device`, { params: { deviceId: id } })
-      .then(res => {
-        if (res.data.result == 'Failed!') {
-          setError(true)
-        } else {
-          setData(res.data.device[0])
-          setError(false)
-        }
-      })
-      .catch(() => {
-        setData(null)
-        setError(true)
-      })
-  }, [id])
-  console.log('res:', data)
+    dispatch(fetchDevice(id))
+  }, [dispatch, id])
 
-  if (data) {
+  console.log('device:', store.device)
+
+  if (store.device) {
+    console.log(store.device)
+
     return (
       <Grid container spacing={6}>
         <Grid item xs={12} md={5} lg={4}>
-          <DeviceViewLeft deviceData={data} />
+          <DeviceViewLeft deviceData={store.device} />
         </Grid>
         <Grid item xs={12} md={7} lg={8}>
-          <DeviceViewRight deviceData={data} />
-        </Grid>
-      </Grid>
-    )
-  } else if (error) {
-    return (
-      <Grid container spacing={6}>
-        <Grid item xs={12}>
-          <Alert severity='error'>
-            Device with the id: {id} does not exist. Please check the list of device:{' '}
-            <Link href='/device-list'>Device List</Link>
-          </Alert>
+          <DeviceViewRight deviceData={store.device} />
         </Grid>
       </Grid>
     )

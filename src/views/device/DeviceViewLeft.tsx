@@ -27,7 +27,9 @@ import { CardActions } from '@mui/material'
 import { formatDate } from 'src/@core/utils/format'
 import { usePort } from 'src/context/PortContext'
 import toast from 'react-hot-toast'
-import DialogRenameDevice from '../components/dialogs/DialogRenameDevice'
+import DialogAlert from '../components/dialogs/DialogAlert'
+
+// import DialogRenameDevice from '../components/dialogs/DialogRenameDevice'
 
 interface StatusObj {
   [key: string]: {
@@ -64,10 +66,18 @@ const ResetButtonStyled = styled(Button)<ButtonProps>(({ theme }) => ({
 
 const DeviceViewLeft = ({ deviceData }: DeviceViewLeftProps) => {
   // const isActive = deviceData.isActive.toString()
-  const status = statusObj[deviceData.isActive.toString()]
+  const status = statusObj[deviceData.isActive?.toString()]
   const [imgSrc, setImgSrc] = useState<string>(`/images/avatars/${deviceData.deviceId}.png`)
   const [inputValue, setInputValue] = useState<string>('')
   const { port, sendToPort, requestOpenPort } = usePort()
+
+  const [message, setMessage] = useState<string>('')
+
+  const [dialogAlertOpen, setDialogAlertOpen] = useState<boolean>(false)
+
+  const toggleDialogAlert = () => {
+    setDialogAlertOpen(!dialogAlertOpen)
+  }
 
   const handleInputImageChange = (file: ChangeEvent) => {
     const reader = new FileReader()
@@ -87,17 +97,24 @@ const DeviceViewLeft = ({ deviceData }: DeviceViewLeftProps) => {
   }
 
   const handleUpdateStatus = async () => {
-    if (!port) {
+    try {
       await requestOpenPort()
-      toast.success('Connected successfully!\nPlease press update status again.')
-    } else {
+      toast.success('Connected successfully!')
+
       if (!port.writable) {
-        toast.error('Update failed!')
+        toast.error("Can't not write to port. Update failed!")
       } else {
         await sendToPort('REQ')
-
-        //all api: dispatch()
         toast.success('Update successfully!')
+      }
+    } catch (err) {
+      if (err instanceof Error) {
+        if (err.message.indexOf('The port is already open.') != -1) {
+          setMessage('The port is already open.')
+        } else if (err.message.indexOf('No port selected by the user.') != -1) {
+          setMessage('No port selected by the user.')
+        }
+        toggleDialogAlert()
       }
     }
   }
@@ -116,15 +133,16 @@ const DeviceViewLeft = ({ deviceData }: DeviceViewLeftProps) => {
               />
 
               <Typography variant='h5' sx={{ mb: 2.5, fontSize: '1.375rem !important' }}>
-                {deviceData.name} <DialogRenameDevice device={deviceData} />
+                {deviceData.name}
+                {/* <DialogRenameDevice device={deviceData} /> */}
               </Typography>
               <CustomChip
                 rounded
                 skin='light'
                 size='small'
-                label={status.title}
+                label={status?.title}
                 sx={{ fontWeight: 500 }}
-                color={status.color}
+                color={status?.color}
               />
             </CardContent>
             <CardContent sx={{ pt: 12, display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
@@ -190,9 +208,9 @@ const DeviceViewLeft = ({ deviceData }: DeviceViewLeftProps) => {
                     rounded
                     skin='light'
                     size='small'
-                    label={status.title}
+                    label={status?.title}
                     sx={{ fontWeight: 500 }}
-                    color={status.color}
+                    color={status?.color}
                   />
                 </Box>
                 <Box sx={{ display: 'flex', mb: 4 }}>
@@ -215,6 +233,7 @@ const DeviceViewLeft = ({ deviceData }: DeviceViewLeftProps) => {
             </CardActions>
           </Card>
         </Grid>
+        <DialogAlert open={dialogAlertOpen} toggle={toggleDialogAlert} message={message} />
       </Grid>
     )
   } else {

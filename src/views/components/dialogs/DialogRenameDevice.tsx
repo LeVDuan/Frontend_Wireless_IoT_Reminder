@@ -22,11 +22,8 @@ import toast from 'react-hot-toast'
 import { useDispatch } from 'react-redux'
 import { AppDispatch, RootState } from 'src/store'
 import { useSelector } from 'react-redux'
-import { fetchDevices } from 'src/store/device'
-import axios from 'axios'
+import { renameDevice } from 'src/store/device'
 import { useAuth } from 'src/hooks/useAuth'
-import { API_DEVICES_URL } from 'src/store/device'
-import { API_LOGS_URL } from 'src/store/log'
 
 // import { renameDevice } from 'src/api/devices'
 
@@ -49,14 +46,14 @@ const DialogRenameDevice = ({ open, toggle, device }: DialogRenameDeviceProps) =
   const dispatch = useDispatch<AppDispatch>()
   const store: DeviceStoreType = useSelector((state: RootState) => state.device) as DeviceStoreType
   const { user } = useAuth()
-  let log: any
+
   const handleApply = async () => {
     toggle(device!._id)
-    if (newName == device!.name) {
+    if (newName === device!.name) {
       setNewName('')
 
       return toast.error('The new name is the same as the current name!')
-    } else if (newName == '') {
+    } else if (newName === '') {
       return
     }
 
@@ -66,43 +63,13 @@ const DialogRenameDevice = ({ open, toggle, device }: DialogRenameDeviceProps) =
 
       return toast.error(`Device name ${newName} already exists!`)
     } else {
-      const details = { objId: device!._id, oldName: device!.name, newName }
-      const response = await axios.patch(`${API_DEVICES_URL}/${device!._id}`, { newName })
-      await dispatch(fetchDevices())
-
-      const promiseToast = new Promise((resolve, reject) => {
-        if (response.data.result == 'Success!') {
-          resolve('OK')
-          log = {
-            userName: user?.fullName,
-            deviceId: device!.deviceId,
-            deviceName: newName,
-            action: 'edit',
-            details,
-            result: 'success'
-          }
-        } else {
-          log = {
-            userName: user?.fullName,
-            deviceId: device!.deviceId,
-            deviceName: device!.name,
-            action: 'edit',
-            details,
-            result: 'failed'
-          }
-          reject('failed!')
-        }
-      })
-      const res = await axios.post(`${API_LOGS_URL}`, { log })
-      console.log('create log: ', res.data)
-
+      dispatch(
+        renameDevice({
+          id: device!._id,
+          newInfo: { deviceId: device!.deviceId, oldName: device!.name, newName, userName: user!.fullName }
+        })
+      )
       setNewName('')
-
-      return toast.promise(promiseToast, {
-        loading: 'Loading ...',
-        success: 'Apply successfully!',
-        error: 'Failed!'
-      })
     }
   }
 

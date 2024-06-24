@@ -18,13 +18,12 @@ import Card from '@mui/material/Card'
 import Icon from 'src/@core/components/icon'
 
 // ** Custom Components Imports
+import { useAuth } from 'src/hooks/useAuth'
 import toast from 'react-hot-toast'
 import { DeviceStoreType } from 'src/@core/utils/types'
+import { addDevice } from 'src/store/device'
 import { useDispatch } from 'react-redux'
 import { AppDispatch } from 'src/store'
-import { fetchDevices } from 'src/store/device'
-import axios from 'axios'
-import { API_DEVICES_URL } from 'src/store/device'
 
 interface DialogAddDeviceProps {
   store: DeviceStoreType
@@ -42,6 +41,7 @@ const DialogAddDevice = ({ store }: DialogAddDeviceProps) => {
   const [name, setName] = useState<string>('')
   const [show, setShow] = useState<boolean>(false)
   const [deviceId, setDeviceId] = useState<number>()
+  const { user } = useAuth()
   const dispatch = useDispatch<AppDispatch>()
 
   const handleSubmit = async () => {
@@ -64,30 +64,10 @@ const DialogAddDevice = ({ store }: DialogAddDeviceProps) => {
 
       return toast.error(`Device name ${name} already exists!`)
     } else {
-      try {
-        const response = await axios.post(`${API_DEVICES_URL}`, { deviceId, name })
-
-        await dispatch(fetchDevices())
-
-        setName('')
-        setDeviceId(undefined)
-
-        const promiseToast = new Promise((resolve, reject) => {
-          if (response.data.result === 'Success!') {
-            resolve('OK')
-          } else {
-            reject('failed!')
-          }
-        })
-
-        return toast.promise(promiseToast, {
-          loading: 'Loading ...',
-          success: 'Successfully!',
-          error: 'Failed!'
-        })
-      } catch (error) {
-        throw error
-      }
+      console.log('add')
+      dispatch(addDevice({ deviceId, name, userName: user!.fullName }))
+      setName('')
+      setDeviceId(undefined)
     }
   }
 
