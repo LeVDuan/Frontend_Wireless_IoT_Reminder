@@ -1,5 +1,5 @@
 // ** React Imports
-import { ElementType, useState, ChangeEvent } from 'react'
+import { ElementType, useState, ChangeEvent, useEffect } from 'react'
 
 // ** MUI Imports
 import Box from '@mui/material/Box'
@@ -27,7 +27,11 @@ import { CardActions } from '@mui/material'
 import { formatDate } from 'src/@core/utils/format'
 import { usePort } from 'src/context/PortContext'
 import toast from 'react-hot-toast'
-import DialogAlert from '../components/dialogs/DialogAlert'
+import { sendUpdateInfo } from 'src/utils'
+import axios from 'axios'
+import { API_DEVICES_URL } from 'src/store/device'
+import { useDispatch } from 'react-redux'
+import { AppDispatch } from 'src/store'
 
 // import DialogRenameDevice from '../components/dialogs/DialogRenameDevice'
 
@@ -69,16 +73,16 @@ const DeviceViewLeft = ({ deviceData }: DeviceViewLeftProps) => {
   const status = statusObj[deviceData.isActive?.toString()]
   const [imgSrc, setImgSrc] = useState<string>(`/images/avatars/${deviceData.deviceId}.png`)
   const [inputValue, setInputValue] = useState<string>('')
-  const { port, sendToPort, requestOpenPort } = usePort()
+  const { selectPort, writeToPort } = usePort()
 
-  const [message, setMessage] = useState<string>('')
+  const [response, setResponse] = useState<string | null>(null)
+  const dispatch = useDispatch<AppDispatch>()
 
-  const [dialogAlertOpen, setDialogAlertOpen] = useState<boolean>(false)
-
-  const toggleDialogAlert = () => {
-    setDialogAlertOpen(!dialogAlertOpen)
-  }
-
+  useEffect(() => {
+    if (response) {
+      sendUpdateInfo(response, dispatch)
+    }
+  }, [response, dispatch])
   const handleInputImageChange = (file: ChangeEvent) => {
     const reader = new FileReader()
     const { files } = file.target as HTMLInputElement
@@ -97,25 +101,29 @@ const DeviceViewLeft = ({ deviceData }: DeviceViewLeftProps) => {
   }
 
   const handleUpdateStatus = async () => {
-    try {
-      await requestOpenPort()
+    const error = await selectPort()
+    if (error) {
+      toast.error(`${error}`)
+    } else {
       toast.success('Connected successfully!')
 
-      if (!port.writable) {
-        toast.error("Can't not write to port. Update failed!")
-      } else {
-        await sendToPort('REQ')
-        toast.success('Update successfully!')
-      }
-    } catch (err) {
-      if (err instanceof Error) {
-        if (err.message.indexOf('The port is already open.') != -1) {
-          setMessage('The port is already open.')
-        } else if (err.message.indexOf('No port selected by the user.') != -1) {
-          setMessage('No port selected by the user.')
-        }
-        toggleDialogAlert()
-      }
+      const brdCmd = (
+        await axios.post(`${API_DEVICES_URL}/control`, {
+          type: 'Broadcast'
+        })
+      ).data.command
+
+      console.log(brdCmd)
+
+      // await writeToPort(brdCmd, setResponse)
+
+      const reqCmd = (
+        await axios.post(`${API_DEVICES_URL}/control`, {
+          type: 'Request',
+          deviceId: -1
+        })
+      ).data.command
+      await writeToPort(reqCmd, setResponse)
     }
   }
 
@@ -233,7 +241,6 @@ const DeviceViewLeft = ({ deviceData }: DeviceViewLeftProps) => {
             </CardActions>
           </Card>
         </Grid>
-        <DialogAlert open={dialogAlertOpen} toggle={toggleDialogAlert} message={message} />
       </Grid>
     )
   } else {

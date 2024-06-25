@@ -1,4 +1,6 @@
+import toast from 'react-hot-toast'
 import { LogAnalyticsType } from 'src/@core/utils/types'
+import { updateStatusDevices } from 'src/store/device'
 
 export const formatTimestamp = (timestamp: string) => {
   const date = new Date(timestamp)
@@ -104,4 +106,27 @@ export const parseToJSON = (res: string): any[] => {
   }
 
   return result
+}
+
+export const sendUpdateInfo = async (response: string | null, dispatch: any, firstTime?: boolean) => {
+  if (response?.startsWith('REQ:') && response?.endsWith('\r')) {
+    if (response.startsWith('REQ:Failed')) {
+      toast.error('Update failed!')
+    } else if (response.startsWith('REQ:-1')) {
+      toast.error('Has no device active!')
+    } else {
+      const update = parseToJSON(response)
+      console.log({ update })
+      try {
+        dispatch(updateStatusDevices({ update }))
+        if (!firstTime) {
+          toast.success('Update successfully!')
+        }
+      } catch (error) {
+        toast.error('Update failed!')
+      }
+    }
+  } else {
+    toast.error('Error receiving data from transmitter, please try again!')
+  }
 }

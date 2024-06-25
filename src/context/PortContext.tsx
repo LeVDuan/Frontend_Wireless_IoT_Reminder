@@ -1,68 +1,113 @@
 // context/PortContext.tsx
-import { createContext, useContext, useState, ReactNode } from 'react'
+import { createContext, useContext, ReactNode } from 'react'
 
 interface PortContextProps {
-  port: SerialPort | null
-  setPort: React.Dispatch<React.SetStateAction<SerialPort | null>>
-  writer: WritableStreamDefaultWriter | null
-  setWriter: React.Dispatch<React.SetStateAction<WritableStreamDefaultWriter | null>>
-  reader: ReadableStreamDefaultReader | null
-  setReader: React.Dispatch<React.SetStateAction<ReadableStreamDefaultReader | null>>
-  requestOpenPort: () => Promise<void>
-  sendToPort: (message: string) => Promise<void>
-  readFromPort: () => Promise<string>
+  selectPort: () => Promise<null | string>
+  writeToPort: (cmd: string, setResponse: React.Dispatch<React.SetStateAction<string | null>>) => Promise<void>
 }
 
 type Props = {
   children: ReactNode
 }
 
-// Tạo Context
+// Create Context
 export const PortContext = createContext<PortContextProps | undefined>(undefined)
 
-// Tạo Provider
+// Create Provider
 export const PortProvider = ({ children }: Props) => {
-  const [port, setPort] = useState<SerialPort | null>(null)
-  const [writer, setWriter] = useState<WritableStreamDefaultWriter | null>(null)
-  const [reader, setReader] = useState<ReadableStreamDefaultReader | null>(null)
+  let reader: ReadableStreamDefaultReader | ReadableStreamBYOBReader | undefined
+  let port: SerialPort | undefined
+  const encoder = new TextEncoder()
+  const decoder = new TextDecoder()
+  const options = { baudRate: 9600 }
 
-  const requestOpenPort = async () => {
-    // USB\VID_1A86&PID_7523&REV_8133
-    const filters = [{ usbVendorId: 0x1a86, usbProductId: 0x7523 }]
-    const newPort = await navigator.serial.requestPort({ filters })
-    if (newPort != port) {
-      await newPort.open({ baudRate: 9600 })
-      setPort(newPort)
-      const writer = newPort.writable.getWriter()
-      const reader = newPort.readable.getReader()
-      setWriter(writer)
-      setReader(reader)
+  // USB\VID_1A86&PID_7523&REV_8133 -> DOIT ESP32 DEVKIT v1
+  const filters = [{ usbVendorId: 0x1a86, usbProductId: 0x7523 }]
+
+  const connectToPort = async () => {
+    if (!port) {
+      return
     }
-    console.log('COM info: ', newPort.getInfo())
-  }
-
-  const sendToPort = async (message: string) => {
-    await writer?.write(new TextEncoder().encode(message))
-  }
-
-  const readFromPort = async (): Promise<string> => {
-    if (reader) {
-      const { value } = await reader?.read()
-      const data = new TextDecoder().decode(value)
-
-      return data
-    } else {
-      return 'err: reader undefine'
+    try {
+      await port.open(options)
+      console.log('Open success!')
+    } catch (error: any) {
+      console.log('Open error: ', error.message)
+      port = undefined
     }
   }
 
-  return (
-    <PortContext.Provider
-      value={{ port, setPort, writer, setWriter, reader, setReader, requestOpenPort, sendToPort, readFromPort }}
-    >
-      {children}
-    </PortContext.Provider>
-  )
+  const selectPort = async () => {
+    try {
+      const slPort = await navigator.serial.requestPort({ filters })
+      if (slPort != port) {
+        port = slPort
+
+        await connectToPort()
+      }
+
+      // console.log('port', port)
+
+      return null
+    } catch (error: any) {
+      console.log('requestPort error: ', error.message)
+
+      return error.message
+    }
+  }
+
+  const writeToPort = async (cmd: string, setResponse: React.Dispatch<React.SetStateAction<string | null>>) => {
+    if (port?.writable == null) {
+      console.log(`unable to find writable port`)
+
+      return
+    }
+    const writer = port.writable.getWriter()
+
+    writer.write(encoder.encode(cmd))
+
+    writer.releaseLock()
+    if (port && port.readable) {
+      try {
+        reader = port.readable.getReader()
+
+        // console.log('reader:', reader)
+
+        let receivedData = ''
+        while (true) {
+          try {
+            const { value, done } = await reader.read()
+            if (done) break
+
+            receivedData += decoder.decode(value)
+            if (receivedData.includes('\n')) {
+              const lines = receivedData.split('\n')
+
+              setResponse(lines[0])
+              receivedData = lines[1]
+
+              // console.log('response: ', lines[0])
+
+              break
+            }
+          } catch (error: any) {
+            console.log('Error while reading: ', error.message)
+          }
+        }
+        reader.releaseLock()
+        reader = undefined
+      } catch (error: any) {
+        console.log('Reader error: ', error.message)
+      }
+    }
+  }
+
+  const values = {
+    selectPort,
+    writeToPort
+  }
+
+  return <PortContext.Provider value={values}>{children}</PortContext.Provider>
 }
 
 export const usePort = () => {

@@ -1,5 +1,5 @@
 // ** React Imports
-import { ChangeEvent, useState } from 'react'
+import { ChangeEvent, useEffect, useState } from 'react'
 
 // ** MUI Imports
 import Box from '@mui/material/Box'
@@ -10,7 +10,6 @@ import CardHeader from '@mui/material/CardHeader'
 import { DataGrid, GridColDef } from '@mui/x-data-grid'
 
 // ** Third Party Components
-import toast from 'react-hot-toast'
 
 // ** Custom Components
 import CustomChip from 'src/@core/components/mui/chip'
@@ -24,13 +23,12 @@ import Icon from 'src/@core/components/icon'
 import DialogSendControlSignal from '../components/dialogs/DialogSendControlSignal'
 import LinearProgress from '@mui/material/LinearProgress'
 import { DeviceType } from 'src/@core/utils/types'
-import { delay, formatTimestamp, getColorFromBatteryValue, parseToJSON } from 'src/utils'
+import { formatTimestamp, getColorFromBatteryValue, sendUpdateInfo } from 'src/utils'
 import CustomAvatar from 'src/@core/components/mui/avatar'
 import QuickSearchToolbar from './QuickSearchToolbar'
 import { DeviceStoreType } from 'src/@core/utils/types'
 import { useDispatch } from 'react-redux'
 import { AppDispatch } from 'src/store'
-import { updateStatusDevices } from 'src/store/device'
 import Link from 'next/link'
 
 interface CellType {
@@ -137,18 +135,25 @@ const DeviceControlListTable = ({ store }: DeviceControlListTableProps) => {
 
   const [selectedDevice, setSelectedDevice] = useState<DeviceType | null>(null)
   const [dialogOpen, setDialogOpen] = useState<boolean>(false)
+  const { writeToPort } = usePort()
+  const [response, setResponse] = useState<string | null>(null)
 
-  const toggleDialogSendSignal = (id: string) => {
-    if (port) {
-      const device = store.devices.find(device => device._id === id)
-      if (device) {
-        setSelectedDevice(device)
-      }
-
-      setDialogOpen(!dialogOpen)
-    } else {
-      toast.error('Please connect the COM port first')
+  useEffect(() => {
+    console.log('res from other comp: ', response)
+    if (response) {
+      sendUpdateInfo(response, dispatch)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [response])
+  const toggleDialogSendSignal = (id: string) => {
+    const device = store.activeDevices.find(device => device._id === id)
+
+    // console.log(device)
+
+    if (device) {
+      setSelectedDevice(device)
+    }
+    setDialogOpen(!dialogOpen)
   }
 
   const handleSearch = (searchValue: string) => {
@@ -167,43 +172,13 @@ const DeviceControlListTable = ({ store }: DeviceControlListTableProps) => {
     }
   }
 
-  const { port, sendToPort, readFromPort } = usePort()
   const updateDevices = async () => {
-    if (port) {
-      if (!port.writable) {
-        toast.error("Can't not write to COM port!")
-      } else {
-        await sendToPort('BRD\n')
-        setIsDisable(true)
-        await delay(3000)
-        await sendToPort('REQ\n')
-        setIsDisable(false)
+    // await sendToPort('BRD\n')
+    setIsDisable(true)
+    await writeToPort('REQ\n', setResponse)
+    await writeToPort('VBR 14 10 1 1\n', setResponse)
 
-        const responseFromPort = await readFromPort()
-
-        console.log('REQ res:', responseFromPort)
-        if (responseFromPort.startsWith('REQ:') && responseFromPort.endsWith('\r\n')) {
-          if (responseFromPort.startsWith('REQ:Failed')) {
-            toast.error('Update failed!')
-          } else if (responseFromPort.startsWith('REQ:-1')) {
-            console.log('Has no device active')
-          } else {
-            const update = parseToJSON(responseFromPort)
-            console.log({ update })
-            try {
-              dispatch(updateStatusDevices({ update }))
-              toast.success('Update successfully!')
-            } catch (error) {
-              toast.error('Update failed!')
-            }
-          }
-        } else {
-          toast.error('Error receiving data from transmitter, please try again!')
-        }
-      }
-    } else {
-      toast.error('Please connect the COM port first')
-    }
+    setIsDisable(false)
   }
 
   const columns: GridColDef[] = [
@@ -230,25 +205,23 @@ const DeviceControlListTable = ({ store }: DeviceControlListTableProps) => {
   return (
     <Card>
       <CardHeader
-        title={`List of active devices: ${store.totalActiveDevices}`}
+        title={`List of active devices: ${store.totalActiveDevices ? store.totalActiveDevices : 0}`}
         action={
-          <>
-            <Button
-              disabled={isDisable}
-              size='small'
-              variant='contained'
-              startIcon={<Icon icon='bx:refresh' />}
-              onClick={updateDevices}
-            >
-              Update status
-            </Button>
-          </>
+          <Button
+            disabled={isDisable}
+            size='small'
+            variant='contained'
+            startIcon={<Icon icon='bx:refresh' />}
+            onClick={updateDevices}
+          >
+            Update status
+          </Button>
         }
       />
       <DataGrid
         autoHeight
         rows={filteredData.length ? filteredData : store.activeDevices}
-        getRowId={row => row.deviceId}
+        getRowId={row => row._id}
         columns={columns}
         pageSizeOptions={[5, 10, 25, 50]}
         paginationModel={paginationModel}
