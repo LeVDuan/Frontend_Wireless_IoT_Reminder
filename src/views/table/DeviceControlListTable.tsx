@@ -30,6 +30,7 @@ import { DeviceStoreType } from 'src/@core/utils/types'
 import { useDispatch } from 'react-redux'
 import { AppDispatch } from 'src/store'
 import Link from 'next/link'
+import { getInitials } from 'src/@core/utils/get-initials'
 
 interface CellType {
   row: DeviceType
@@ -54,7 +55,19 @@ const escapeRegExp = (value: string) => {
 interface DeviceControlListTableProps {
   store: DeviceStoreType
 }
-
+const renderDeviceAvatar = (row: DeviceType) => {
+  if (row.deviceId === 14 || row.deviceId === 0 || row.deviceId === 1) {
+    return (
+      <CustomAvatar src={`/images/avatars/${row.deviceId}.jpg`} sx={{ mr: 3, width: '1.875rem', height: '1.875rem' }} />
+    )
+  } else {
+    return (
+      <CustomAvatar skin='light' color='info' sx={{ mr: 3, width: '1.875rem', height: '1.875rem' }}>
+        {getInitials(row.name)}
+      </CustomAvatar>
+    )
+  }
+}
 const defaultColumns: GridColDef[] = [
   {
     flex: 0.3,
@@ -68,10 +81,7 @@ const defaultColumns: GridColDef[] = [
           href={`/device/${row._id}`}
           sx={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}
         >
-          <CustomAvatar
-            src={`/images/avatars/${row.deviceId}.png`}
-            sx={{ mr: 3, width: '1.875rem', height: '1.875rem' }}
-          />
+          {renderDeviceAvatar(row)}
           <Box sx={{ display: 'flex', flexDirection: 'column' }}>
             <Typography noWrap variant='body2' sx={{ color: 'text.primary', fontWeight: 500 }}>
               {row.name}

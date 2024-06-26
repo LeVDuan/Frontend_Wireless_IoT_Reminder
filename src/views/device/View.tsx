@@ -21,11 +21,9 @@ const DeviceView = ({ id }: DeviceViewProps) => {
     dispatch(fetchDevice(id))
   }, [dispatch, id])
 
-  console.log('device:', store.device)
+  console.log('store:', store)
 
-  if (store.device) {
-    console.log(store.device)
-
+  if (store.device && store.device._id) {
     return (
       <Grid container spacing={6}>
         <Grid item xs={12} md={5} lg={4}>

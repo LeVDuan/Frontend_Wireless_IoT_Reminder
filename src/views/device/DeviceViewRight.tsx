@@ -36,6 +36,7 @@ import { getColorFromBatteryValue, timeDifference } from 'src/utils'
 import axios from 'axios'
 import Link from 'next/link'
 import { API_LOGS_URL } from 'src/store/log'
+import { useAuth } from 'src/hooks/useAuth'
 
 interface DeviceViewLeftProps {
   deviceData: DeviceType
@@ -87,14 +88,15 @@ const DeviceViewRight = ({ deviceData }: DeviceViewLeftProps) => {
   const theme = useTheme()
   const [recentHistory, setRecentHistory] = useState<LogType[]>([])
   const totalControl = deviceData.VBRCount + deviceData.LGTCount + deviceData.VLGCount
-  let VBRRatio = 0,
-    LGTRatio = 0,
-    VLGRatio = 0
-  if (totalControl != 0) {
-    VBRRatio = (deviceData.VBRCount * 100) / totalControl
-    LGTRatio = (deviceData.LGTCount * 100) / totalControl
-    VLGRatio = (deviceData.VLGCount * 100) / totalControl
-  }
+  const { user } = useAuth()
+  const chartRatioData =
+    totalControl !== 0
+      ? [
+          (deviceData.VBRCount * 100) / totalControl,
+          (deviceData.LGTCount * 100) / totalControl,
+          (deviceData.VLGCount * 100) / totalControl
+        ]
+      : [0, 0, 0]
   const data: DataType[] = [
     {
       amount: deviceData.VBRCount,
@@ -259,13 +261,7 @@ const DeviceViewRight = ({ deviceData }: DeviceViewLeftProps) => {
                   </Typography>
                   <Typography sx={{ color: 'text.secondary' }}>Total Controls</Typography>
                 </Box>
-                <ReactApexcharts
-                  type='donut'
-                  width={110}
-                  height={125}
-                  options={optionsDonut}
-                  series={[VBRRatio, LGTRatio, VLGRatio]}
-                />
+                <ReactApexcharts type='donut' width={110} height={125} options={optionsDonut} series={chartRatioData} />
               </Box>
               {data.map((item: DataType, index: number) => {
                 return (
@@ -318,7 +314,7 @@ const DeviceViewRight = ({ deviceData }: DeviceViewLeftProps) => {
                 type='radialBar'
                 height={260}
                 options={optionsRadial}
-                series={[deviceData.batteryStatus]}
+                series={[deviceData.batteryStatus ?? 0]}
               />
               <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-around' }}>
                 <Box
@@ -380,7 +376,7 @@ const DeviceViewRight = ({ deviceData }: DeviceViewLeftProps) => {
                             <Avatar src='/images/avatars/DuanLV.jpg' sx={{ mr: 2.25, width: 38, height: 38 }} />
                             <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                               <Typography sx={{ fontWeight: 500 }}>{log.userName}</Typography>
-                              <Typography sx={{ color: 'text.secondary' }}>Admin</Typography>
+                              <Typography sx={{ color: 'text.secondary' }}>{user?.email}</Typography>
                             </Box>
                           </Box>
                         </TimelineContent>
@@ -416,7 +412,7 @@ const DeviceViewRight = ({ deviceData }: DeviceViewLeftProps) => {
                             <Avatar src='/images/avatars/DuanLV.jpg' sx={{ mr: 2.25, width: 38, height: 38 }} />
                             <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                               <Typography sx={{ fontWeight: 500 }}>{log.userName}</Typography>
-                              <Typography sx={{ color: 'text.secondary' }}>Admin</Typography>
+                              <Typography sx={{ color: 'text.secondary' }}>{user?.email}</Typography>
                             </Box>
                           </Box>
                         </TimelineContent>
@@ -424,6 +420,7 @@ const DeviceViewRight = ({ deviceData }: DeviceViewLeftProps) => {
                     )
                   } else if (log.action == 'control') {
                     const details = log.details as DetailsControl
+
                     const logAction = colorAction[details.type]
 
                     return (
@@ -456,7 +453,7 @@ const DeviceViewRight = ({ deviceData }: DeviceViewLeftProps) => {
                             <Avatar src='/images/avatars/DuanLV.jpg' sx={{ mr: 2.25, width: 38, height: 38 }} />
                             <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                               <Typography sx={{ fontWeight: 500 }}>{log.userName}</Typography>
-                              <Typography sx={{ color: 'text.secondary' }}>Admin</Typography>
+                              <Typography sx={{ color: 'text.secondary' }}>{user?.email}</Typography>
                             </Box>
                           </Box>
                         </TimelineContent>
@@ -465,9 +462,6 @@ const DeviceViewRight = ({ deviceData }: DeviceViewLeftProps) => {
                   }
                 })}
                 <TimelineItem sx={{ minHeight: 0 }}>
-                  <TimelineSeparator>
-                    <TimelineDot color='success' />
-                  </TimelineSeparator>
                   <TimelineContent sx={{ mt: 0 }}>
                     <Box
                       sx={{
@@ -478,12 +472,11 @@ const DeviceViewRight = ({ deviceData }: DeviceViewLeftProps) => {
                         justifyContent: 'space-between'
                       }}
                     >
-                      <Typography sx={{ mr: 2, fontWeight: 500 }}>Most recent activities.</Typography>
-                      <Typography variant='body2' sx={{ color: 'text.disabled' }}>
+                      <Typography variant='body2' sx={{ color: 'text.secondary' }}>
                         ...
                       </Typography>
+                      <LinkStyled href='/activity-history/'>All history</LinkStyled>
                     </Box>
-                    <LinkStyled href='/activity-history/'>Read more</LinkStyled>
                   </TimelineContent>
                 </TimelineItem>
               </Timeline>

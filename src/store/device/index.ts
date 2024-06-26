@@ -73,6 +73,7 @@ export const renameDevice = createAsyncThunk(
       const response = await axios.patch(`${API_DEVICES_URL}/${device.id}`, device.newInfo)
 
       await dispatch(fetchDevices())
+      await dispatch(fetchDevice(device.id))
       console.log('added res: ', response.data)
       toast.success('Successfully!')
 

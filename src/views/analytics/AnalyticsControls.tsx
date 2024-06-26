@@ -13,9 +13,7 @@ const AnalyticsControls = ({ data }: AnalyticsControlsProps) => {
     <CardStatisticsVertical
       title='Total controls'
       stats={`${sum}`}
-      trendNumber={12.14}
       avatarSrc='/images/cards/ri--remote-control-line.png'
-      avatarColor='primary'
     />
   )
 }

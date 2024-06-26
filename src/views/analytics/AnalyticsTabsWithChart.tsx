@@ -237,7 +237,7 @@ const AnalyticsTabsWithChart = ({ dataAnalytics }: AnalyticsTabsWithChartProps) 
               skin='light'
               variant='rounded'
               color={data[value].avatarColor}
-              sx={{ mr: 3.5, width: 46, height: 46 }}
+              sx={{ mr: 3.5, width: 50, height: 50 }}
             >
               {data[value].avatarIcon}
             </CustomAvatar>
@@ -252,8 +252,9 @@ const AnalyticsTabsWithChart = ({ dataAnalytics }: AnalyticsTabsWithChartProps) 
           </Box>
           <ReactApexcharts type='area' height={260} options={options} series={data[value].series} />
           <Box sx={{ p: 5, pt: 6, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-              <Typography sx={{ color: 'text.secondary' }}>{`${data[value].title} this week`}</Typography>
+            <Box sx={{ display: 'flex', flexDirection: 'row' }}>
+              {data[value].avatarIcon}
+              <Typography ml={2} sx={{ color: 'text.primary' }}>{`${data[value].title} this week`}</Typography>
             </Box>
           </Box>
         </TabPanel>

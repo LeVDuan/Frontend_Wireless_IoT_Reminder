@@ -19,7 +19,7 @@ import AnalyticsControls from 'src/views/analytics/AnalyticsControls'
 import { API_LOGS_URL } from 'src/store/log'
 
 const AnalyticsDashboard = () => {
-  const [data, setData] = useState<AnalyticsType>()
+  const [data, setData] = useState<AnalyticsType | null>(null)
 
   useEffect(() => {
     const getAnalytics = async () => {

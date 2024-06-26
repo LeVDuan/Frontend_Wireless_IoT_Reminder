@@ -36,7 +36,7 @@ const AnalyticsStatistics = ({ data }: AnalyticsTransactionsProps) => {
     {
       amount: data.LGT,
       title: 'Light Up',
-      avatarColor: 'secondary',
+      avatarColor: 'success',
       avatarIcon: <Icon icon='heroicons-outline:light-bulb' />
     },
     {
@@ -48,7 +48,7 @@ const AnalyticsStatistics = ({ data }: AnalyticsTransactionsProps) => {
     {
       amount: data.deviceActiveCount,
       title: 'Active device',
-      avatarColor: 'success',
+      avatarColor: 'warning',
       avatarIcon: <Icon icon='bi:device-ssd' />
     },
     {

@@ -26,18 +26,6 @@ export const fetchLogs = createAsyncThunk('log/fetchLogs', async (params: DataPa
   }
 })
 
-export const fetchAnalytics = createAsyncThunk('log/fetchAnalytics', async () => {
-  try {
-    const response = await axios.get(API_LOGS_URL)
-
-    // console.log('logs:', response.data)
-
-    return response
-  } catch (error) {
-    throw error
-  }
-})
-
 export const logSlice = createSlice({
   name: 'log',
   initialState: {

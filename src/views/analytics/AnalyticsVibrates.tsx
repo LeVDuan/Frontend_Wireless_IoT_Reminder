@@ -11,7 +11,6 @@ const AnalyticsVibrates = ({ data }: AnalyticsVibratesProps) => {
       stats={`${data.VBR}`}
       trend='negative'
       title='Total vibration'
-      trendNumber={14.82}
       avatarSrc='/images/cards/lucide--vibrate.png'
     />
   )

@@ -7,7 +7,6 @@ import View from 'src/views/device/View'
 const DeviceView = () => {
   const router = useRouter()
   const id = router.query.id
-
   if (!id) {
     return null
   }

@@ -8,7 +8,7 @@ import CardContent from '@mui/material/CardContent'
 import { CardStatsVerticalProps } from 'src/@core/components/card-statistics/types'
 
 // ** Icon Import
-import Icon from 'src/@core/components/icon'
+// import Icon from 'src/@core/components/icon'
 
 // ** Custom Components Imports
 import CustomAvatar from 'src/@core/components/mui/avatar'
@@ -16,16 +16,7 @@ import OptionsMenu from 'src/@core/components/option-menu'
 
 const CardStatsVertical = (props: CardStatsVerticalProps) => {
   // ** Props
-  const {
-    title,
-    stats,
-    avatarSrc,
-    avatarIcon,
-    trendNumber,
-    optionsMenuProps,
-    trend = 'positive',
-    avatarColor = 'primary'
-  } = props
+  const { title, stats, avatarSrc, avatarIcon, optionsMenuProps, avatarColor = 'primary' } = props
 
   return (
     <Card>
@@ -36,7 +27,7 @@ const CardStatsVertical = (props: CardStatsVerticalProps) => {
             variant='rounded'
             color={avatarColor}
             src={avatarSrc ?? ''}
-            sx={{ width: 42, height: 42 }}
+            sx={{ width: 62, height: 62 }}
           >
             {avatarIcon && !avatarSrc ? avatarIcon : null}
           </CustomAvatar>
@@ -53,7 +44,7 @@ const CardStatsVertical = (props: CardStatsVerticalProps) => {
         <Typography variant='h5' sx={{ mb: 2 }}>
           {stats}
         </Typography>
-        <Box
+        {/* <Box
           sx={{
             display: 'flex',
             alignItems: 'center',
@@ -67,7 +58,7 @@ const CardStatsVertical = (props: CardStatsVerticalProps) => {
           >
             {`${trendNumber}%`}
           </Typography>
-        </Box>
+        </Box> */}
       </CardContent>
     </Card>
   )

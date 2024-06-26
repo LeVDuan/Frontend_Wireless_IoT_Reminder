@@ -18,7 +18,6 @@ import { ThemeColor } from 'src/@core/layouts/types'
 import { DeviceType } from 'src/@core/utils/types'
 
 // ** Data Import
-import DialogRenameDevice from '../components/dialogs/DialogRenameDevice'
 import DialogDeleteConfirm from '../components/dialogs/DialogDeleteConfirm'
 
 // import DialogViewDevice from '../components/dialogs/DialogViewDevice'
@@ -31,7 +30,10 @@ import Tooltip from '@mui/material/Tooltip'
 import { DeviceStoreType } from 'src/@core/utils/types'
 import Link from 'next/link'
 import Icon from 'src/@core/components/icon'
-import DialogAddDevice from '../components/dialogs/DialogAddDevice'
+import AddDeviceDrawer from '../components/drawers/AddDeviceDrawer'
+import { getInitials } from 'src/@core/utils/get-initials'
+import RenameDrawer from '../components/drawers/RenameDrawerInList'
+import Button from '@mui/material/Button'
 
 interface DeviceListTableProps {
   store: DeviceStoreType
@@ -57,6 +59,18 @@ const escapeRegExp = (value: string) => {
   return value.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')
 }
 
+const renderDeviceAvatar = (row: DeviceType) => {
+  if (row.deviceId === 14 || row.deviceId === 0 || row.deviceId === 1) {
+    return <CustomAvatar src={`/images/avatars/${row.deviceId}.jpg`} sx={{ mr: 3, width: 30, height: 30 }} />
+  } else {
+    return (
+      <CustomAvatar skin='light' color='info' sx={{ mr: 3, width: 30, height: 30, fontSize: '.8rem', lineHeight: 1.5 }}>
+        {getInitials(row.name)}
+      </CustomAvatar>
+    )
+  }
+}
+
 const defaultColumns: GridColDef[] = [
   {
     flex: 0.3,
@@ -70,10 +84,7 @@ const defaultColumns: GridColDef[] = [
           href={`/device/${row._id}`}
           sx={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}
         >
-          <CustomAvatar
-            src={`/images/avatars/${row.deviceId}.png`}
-            sx={{ mr: 3, width: '1.875rem', height: '1.875rem' }}
-          />
+          {renderDeviceAvatar(row)}
           <Box sx={{ display: 'flex', flexDirection: 'column' }}>
             <Typography noWrap variant='body2' sx={{ color: 'text.primary', fontWeight: 500 }}>
               {row.name}
@@ -136,8 +147,9 @@ const DeviceListTable = ({ store }: DeviceListTableProps) => {
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 5 })
 
   const [selectedDevice, setSelectedDevice] = useState<DeviceType | null>(null)
-  const [dialogRenameOpen, setDialogRenameOpen] = useState<boolean>(false)
+  const [renameDrawerOpen, setRenameDrawerOpen] = useState<boolean>(false)
   const [dialogDelCfOpen, setDialogDelCfOpen] = useState<boolean>(false)
+  const [addDeviceDrawerOpen, setAddDeviceDrawerOpen] = useState<boolean>(false)
   const handleSearch = (searchValue: string) => {
     setSearchText(searchValue)
     const searchRegex = new RegExp(escapeRegExp(searchValue), 'i')
@@ -154,13 +166,13 @@ const DeviceListTable = ({ store }: DeviceListTableProps) => {
     }
   }
 
-  const toggleDialogRename = (id: string) => {
+  const toggleRenameDrawer = (id: string) => {
     const device = store.devices.find(device => device._id === id)
     if (device) {
       setSelectedDevice(device)
     }
 
-    setDialogRenameOpen(!dialogRenameOpen)
+    setRenameDrawerOpen(!renameDrawerOpen)
   }
 
   const toggleDialogDelCf = (id: string) => {
@@ -172,6 +184,9 @@ const DeviceListTable = ({ store }: DeviceListTableProps) => {
     setDialogDelCfOpen(!dialogDelCfOpen)
   }
 
+  const toggleAddDeviceDrawer = () => {
+    setAddDeviceDrawerOpen(!addDeviceDrawerOpen)
+  }
   const columns: GridColDef[] = [
     ...defaultColumns,
     {
@@ -189,7 +204,7 @@ const DeviceListTable = ({ store }: DeviceListTableProps) => {
               </IconButton>
             </Tooltip>
             <Tooltip title='Rename'>
-              <IconButton size='small' onClick={() => toggleDialogRename(row._id)}>
+              <IconButton size='small' onClick={() => toggleRenameDrawer(row._id)}>
                 <Icon icon='bx:pencil' fontSize={20} />
               </IconButton>
             </Tooltip>
@@ -211,9 +226,9 @@ const DeviceListTable = ({ store }: DeviceListTableProps) => {
           <CardHeader
             title={`Number of devices in the system: ${store.totalDevices} devices.`}
             action={
-              <div>
-                <DialogAddDevice store={store} />
-              </div>
+              <Button size='medium' variant='contained' className='demo-space-x' onClick={toggleAddDeviceDrawer}>
+                Add Device
+              </Button>
             }
           />
 
@@ -239,8 +254,9 @@ const DeviceListTable = ({ store }: DeviceListTableProps) => {
           />
         </Card>
       </Grid>
-      <DialogRenameDevice open={dialogRenameOpen} toggle={toggleDialogRename} device={selectedDevice} />
+      <RenameDrawer open={renameDrawerOpen} toggle={toggleRenameDrawer} device={selectedDevice} />
       <DialogDeleteConfirm open={dialogDelCfOpen} toggle={toggleDialogDelCf} device={selectedDevice} />
+      <AddDeviceDrawer open={addDeviceDrawerOpen} toggle={toggleAddDeviceDrawer} />
     </Grid>
   )
 }

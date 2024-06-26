@@ -18,7 +18,7 @@ export type CardStatsVerticalProps = {
   title: string
   stats: string
   avatarSrc?: string
-  trendNumber: number
+  trendNumber?: number
   avatarIcon?: string
   avatarColor?: ThemeColor
   trend?: 'positive' | 'negative'

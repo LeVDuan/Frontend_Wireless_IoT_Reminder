@@ -67,7 +67,7 @@ interface CellType {
 }
 
 const logActionObj: LogActionObj = {
-  edit: { title: 'Edit', color: 'info', icon: 'bx:edit' },
+  edit: { title: 'Rename', color: 'info', icon: 'bx:edit' },
   add: { title: 'Add', color: 'warning', icon: 'gg:add-r' },
   delete: { title: 'Delete', color: 'error', icon: 'bx:trash-alt' },
   control: { title: 'Control', color: 'primary', icon: 'ri:remote-control-line' }
@@ -77,17 +77,13 @@ const escapeRegExp = (value: string) => {
   return value.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')
 }
 
-const renderClient = (row: LogType) => {
-  if (row.deviceId < 16 && row.deviceId > 0) {
-    return <CustomAvatar src={`/images/avatars/${row.deviceId}.png`} sx={{ mr: 3, width: 30, height: 30 }} />
+const renderDeviceAvatar = (row: LogType) => {
+  if (row.deviceId === 14 || row.deviceId === 0 || row.deviceId === 1) {
+    return <CustomAvatar src={`/images/avatars/${row.deviceId}.jpg`} sx={{ mr: 3, width: 30, height: 30 }} />
   } else {
     return (
-      <CustomAvatar
-        skin='light'
-        color='primary'
-        sx={{ mr: 3, width: 30, height: 30, fontSize: '.8rem', lineHeight: 1.5 }}
-      >
-        {getInitials(row.userName)}
+      <CustomAvatar skin='light' color='info' sx={{ mr: 3, width: 30, height: 30, fontSize: '.8rem', lineHeight: 1.5 }}>
+        {getInitials(row.deviceName)}
       </CustomAvatar>
     )
   }
@@ -95,24 +91,25 @@ const renderClient = (row: LogType) => {
 
 const defaultColumns: GridColDef[] = [
   {
-    flex: 0.2,
-    field: 'name',
-    minWidth: 120,
-    headerName: 'Action by',
+    flex: 0.18,
+    minWidth: 100,
+    field: 'device',
+    headerName: 'Device',
     renderCell: ({ row }: CellType) => {
       return (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          {renderClient(row)}
+          {renderDeviceAvatar(row)}
           <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-            <Typography sx={{ fontWeight: 600, color: 'text.secondary' }}>{row.userName}</Typography>
+            <Typography sx={{ fontWeight: 600, color: 'text.secondary' }}>{row.deviceName}</Typography>
             <Typography noWrap variant='caption' sx={{ color: 'text.disabled' }}>
-              {'duan.lv0308@gmail.com'}
+              #{row.deviceId}
             </Typography>
           </Box>
         </Box>
       )
     }
   },
+
   {
     flex: 0.1,
     minWidth: 180,
@@ -134,33 +131,33 @@ const defaultColumns: GridColDef[] = [
               <Icon fontSize='1rem' icon={logActionObj[row.action].icon} />
             </CustomAvatar>
           </Tooltip>
-          <Typography variant='inherit' sx={{ ml: 2, fontWeight: 400, color: 'text.secondary' }}>
-            {logActionObj[row.action].title.toUpperCase()}
+          <Typography variant='inherit' sx={{ ml: 2, fontWeight: 500, color: 'text.secondary' }}>
+            {logActionObj[row.action].title}
           </Typography>
         </>
       )
     }
   },
-
   {
-    flex: 0.18,
-    minWidth: 100,
-    field: 'device',
-    headerName: 'Device',
+    flex: 0.2,
+    field: 'name',
+    minWidth: 120,
+    headerName: 'Action by',
     renderCell: ({ row }: CellType) => {
       return (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          {renderClient(row)}
+          <CustomAvatar src={'/images/avatars/DuanLV.jpg'} sx={{ mr: 3, width: 30, height: 30 }} />
           <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-            <Typography sx={{ fontWeight: 600, color: 'text.secondary' }}>{row.deviceName}</Typography>
+            <Typography sx={{ fontWeight: 600, color: 'text.secondary' }}>{row.userName}</Typography>
             <Typography noWrap variant='caption' sx={{ color: 'text.disabled' }}>
-              #{row.deviceId}
+              {'duan.lv194508@sis.hust.edu.vn'}
             </Typography>
           </Box>
         </Box>
       )
     }
   },
+
   {
     flex: 0.2,
     minWidth: 100,
@@ -238,8 +235,9 @@ const LogListTable = ({ store }: LogListTableProps) => {
 
   useEffect(() => {
     dispatch(fetchLogs({ dates: dates, action: actionValue }))
-    console.log('date:', dates)
-    console.log('action Value:', actionValue)
+
+    // console.log('date:', dates)
+    // console.log('action Value:', actionValue)
   }, [dispatch, dates, actionValue])
 
   const handleSearch = (searchValue: string) => {
@@ -269,7 +267,8 @@ const LogListTable = ({ store }: LogListTableProps) => {
     }
     setStartDateRange(start)
     setEndDateRange(end)
-    console.log('start:', new Date(start), 'end:', new Date(end))
+
+    // console.log('start:', new Date(start), 'end:', new Date(end))
   }
 
   const columns: GridColDef[] = [
@@ -315,7 +314,7 @@ const LogListTable = ({ store }: LogListTableProps) => {
                       labelId='log-action-select'
                     >
                       <MenuItem value=''>None</MenuItem>
-                      <MenuItem value='edit'>Edit</MenuItem>
+                      <MenuItem value='edit'>Rename</MenuItem>
                       <MenuItem value='control'>Control</MenuItem>
                       <MenuItem value='add'>Add</MenuItem>
                       <MenuItem value='delete'>Delete</MenuItem>

@@ -20,6 +20,7 @@ import Icon from 'src/@core/components/icon'
 
 // ** Types
 import { DetailsControl, DetailsEdit, LogType } from 'src/@core/utils/types'
+import { formatTimestamp } from 'src/utils'
 
 interface Props {
   open: boolean
@@ -45,13 +46,13 @@ interface LogControlObj {
 const Header = styled(Box)<BoxProps>(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
-  padding: theme.spacing(6),
+  padding: theme.spacing(3, 4),
   justifyContent: 'space-between',
-  paddingBottom: theme.spacing(2.25)
+  backgroundColor: theme.palette.background.default
 }))
 
 const logActionObj: LogActionObj = {
-  edit: { title: 'Edit', color: 'info' },
+  edit: { title: 'Rename', color: 'info' },
   add: { title: 'Add', color: 'warning' },
   delete: { title: 'Delete', color: 'error' },
   control: { title: 'Control', color: 'primary' }
@@ -225,6 +226,13 @@ const ViewLogDrawer = ({ open, toggle, log }: Props) => {
                   color={log.result === 'success' ? 'success' : 'error'}
                   label={log.result}
                 />
+              </ListItem>
+              <ListItem>
+                <ListItemIcon>
+                  <Icon icon='gravity-ui:timestamps' />
+                </ListItemIcon>
+                <ListItemText primary='Timestamp' />
+                <span>{formatTimestamp(log.timestamp)}</span>
               </ListItem>
             </List>
             <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between' }}>

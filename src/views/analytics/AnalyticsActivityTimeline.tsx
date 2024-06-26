@@ -23,6 +23,7 @@ import { ThemeColor } from 'src/@core/layouts/types'
 import Link from 'next/link'
 import { timeDifference } from 'src/utils'
 import { API_LOGS_URL } from 'src/store/log'
+import { useAuth } from 'src/hooks/useAuth'
 
 interface ColorAction {
   [key: string]: {
@@ -60,6 +61,7 @@ const LinkStyled = styled(Link)(({ theme }) => ({
 
 const AnalyticsActivityTimeline = () => {
   const [recentHistory, setRecentHistory] = useState<LogType[]>([])
+  const { user } = useAuth()
 
   useEffect(() => {
     axios
@@ -78,17 +80,12 @@ const AnalyticsActivityTimeline = () => {
     <Card>
       <CardHeader
         title='Recent activity'
-        action={
-          <OptionsMenu
-            iconButtonProps={{ size: 'small' }}
-            options={['Share timeline', 'Suggest edits', 'Report bug']}
-          />
-        }
+        action={<OptionsMenu iconButtonProps={{ size: 'small' }} options={['Share timeline']} />}
       />
       <CardContent sx={{ pb: theme => `${theme.spacing(3.75)} !important` }}>
         <Timeline sx={{ my: 0, py: 0 }}>
           {recentHistory.map(log => {
-            if (log.action == 'edit') {
+            if (log.action === 'edit') {
               const logAction = colorAction[log.action]
               const editDetails = log.details as DetailsEdit
 
@@ -109,7 +106,7 @@ const AnalyticsActivityTimeline = () => {
                       }}
                     >
                       <Typography sx={{ mr: 2, fontWeight: 500 }}>
-                        {log.userName} {logAction.title} this device
+                        {log.userName} {logAction.title.toLowerCase()} {log.deviceName}
                       </Typography>
                       <Typography variant='body2' sx={{ color: 'text.disabled' }}>
                         {timeDifference(log.timestamp)}
@@ -123,13 +120,13 @@ const AnalyticsActivityTimeline = () => {
                       <Avatar src='/images/avatars/DuanLV.jpg' sx={{ mr: 2.25, width: 38, height: 38 }} />
                       <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                         <Typography sx={{ fontWeight: 500 }}>{log.userName}</Typography>
-                        <Typography sx={{ color: 'text.secondary' }}>Admin</Typography>
+                        <Typography sx={{ color: 'text.secondary' }}>{user?.email}</Typography>
                       </Box>
                     </Box>
                   </TimelineContent>
                 </TimelineItem>
               )
-            } else if (log.action == 'add' || log.action == 'delete') {
+            } else if (log.action === 'add' || log.action === 'delete') {
               const logAction = colorAction[log.action]
 
               return (
@@ -149,23 +146,27 @@ const AnalyticsActivityTimeline = () => {
                       }}
                     >
                       <Typography sx={{ mr: 2, fontWeight: 500 }}>
-                        {log.userName} {logAction.title}
+                        {log.userName} {logAction.title.toLowerCase()} {log.deviceName}
                       </Typography>
                       <Typography variant='body2' sx={{ color: 'text.disabled' }}>
                         {timeDifference(log.timestamp)}
                       </Typography>
                     </Box>
+                    <Typography sx={{ mb: 2, color: 'text.secondary' }}>
+                      <span>{logAction.title + 'ed'}: </span>
+                      <span>{log.deviceName}</span> <span>(#{log.deviceId})</span>
+                    </Typography>
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
                       <Avatar src='/images/avatars/DuanLV.jpg' sx={{ mr: 2.25, width: 38, height: 38 }} />
                       <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                         <Typography sx={{ fontWeight: 500 }}>{log.userName}</Typography>
-                        <Typography sx={{ color: 'text.secondary' }}>Admin</Typography>
+                        <Typography sx={{ color: 'text.secondary' }}>{user?.email}</Typography>
                       </Box>
                     </Box>
                   </TimelineContent>
                 </TimelineItem>
               )
-            } else if (log.action == 'control') {
+            } else if (log.action === 'control') {
               const details = log.details as DetailsControl
               const logAction = colorAction[details.type]
 
@@ -186,7 +187,7 @@ const AnalyticsActivityTimeline = () => {
                       }}
                     >
                       <Typography sx={{ mr: 2, fontWeight: 500 }}>
-                        {log.userName} {logAction.title} device {log.deviceName}
+                        {log.userName} {logAction.title.toLowerCase()} {log.deviceName}
                       </Typography>
                       <Typography variant='body2' sx={{ color: 'text.disabled' }}>
                         {timeDifference(log.timestamp)}
@@ -199,7 +200,7 @@ const AnalyticsActivityTimeline = () => {
                       <Avatar src='/images/avatars/DuanLV.jpg' sx={{ mr: 2.25, width: 38, height: 38 }} />
                       <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                         <Typography sx={{ fontWeight: 500 }}>{log.userName}</Typography>
-                        <Typography sx={{ color: 'text.secondary' }}>Admin</Typography>
+                        <Typography sx={{ color: 'text.secondary' }}>{user?.email}</Typography>
                       </Box>
                     </Box>
                   </TimelineContent>
@@ -208,9 +209,6 @@ const AnalyticsActivityTimeline = () => {
             }
           })}
           <TimelineItem sx={{ minHeight: 0 }}>
-            <TimelineSeparator>
-              <TimelineDot color='success' />
-            </TimelineSeparator>
             <TimelineContent sx={{ mt: 0 }}>
               <Box
                 sx={{
@@ -221,12 +219,11 @@ const AnalyticsActivityTimeline = () => {
                   justifyContent: 'space-between'
                 }}
               >
-                <Typography sx={{ mr: 2, fontWeight: 500 }}>Most recent activities.</Typography>
-                <Typography variant='body2' sx={{ color: 'text.disabled' }}>
+                <Typography variant='body2' sx={{ color: 'text.secondary' }}>
                   ...
                 </Typography>
+                <LinkStyled href='/activity-history/'>All history</LinkStyled>
               </Box>
-              <LinkStyled href='/activity-history/'>Read more</LinkStyled>
             </TimelineContent>
           </TimelineItem>
         </Timeline>

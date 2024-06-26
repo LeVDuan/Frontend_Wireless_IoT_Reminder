@@ -19,7 +19,7 @@ const ActivityHistory = () => {
     dispatch(fetchLogs({ dates: [], action: '' }))
   }, [dispatch])
 
-  console.log('Logs store: ', store)
+  // console.log('Logs store: ', store)
 
   return (
     <Grid container spacing={6} className='match-height' justifyItems='center'>
