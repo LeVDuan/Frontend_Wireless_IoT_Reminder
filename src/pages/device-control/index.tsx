@@ -25,7 +25,7 @@ const DeviceControl = () => {
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>()
   const store: DeviceStoreType = useSelector((state: RootState) => state.device) as DeviceStoreType
-  const { selectPort, writeToPort } = usePort()
+  const { port, selectPort, writeToPort } = usePort()
   const [hasPort, setHasPort] = useState<boolean>(false)
   const [response, setResponse] = useState<string | null>(null)
 
@@ -34,11 +34,20 @@ const DeviceControl = () => {
   }, [dispatch])
 
   useEffect(() => {
+    console.log('res: ', port)
+    const send = async () => {
+      await writeToPort('BRD\n', setResponse)
+      await writeToPort('REQ 100\n', setResponse)
+    }
+    send()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [port])
+  useEffect(() => {
     console.log('res: ', response)
 
-    if (response) {
-      sendUpdateInfo(response, dispatch)
-    }
+    // if (response) {
+    //   sendUpdateInfo(response, dispatch)
+    // }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [response])
 
@@ -52,23 +61,25 @@ const DeviceControl = () => {
       toast.success('Connected successfully!')
       setHasPort(true)
 
-      const brdCmd = (
-        await axios.post(`${API_DEVICES_URL}/control`, {
-          type: 'Broadcast'
-        })
-      ).data.command
+      // const brdCmd = (
+      //   await axios.post(`${API_DEVICES_URL}/control`, {
+      //     type: 'Broadcast'
+      //   })
+      // ).data.command
 
-      console.log(brdCmd)
+      // console.log(brdCmd)
 
       // await writeToPort(brdCmd, setResponse)
+      // await writeToPort('BRD\n', setResponse)
+      // await writeToPort('REQ 100\n', setResponse)
 
-      const reqCmd = (
-        await axios.post(`${API_DEVICES_URL}/control`, {
-          type: 'Request',
-          deviceId: -1 // get all activeDevice info
-        })
-      ).data.command
-      await writeToPort(reqCmd, setResponse)
+      // const reqCmd = (
+      //   await axios.post(`${API_DEVICES_URL}/control`, {
+      //     type: 'Request',
+      //     deviceId: -1 // get all activeDevice info
+      //   })
+      // ).data.command
+      // await writeToPort(reqCmd, setResponse)
     }
   }
 

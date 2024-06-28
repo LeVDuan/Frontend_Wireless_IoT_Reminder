@@ -67,36 +67,43 @@ const DeviceViewLeft = ({ deviceData }: DeviceViewLeftProps) => {
   }
 
   useEffect(() => {
-    if (response) {
-      sendUpdateInfo(response, dispatch)
-    }
-  }, [response, dispatch])
+    console.log('res 1: ', response)
+
+    // if (response) {
+    //   sendUpdateInfo(response, dispatch)
+    // }
+  }, [response])
 
   const handleUpdateStatus = async () => {
-    const error = await selectPort()
-    if (error) {
-      toast.error(`${error}`)
-    } else {
-      toast.success('Connected successfully!')
+    // const error = await selectPort()
+    // if (error) {
+    //   toast.error(`${error}`)
+    // } else {
+    //   toast.success('Connected successfully!')
 
-      const brdCmd = (
-        await axios.post(`${API_DEVICES_URL}/control`, {
-          type: 'Broadcast'
-        })
-      ).data.command
+    // const brdCmd = (
+    //   await axios.post(`${API_DEVICES_URL}/control`, {
+    //     type: 'Broadcast'
+    //   })
+    // ).data.command
 
-      console.log(brdCmd)
+    // console.log(brdCmd)
 
-      // await writeToPort(brdCmd, setResponse)
+    // await writeToPort(brdCmd, setResponse)
 
-      const reqCmd = (
-        await axios.post(`${API_DEVICES_URL}/control`, {
-          type: 'Request',
-          deviceId: -1
-        })
-      ).data.command
-      await writeToPort(reqCmd, setResponse)
-    }
+    // const reqCmd = (
+    //   await axios.post(`${API_DEVICES_URL}/control`, {
+    //     type: 'Request',
+    //     deviceId: -1
+    //   })
+    // ).data.command
+    // await writeToPort(reqCmd, setResponse)
+
+    await writeToPort('BRD\n', setResponse)
+
+    await writeToPort('REQ 15\n', setResponse)
+
+    // }
   }
   const renderDeviceAvatar = (device: DeviceType) => {
     if (device.deviceId === 14 || device.deviceId === 0 || device.deviceId === 1) {

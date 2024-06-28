@@ -150,9 +150,10 @@ const DeviceControlListTable = ({ store }: DeviceControlListTableProps) => {
 
   useEffect(() => {
     console.log('res from other comp: ', response)
-    if (response) {
-      sendUpdateInfo(response, dispatch)
-    }
+
+    // if (response) {
+    //   sendUpdateInfo(response, dispatch)
+    // }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [response])
   const toggleDialogSendSignal = (id: string) => {
@@ -185,8 +186,11 @@ const DeviceControlListTable = ({ store }: DeviceControlListTableProps) => {
   const updateDevices = async () => {
     // await sendToPort('BRD\n')
     setIsDisable(true)
-    await writeToPort('REQ\n', setResponse)
-    await writeToPort('VBR 14 10 1 1\n', setResponse)
+    await writeToPort('BRD\n', setResponse)
+
+    await writeToPort('REQ 100\n', setResponse)
+
+    // await writeToPort('VBR 14 10 1 1\n', setResponse)
 
     setIsDisable(false)
   }

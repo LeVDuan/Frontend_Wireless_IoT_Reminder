@@ -1,7 +1,9 @@
 // context/PortContext.tsx
-import { createContext, useContext, ReactNode } from 'react'
+import { createContext, useContext, ReactNode, useState, useEffect } from 'react'
 
 interface PortContextProps {
+  port: SerialPort | undefined
+  setPort: React.Dispatch<React.SetStateAction<SerialPort | undefined>>
   selectPort: () => Promise<null | string>
   writeToPort: (cmd: string, setResponse: React.Dispatch<React.SetStateAction<string | null>>) => Promise<void>
 }
@@ -15,25 +17,30 @@ export const PortContext = createContext<PortContextProps | undefined>(undefined
 
 // Create Provider
 export const PortProvider = ({ children }: Props) => {
+  const [port, setPort] = useState<SerialPort | undefined>(undefined)
   let reader: ReadableStreamDefaultReader | ReadableStreamBYOBReader | undefined
-  let port: SerialPort | undefined
+
+  // let port: SerialPort | undefined
   const encoder = new TextEncoder()
   const decoder = new TextDecoder()
   const options = { baudRate: 9600 }
 
   // USB\VID_1A86&PID_7523&REV_8133 -> DOIT ESP32 DEVKIT v1
   const filters = [{ usbVendorId: 0x1a86, usbProductId: 0x7523 }]
-
-  const connectToPort = async () => {
-    if (!port) {
+  useEffect(() => {
+    console.log(port)
+  }, [port])
+  const connectToPort = async (selectPort: SerialPort | undefined) => {
+    if (!selectPort) {
       return
     }
     try {
-      await port.open(options)
+      await selectPort.open(options)
       console.log('Open success!')
+      setPort(selectPort)
     } catch (error: any) {
       console.log('Open error: ', error.message)
-      port = undefined
+      setPort(undefined)
     }
   }
 
@@ -41,9 +48,9 @@ export const PortProvider = ({ children }: Props) => {
     try {
       const slPort = await navigator.serial.requestPort({ filters })
       if (slPort != port) {
-        port = slPort
+        // port = slPort
 
-        await connectToPort()
+        await connectToPort(slPort)
       }
 
       // console.log('port', port)
@@ -57,6 +64,7 @@ export const PortProvider = ({ children }: Props) => {
   }
 
   const writeToPort = async (cmd: string, setResponse: React.Dispatch<React.SetStateAction<string | null>>) => {
+    console.log('write port: ', port)
     if (port?.writable == null) {
       console.log(`unable to find writable port`)
 
@@ -103,6 +111,8 @@ export const PortProvider = ({ children }: Props) => {
   }
 
   const values = {
+    port,
+    setPort,
     selectPort,
     writeToPort
   }
