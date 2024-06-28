@@ -28,7 +28,9 @@ import toast from 'react-hot-toast'
 import { useAuth } from 'src/hooks/useAuth'
 import { DeviceType } from 'src/@core/utils/types'
 import axios from 'axios'
-import { API_DEVICES_URL } from 'src/store/device'
+import { API_DEVICES_URL, controlDevice } from 'src/store/device'
+import { useDispatch } from 'react-redux'
+import { AppDispatch } from 'src/store'
 
 interface DialogSendControlSignalProps {
   open: boolean
@@ -52,14 +54,39 @@ const DialogSendControlSignal = ({ open, toggle, device }: DialogSendControlSign
   const { writeToPort } = usePort()
   const { user } = useAuth()
   const [response, setResponse] = useState<string | null>(null)
+  const dispatch = useDispatch<AppDispatch>()
 
   useEffect(() => {
     // console.log(response)
+
+    const updateCountControls = async (result: string) => {
+      const log = {
+        userName: user!.fullName,
+        deviceName: device!.name,
+        type,
+        deviceId: device!.deviceId,
+        controlTime,
+        periodTime,
+        pauseTime,
+        result
+      }
+      console.log('Control time', controlTime)
+      dispatch(controlDevice({ _id: device!._id, controlLogs: log }))
+    }
     if (response && response.includes(':-1')) {
       toast.error('Send control signal failed!')
+      updateCountControls('error')
     } else if (response && response.includes(':1')) {
       toast.success('Send control signal successfully!')
+
+      updateCountControls('success')
     }
+
+    setControlTime(0)
+    setPeriodTime(0)
+    setPauseTime(0)
+    setResponse(null)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [response])
 
   const handleSend = async () => {
@@ -78,11 +105,8 @@ const DialogSendControlSignal = ({ open, toggle, device }: DialogSendControlSign
       const ctrlSignal = res.data.command
 
       // console.log(ctrlSignal)
-
       await writeToPort(ctrlSignal, setResponse)
-      setControlTime(0)
-      setPeriodTime(0)
-      setPauseTime(0)
+
       toggle(device._id)
     }
   }

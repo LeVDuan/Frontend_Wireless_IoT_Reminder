@@ -27,13 +27,11 @@ const DeviceControl = () => {
   const store: DeviceStoreType = useSelector((state: RootState) => state.device) as DeviceStoreType
   const { port, selectPort, writeToPort } = usePort()
   const [response, setResponse] = useState<string | null>(null)
+  const [firstTime, setFirstTime] = useState<boolean>(true)
 
   useEffect(() => {
     // console.log('port: ', port)
     const updateActiveDeviceFromTransmitter = async () => {
-      // await writeToPort('BRD\n', setResponse)
-      // await writeToPort('REQ 100\n', setResponse)
-
       const brdCmd = (
         await axios.post(`${API_DEVICES_URL}/control`, {
           type: 'Broadcast'
@@ -54,7 +52,7 @@ const DeviceControl = () => {
 
       await writeToPort(reqCmd, setResponse)
     }
-    if (port !== undefined) {
+    if (port !== undefined && !firstTime) {
       updateActiveDeviceFromTransmitter()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -68,12 +66,14 @@ const DeviceControl = () => {
       sendUpdateInfo(response, dispatch, true)
       dispatch(fetchActiveDevices())
     }
+    setResponse(null)
   }, [response, dispatch])
 
   // console.log('store:', store)
 
   const handleOpenPort = async () => {
     const error = await selectPort()
+    setFirstTime(false)
     if (error) {
       toast.error(error)
     } else {

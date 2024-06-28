@@ -23,10 +23,9 @@ import { ThemeColor } from 'src/@core/layouts/types'
 import { DeviceType } from 'src/@core/utils/types'
 import Button from '@mui/material/Button'
 import { CardActions } from '@mui/material'
-import { formatDate } from 'src/@core/utils/format'
 import { usePort } from 'src/context/PortContext'
 import toast from 'react-hot-toast'
-import { sendUpdateInfo } from 'src/utils'
+import { formatTimestamp, sendUpdateInfo } from 'src/utils'
 import axios from 'axios'
 import { API_DEVICES_URL } from 'src/store/device'
 import { useDispatch } from 'react-redux'
@@ -57,7 +56,7 @@ const DeviceViewLeft = ({ deviceData }: DeviceViewLeftProps) => {
 
   const status = statusObj[deviceData.isActive?.toString()]
   const { port, selectPort, writeToPort } = usePort()
-
+  const [firstTime, setFirstTime] = useState<boolean>(true)
   const [response, setResponse] = useState<string | null>(null)
   const dispatch = useDispatch<AppDispatch>()
 
@@ -66,7 +65,7 @@ const DeviceViewLeft = ({ deviceData }: DeviceViewLeftProps) => {
     setRenameDrawerOpen(!renameDrawerOpen)
   }
   useEffect(() => {
-    // console.log('port: ', port)
+    console.log('port: ', port)
     const updateFromTransmitter = async () => {
       const brdCmd = (
         await axios.post(`${API_DEVICES_URL}/control`, {
@@ -87,23 +86,25 @@ const DeviceViewLeft = ({ deviceData }: DeviceViewLeftProps) => {
       await writeToPort(reqCmd, setResponse)
       console.log(reqCmd)
     }
-    if (port !== undefined) {
+    if (port !== undefined && !firstTime) {
       updateFromTransmitter()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [port])
   useEffect(() => {
-    console.log('res 1: ', response)
+    console.log('res in view: ', response)
 
     if (response && response.includes('REQ:')) {
       sendUpdateInfo(response, dispatch, false, deviceData._id)
     }
+    setResponse(null)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [response, dispatch])
 
   const handleUpdateStatus = async () => {
     if (port === undefined) {
       const error = await selectPort()
+      setFirstTime(false)
       if (error) {
         toast.error(`${error}`)
       } else {
@@ -127,7 +128,6 @@ const DeviceViewLeft = ({ deviceData }: DeviceViewLeftProps) => {
         })
       ).data.command
       await writeToPort(reqCmd, setResponse)
-      console.log(reqCmd)
     }
   }
   const renderDeviceAvatar = (device: DeviceType) => {
@@ -233,7 +233,7 @@ const DeviceViewLeft = ({ deviceData }: DeviceViewLeftProps) => {
                 </Box>
                 <Box sx={{ display: 'flex', mb: 4 }}>
                   <Typography sx={{ mr: 2, fontWeight: 700, color: 'text.secondary' }}>Last updated:</Typography>
-                  <Typography sx={{ color: 'text.secondary' }}>{formatDate(deviceData.lastUpdated)}</Typography>
+                  <Typography sx={{ color: 'text.secondary' }}>{formatTimestamp(deviceData.lastUpdated)}</Typography>
                 </Box>
               </Box>
             </CardContent>

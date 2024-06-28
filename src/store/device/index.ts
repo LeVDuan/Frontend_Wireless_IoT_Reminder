@@ -104,6 +104,39 @@ export const deleteDevice = createAsyncThunk(
   }
 )
 
+export const controlDevice = createAsyncThunk(
+  'device/control',
+  async (
+    controlInfo: {
+      _id: string
+      controlLogs: {
+        userName: string
+        deviceName: string
+        type: string
+        deviceId: number
+        controlTime: number
+        periodTime: number
+        pauseTime: number
+        result: string
+      }
+    },
+    { dispatch }: any
+  ) => {
+    try {
+      const response = await axios.patch(`${API_DEVICES_URL}/control/${controlInfo._id}`, controlInfo.controlLogs)
+
+      await dispatch(fetchDevice(controlInfo._id))
+
+      // console.log('deleted res: ', response.data)
+      toast.success('Successfully!')
+
+      return response
+    } catch (error: any) {
+      toast.error(error.message as string)
+    }
+  }
+)
+
 export const updateStatusDevices = createAsyncThunk(
   'device/updateDevices',
   async (updateInfo: { update: string; many: boolean; id?: string }, { dispatch }: any) => {

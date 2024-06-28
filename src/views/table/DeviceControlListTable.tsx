@@ -158,6 +158,7 @@ const DeviceControlListTable = ({ store }: DeviceControlListTableProps) => {
       sendUpdateInfo(response, dispatch, true)
       dispatch(fetchActiveDevices())
     }
+    setResponse(null)
   }, [response, dispatch])
   const toggleDialogSendSignal = (id: string) => {
     const device = store.activeDevices.find(device => device._id === id)
