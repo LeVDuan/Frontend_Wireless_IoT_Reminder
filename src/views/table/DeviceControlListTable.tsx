@@ -31,6 +31,8 @@ import { useDispatch } from 'react-redux'
 import { AppDispatch } from 'src/store'
 import Link from 'next/link'
 import { getInitials } from 'src/@core/utils/get-initials'
+import axios from 'axios'
+import { API_DEVICES_URL, fetchActiveDevices } from 'src/store/device'
 
 interface CellType {
   row: DeviceType
@@ -149,13 +151,14 @@ const DeviceControlListTable = ({ store }: DeviceControlListTableProps) => {
   const [response, setResponse] = useState<string | null>(null)
 
   useEffect(() => {
-    console.log('res from other comp: ', response)
+    // console.log('res: ', response)
 
-    // if (response) {
-    //   sendUpdateInfo(response, dispatch)
-    // }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [response])
+    if (response && response.includes('REQ:')) {
+      // console.log('update')
+      sendUpdateInfo(response, dispatch, true)
+      dispatch(fetchActiveDevices())
+    }
+  }, [response, dispatch])
   const toggleDialogSendSignal = (id: string) => {
     const device = store.activeDevices.find(device => device._id === id)
 
@@ -184,13 +187,30 @@ const DeviceControlListTable = ({ store }: DeviceControlListTableProps) => {
   }
 
   const updateDevices = async () => {
-    // await sendToPort('BRD\n')
     setIsDisable(true)
-    await writeToPort('BRD\n', setResponse)
 
-    await writeToPort('REQ 100\n', setResponse)
+    // await writeToPort('BRD\n', setResponse)
+    // await writeToPort('REQ 100\n', setResponse)
 
-    // await writeToPort('VBR 14 10 1 1\n', setResponse)
+    const brdCmd = (
+      await axios.post(`${API_DEVICES_URL}/control`, {
+        type: 'Broadcast'
+      })
+    ).data.command
+
+    // console.log(brdCmd)
+    await writeToPort(brdCmd, setResponse)
+
+    const reqCmd = (
+      await axios.post(`${API_DEVICES_URL}/control`, {
+        type: 'Request',
+        deviceId: -1 // get all activeDevice info
+      })
+    ).data.command
+
+    // console.log(reqCmd)
+
+    await writeToPort(reqCmd, setResponse)
 
     setIsDisable(false)
   }

@@ -28,7 +28,7 @@ export const PortProvider = ({ children }: Props) => {
   // USB\VID_1A86&PID_7523&REV_8133 -> DOIT ESP32 DEVKIT v1
   const filters = [{ usbVendorId: 0x1a86, usbProductId: 0x7523 }]
   useEffect(() => {
-    console.log(port)
+    // console.log(port)
   }, [port])
   const connectToPort = async (selectPort: SerialPort | undefined) => {
     if (!selectPort) {
@@ -64,7 +64,6 @@ export const PortProvider = ({ children }: Props) => {
   }
 
   const writeToPort = async (cmd: string, setResponse: React.Dispatch<React.SetStateAction<string | null>>) => {
-    console.log('write port: ', port)
     if (port?.writable == null) {
       console.log(`unable to find writable port`)
 
@@ -78,8 +77,6 @@ export const PortProvider = ({ children }: Props) => {
     if (port && port.readable) {
       try {
         reader = port.readable.getReader()
-
-        // console.log('reader:', reader)
 
         let receivedData = ''
         while (true) {

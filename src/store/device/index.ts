@@ -26,7 +26,7 @@ export const fetchActiveDevices = createAsyncThunk('device/fetchActiveDevices', 
   try {
     const response = await axios.get(`${API_DEVICES_URL}/activeDevices`)
 
-    console.log('ActiveDevices:', response.data)
+    // console.log('ActiveDevices:', response.data)
 
     return response
   } catch (error) {
@@ -53,7 +53,8 @@ export const addDevice = createAsyncThunk(
       const response = await axios.post(`${API_DEVICES_URL}`, device)
 
       await dispatch(fetchDevices())
-      console.log('added res: ', response.data)
+
+      // console.log('added res: ', response.data)
       toast.success('Successfully!')
 
       return response
@@ -74,7 +75,8 @@ export const renameDevice = createAsyncThunk(
 
       await dispatch(fetchDevices())
       await dispatch(fetchDevice(device.id))
-      console.log('added res: ', response.data)
+
+      // console.log('added res: ', response.data)
       toast.success('Successfully!')
 
       return response
@@ -91,7 +93,8 @@ export const deleteDevice = createAsyncThunk(
       const response = await axios.delete(`${API_DEVICES_URL}/${device.id}`, { data: { userName: device.userName } })
 
       await dispatch(fetchDevices())
-      console.log('deleted res: ', response.data)
+
+      // console.log('deleted res: ', response.data)
       toast.success('Successfully!')
 
       return response
@@ -101,18 +104,30 @@ export const deleteDevice = createAsyncThunk(
   }
 )
 
-export const updateStatusDevices = createAsyncThunk('device/updateDevices', async (update: any, { dispatch }: any) => {
-  try {
-    const response = await axios.patch(`${API_DEVICES_URL}/updateStatus/all`, update)
+export const updateStatusDevices = createAsyncThunk(
+  'device/updateDevices',
+  async (updateInfo: { update: string; many: boolean; id?: string }, { dispatch }: any) => {
+    try {
+      const response = await axios.patch(`${API_DEVICES_URL}?many=${updateInfo.many}`, { update: updateInfo.update })
+      if (updateInfo.many) {
+        // console.log('update many')
+        await dispatch(fetchActiveDevices())
+      } else {
+        // console.log('update one')
+        await dispatch(fetchDevice(updateInfo.id!))
+      }
 
-    await dispatch(fetchActiveDevices())
-    console.log('updated res: ', response.data)
-
-    return response
-  } catch (error) {
-    throw error
+      // console.log('updated res: ', response.data.message)
+      if (response.data.message.includes('success')) {
+        return toast.success(response.data.message)
+      } else {
+        return toast.error(response.data.message)
+      }
+    } catch (error) {
+      throw error
+    }
   }
-})
+)
 
 export const deviceSlice: any = createSlice({
   name: 'device',

@@ -26,30 +26,49 @@ const DeviceControl = () => {
   const dispatch = useDispatch<AppDispatch>()
   const store: DeviceStoreType = useSelector((state: RootState) => state.device) as DeviceStoreType
   const { port, selectPort, writeToPort } = usePort()
-  const [hasPort, setHasPort] = useState<boolean>(false)
   const [response, setResponse] = useState<string | null>(null)
 
   useEffect(() => {
-    dispatch(fetchActiveDevices())
-  }, [dispatch])
+    // console.log('port: ', port)
+    const updateActiveDeviceFromTransmitter = async () => {
+      // await writeToPort('BRD\n', setResponse)
+      // await writeToPort('REQ 100\n', setResponse)
 
-  useEffect(() => {
-    console.log('res: ', port)
-    const send = async () => {
-      await writeToPort('BRD\n', setResponse)
-      await writeToPort('REQ 100\n', setResponse)
+      const brdCmd = (
+        await axios.post(`${API_DEVICES_URL}/control`, {
+          type: 'Broadcast'
+        })
+      ).data.command
+
+      // console.log(brdCmd)
+      await writeToPort(brdCmd, setResponse)
+
+      const reqCmd = (
+        await axios.post(`${API_DEVICES_URL}/control`, {
+          type: 'Request',
+          deviceId: -1 // get all activeDevice info
+        })
+      ).data.command
+
+      // console.log(reqCmd)
+
+      await writeToPort(reqCmd, setResponse)
     }
-    send()
+    if (port !== undefined) {
+      updateActiveDeviceFromTransmitter()
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [port])
-  useEffect(() => {
-    console.log('res: ', response)
 
-    // if (response) {
-    //   sendUpdateInfo(response, dispatch)
-    // }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [response])
+  useEffect(() => {
+    // console.log('res: ', response)
+
+    if (response && response.includes('REQ:')) {
+      // console.log('update')
+      sendUpdateInfo(response, dispatch, true)
+      dispatch(fetchActiveDevices())
+    }
+  }, [response, dispatch])
 
   // console.log('store:', store)
 
@@ -59,27 +78,6 @@ const DeviceControl = () => {
       toast.error(error)
     } else {
       toast.success('Connected successfully!')
-      setHasPort(true)
-
-      // const brdCmd = (
-      //   await axios.post(`${API_DEVICES_URL}/control`, {
-      //     type: 'Broadcast'
-      //   })
-      // ).data.command
-
-      // console.log(brdCmd)
-
-      // await writeToPort(brdCmd, setResponse)
-      // await writeToPort('BRD\n', setResponse)
-      // await writeToPort('REQ 100\n', setResponse)
-
-      // const reqCmd = (
-      //   await axios.post(`${API_DEVICES_URL}/control`, {
-      //     type: 'Request',
-      //     deviceId: -1 // get all activeDevice info
-      //   })
-      // ).data.command
-      // await writeToPort(reqCmd, setResponse)
     }
   }
 
@@ -104,7 +102,7 @@ const DeviceControl = () => {
           Open Port
         </Button>
       </Grid>
-      {hasPort && (
+      {port !== undefined && (
         <Grid item xs={12}>
           <DeviceControlListTable store={store} />
         </Grid>

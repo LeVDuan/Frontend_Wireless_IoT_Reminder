@@ -54,31 +54,32 @@ const DialogSendControlSignal = ({ open, toggle, device }: DialogSendControlSign
   const [response, setResponse] = useState<string | null>(null)
 
   useEffect(() => {
-    console.log(response)
-
-    // if (response) {
-    //   toast.success('Send control signal successfully!')
-    // }
+    // console.log(response)
+    if (response && response.includes(':-1')) {
+      toast.error('Send control signal failed!')
+    } else if (response && response.includes(':1')) {
+      toast.success('Send control signal successfully!')
+    }
   }, [response])
 
   const handleSend = async () => {
     if (device != null) {
       // get command from backend
-      // const res = await axios.post(`${API_DEVICES_URL}/control`, {
-      //   userName: user?.fullName,
-      //   deviceName: device.name,
-      //   objId: device._id,
-      //   type,
-      //   deviceId: device.deviceId,
-      //   controlTime,
-      //   periodTime,
-      //   pauseTime
-      // })
-      // const ctrlSignal = res.data.command
+      const res = await axios.post(`${API_DEVICES_URL}/control`, {
+        userName: user?.fullName,
+        deviceName: device.name,
+        objId: device._id,
+        type,
+        deviceId: device.deviceId,
+        controlTime,
+        periodTime,
+        pauseTime
+      })
+      const ctrlSignal = res.data.command
+
       // console.log(ctrlSignal)
 
-      // await writeToPort(ctrlSignal, setResponse)
-      await writeToPort('VBR 15 5 1 1\n', setResponse)
+      await writeToPort(ctrlSignal, setResponse)
       setControlTime(0)
       setPeriodTime(0)
       setPauseTime(0)
