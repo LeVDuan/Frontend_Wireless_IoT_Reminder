@@ -29,7 +29,7 @@ const AnalyticsDashboard = () => {
     getAnalytics()
   }, [])
 
-  console.log('analytics', data)
+  // console.log('analytics', data)
   if (data) {
     return (
       <ApexChartWrapper>

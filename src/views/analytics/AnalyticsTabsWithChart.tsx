@@ -99,6 +99,7 @@ const AnalyticsTabsWithChart = ({ dataAnalytics }: AnalyticsTabsWithChartProps) 
     tickAmountChart = (maxCtrl - minCtrl) / minCtrl
     minCtrl -= tickAmountChart
     if (minCtrl <= 0) minCtrl = 0
+    if (tickAmountChart < 1 && tickAmountChart > 0) tickAmountChart = 1
   }
 
   // ** Hook
@@ -215,7 +216,8 @@ const AnalyticsTabsWithChart = ({ dataAnalytics }: AnalyticsTabsWithChartProps) 
           size: 7,
           seriesIndex: 0,
           fillColor: theme.palette.common.white,
-          strokeColor: theme.palette.primary.main
+          strokeColor: theme.palette.primary.main,
+          dataPointIndex: 6
         }
       ]
     }
