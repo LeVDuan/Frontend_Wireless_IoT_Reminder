@@ -71,7 +71,7 @@ const RenameDrawer = ({ open, toggle }: RenameDrawerProps) => {
   const { user } = useAuth()
 
   const defaultValues = {
-    currentName: store.device.name,
+    currentName: '',
     newName: ''
   }
   const {
@@ -138,8 +138,8 @@ const RenameDrawer = ({ open, toggle }: RenameDrawerProps) => {
               name='currentName'
               control={control}
               rules={{ required: true }}
-              render={({ field: { value } }) => (
-                <TextField value={value} label='Current Name' InputProps={{ readOnly: true }} />
+              render={({ field: {} }) => (
+                <TextField value={store.device.name} label='Current Name' InputProps={{ readOnly: true }} />
               )}
             />
           </FormControl>

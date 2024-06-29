@@ -28,28 +28,21 @@ const DialogDeleteLogConfirm = ({ open, toggle, log }: DialogDeleteConfirmProps)
   const dispatch = useDispatch<AppDispatch>()
 
   const handleDelete = async () => {
-    if (log != null) {
+    if (log !== null) {
       toggle(log._id)
 
       try {
         const response = await axios.delete(`${API_LOGS_URL}/${log._id}`)
 
         await dispatch(fetchLogs({ dates: [], action: '' }))
-        console.log('deleted res: ', response.data)
 
-        const promiseToast = new Promise((resolve, reject) => {
-          if (response.data.result == 'Success!') {
-            resolve('OK')
-          } else {
-            reject('failed!')
-          }
-        })
+        // console.log('deleted res: ', response.data)
 
-        return toast.promise(promiseToast, {
-          loading: 'Loading ...',
-          success: 'Successfully!',
-          error: 'Failed!'
-        })
+        if (response.data.result === 'Success!') {
+          return toast.success('Successfully!')
+        } else {
+          return toast.success('Failed!')
+        }
       } catch (error) {
         throw error
       }

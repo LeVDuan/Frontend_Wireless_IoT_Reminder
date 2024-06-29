@@ -60,7 +60,7 @@ const escapeRegExp = (value: string) => {
 }
 
 const renderDeviceAvatar = (row: DeviceType) => {
-  if (row.deviceId === 14 || row.deviceId === 0 || row.deviceId === 1) {
+  if (row.deviceId === 14 || row.deviceId === 0 || row.deviceId === 1 || row.deviceId === 15) {
     return <CustomAvatar src={`/images/avatars/${row.deviceId}.jpg`} sx={{ mr: 3, width: 30, height: 30 }} />
   } else {
     return (

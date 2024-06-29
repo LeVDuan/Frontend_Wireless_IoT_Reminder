@@ -51,6 +51,30 @@ const statusObj: StatusObj = {
   true: { title: 'Active', color: 'success' }
 }
 
+const renderDeviceAvatar = (device: DeviceType) => {
+  if (device.deviceId === 14 || device.deviceId === 0 || device.deviceId === 1 || device.deviceId === 15) {
+    return (
+      <CustomAvatar
+        skin='light'
+        variant='rounded'
+        src={`/images/avatars/${device.deviceId}.jpg`}
+        sx={{ width: 110, height: 110, fontWeight: 600, mb: 6, fontSize: '3rem' }}
+      />
+    )
+  } else {
+    return (
+      <CustomAvatar
+        skin='light'
+        variant='rounded'
+        color='info'
+        sx={{ width: 110, height: 110, fontWeight: 600, mb: 6, fontSize: '3rem' }}
+      >
+        {getInitials(device.name)}
+      </CustomAvatar>
+    )
+  }
+}
+
 const DeviceViewLeft = ({ deviceData }: DeviceViewLeftProps) => {
   // console.log('deviceData', deviceData)
 
@@ -65,7 +89,7 @@ const DeviceViewLeft = ({ deviceData }: DeviceViewLeftProps) => {
     setRenameDrawerOpen(!renameDrawerOpen)
   }
   useEffect(() => {
-    console.log('port: ', port)
+    // console.log('port: ', port)
     const updateFromTransmitter = async () => {
       const brdCmd = (
         await axios.post(`${API_DEVICES_URL}/control`, {
@@ -73,7 +97,7 @@ const DeviceViewLeft = ({ deviceData }: DeviceViewLeftProps) => {
         })
       ).data.command
 
-      console.log(brdCmd)
+      // console.log(brdCmd)
 
       await writeToPort(brdCmd, setResponse)
 
@@ -84,7 +108,8 @@ const DeviceViewLeft = ({ deviceData }: DeviceViewLeftProps) => {
         })
       ).data.command
       await writeToPort(reqCmd, setResponse)
-      console.log(reqCmd)
+
+      // console.log(reqCmd)
     }
     if (port !== undefined && !firstTime) {
       updateFromTransmitter()
@@ -92,8 +117,6 @@ const DeviceViewLeft = ({ deviceData }: DeviceViewLeftProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [port])
   useEffect(() => {
-    console.log('res in view: ', response)
-
     if (response && response.includes('REQ:')) {
       sendUpdateInfo(response, dispatch, false, deviceData._id)
     }
@@ -116,9 +139,6 @@ const DeviceViewLeft = ({ deviceData }: DeviceViewLeftProps) => {
           type: 'Broadcast'
         })
       ).data.command
-
-      console.log(brdCmd)
-
       await writeToPort(brdCmd, setResponse)
 
       const reqCmd = (
@@ -130,29 +150,7 @@ const DeviceViewLeft = ({ deviceData }: DeviceViewLeftProps) => {
       await writeToPort(reqCmd, setResponse)
     }
   }
-  const renderDeviceAvatar = (device: DeviceType) => {
-    if (device.deviceId === 14 || device.deviceId === 0 || device.deviceId === 1) {
-      return (
-        <CustomAvatar
-          skin='light'
-          variant='rounded'
-          src={`/images/avatars/${device.deviceId}.jpg`}
-          sx={{ width: 110, height: 110, fontWeight: 600, mb: 6, fontSize: '3rem' }}
-        />
-      )
-    } else {
-      return (
-        <CustomAvatar
-          skin='light'
-          variant='rounded'
-          color='info'
-          sx={{ width: 110, height: 110, fontWeight: 600, mb: 6, fontSize: '3rem' }}
-        >
-          {getInitials(device.name)}
-        </CustomAvatar>
-      )
-    }
-  }
+
   if (deviceData) {
     return (
       <Grid container spacing={6}>
@@ -239,7 +237,7 @@ const DeviceViewLeft = ({ deviceData }: DeviceViewLeftProps) => {
             </CardContent>
 
             <CardActions sx={{ display: 'flex', justifyContent: 'center' }}>
-              <Button variant='contained' disabled={!deviceData.isActive} sx={{ mr: 2 }} onClick={handleUpdateStatus}>
+              <Button variant='contained' sx={{ mr: 2 }} onClick={handleUpdateStatus}>
                 Update status
               </Button>
             </CardActions>

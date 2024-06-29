@@ -65,7 +65,7 @@ const logControlObj: LogControlObj = {
 }
 
 const renderLogDetails = (row: LogType) => {
-  console.log(row.action)
+  // console.log(row.action)
   switch (row.action) {
     case 'edit':
       const detailsEdit = row.details as DetailsEdit

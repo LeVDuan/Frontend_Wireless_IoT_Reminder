@@ -70,7 +70,6 @@ const DialogSendControlSignal = ({ open, toggle, device }: DialogSendControlSign
         pauseTime,
         result
       }
-      console.log('Control time', controlTime)
       dispatch(controlDevice({ _id: device!._id, controlLogs: log }))
     }
     if (response && response.includes(':-1')) {

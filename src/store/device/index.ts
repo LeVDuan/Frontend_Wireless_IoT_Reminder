@@ -38,7 +38,7 @@ export const fetchDevice = createAsyncThunk('device/fetchDevice', async (id: str
   try {
     const response = await axios.get(`${API_DEVICES_URL}/${id}`)
 
-    // console.log('Devices:', response.data)
+    // console.log('Device:', response.data)
 
     return response
   } catch (error) {
