@@ -127,7 +127,7 @@ const AddDeviceDrawer = ({ open, toggle }: AddDeviceDrawerProps) => {
       sx={{ '& .MuiDrawer-paper': { width: { xs: 300, sm: 400 } } }}
     >
       <Header>
-        <Typography variant='h6'>Add User</Typography>
+        <Typography variant='h6'>Add Device</Typography>
         <IconButton size='small' onClick={handleClose} sx={{ color: 'text.primary' }}>
           <Icon icon='bx:x' fontSize={20} />
         </IconButton>
