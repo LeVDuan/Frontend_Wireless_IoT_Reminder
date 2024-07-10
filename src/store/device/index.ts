@@ -141,11 +141,18 @@ export const updateStatusDevices = createAsyncThunk(
   'device/updateDevices',
   async (updateInfo: { update: string; many: boolean; id?: string }, { dispatch }: any) => {
     try {
-      const response = await axios.patch(`${API_DEVICES_URL}?many=${updateInfo.many}`, { update: updateInfo.update })
+      let response
       if (updateInfo.many) {
+        response = await axios.patch(`${API_DEVICES_URL}?many=${updateInfo.many}`, { update: updateInfo.update })
+
         // console.log('update many')
         await dispatch(fetchActiveDevices())
       } else {
+        response = await axios.patch(`${API_DEVICES_URL}?many=${updateInfo.many}`, {
+          update: updateInfo.update,
+          id: updateInfo.id
+        })
+
         // console.log('update one')
         await dispatch(fetchDevice(updateInfo.id!))
       }
