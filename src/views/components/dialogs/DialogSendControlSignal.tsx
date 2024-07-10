@@ -84,31 +84,30 @@ const DialogSendControlSignal = ({ open, toggle, device }: DialogSendControlSign
     setControlTime(0)
     setPeriodTime(0)
     setPauseTime(0)
+    setType('')
     setResponse(null)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [response])
 
   const handleSend = async () => {
-    if (device != null) {
-      if (type === '') {
-      } else {
-        // get command from backend
-        const res = await axios.post(`${API_DEVICES_URL}/control`, {
-          userName: user?.fullName,
-          deviceName: device.name,
-          objId: device._id,
-          type,
-          deviceId: device.deviceId,
-          controlTime,
-          periodTime,
-          pauseTime
-        })
-        const ctrlSignal = res.data.command
+    if (!type) return
 
-        // console.log(ctrlSignal)
-        await writeToPort(ctrlSignal, setResponse)
-      }
-      setType('')
+    if (device !== null) {
+      // get command from backend
+      const res = await axios.post(`${API_DEVICES_URL}/control`, {
+        userName: user?.fullName,
+        deviceName: device.name,
+        objId: device._id,
+        type,
+        deviceId: device.deviceId,
+        controlTime,
+        periodTime,
+        pauseTime
+      })
+      const ctrlSignal = res.data.command
+
+      // console.log(ctrlSignal)
+      await writeToPort(ctrlSignal, setResponse)
       toggle(device._id)
     }
   }
@@ -131,8 +130,8 @@ const DialogSendControlSignal = ({ open, toggle, device }: DialogSendControlSign
             <IconButton
               size='small'
               onClick={() => {
-                setType('')
                 toggle(device._id)
+                setType('')
               }}
               sx={{ position: 'absolute', right: '1rem', top: '1rem' }}
             >
@@ -235,7 +234,7 @@ const DialogSendControlSignal = ({ open, toggle, device }: DialogSendControlSign
                   fullWidth
                   label='Pause time(s)'
                   type='number'
-                  inputProps={{ min: 0, max: 100 }}
+                  inputProps={{ min: 0, max: controlTime }}
                   onChange={e => setPauseTime(Number(e.target.value))}
                 />
               </Grid>
@@ -250,15 +249,21 @@ const DialogSendControlSignal = ({ open, toggle, device }: DialogSendControlSign
               pb: theme => [`${theme.spacing(8)} !important`, `${theme.spacing(10)} !important`]
             }}
           >
-            <Button variant='contained' sx={{ mr: 1 }} endIcon={<Icon icon='bx:send' />} onClick={handleSend}>
+            <Button
+              variant='contained'
+              sx={{ mr: 1 }}
+              endIcon={<Icon icon='bx:send' />}
+              onClick={handleSend}
+              disabled={!type || !controlTime}
+            >
               Send
             </Button>
             <Button
               variant='outlined'
               color='secondary'
               onClick={() => {
-                setType('')
                 toggle(device._id)
+                setType('')
               }}
             >
               Cancel
