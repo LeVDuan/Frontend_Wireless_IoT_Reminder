@@ -245,7 +245,7 @@ const DeviceViewRight = ({ deviceData }: DeviceViewLeftProps) => {
   if (deviceData) {
     return (
       <Grid container spacing={6}>
-        <Grid item xs={6}>
+        <Grid item xs={12} md={6}>
           <Card>
             <CardHeader
               sx={{ pb: 2.5 }}
@@ -303,7 +303,7 @@ const DeviceViewRight = ({ deviceData }: DeviceViewLeftProps) => {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={6}>
+        <Grid item xs={12} md={6}>
           <Card>
             <CardHeader
               title='Battery'

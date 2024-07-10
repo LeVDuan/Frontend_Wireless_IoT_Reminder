@@ -21,7 +21,7 @@ import { ApexOptions } from 'apexcharts'
 
 // ** Custom Components Imports
 import ReactApexcharts from 'src/@core/components/react-apexcharts'
-import { AnalyticsType, LogAnalyticsType } from 'src/@core/utils/types'
+import { AnalyticsType } from 'src/@core/utils/types'
 import { ThemeColor } from 'src/@core/layouts/types'
 import { getCategoriesLast7days, getSeries } from 'src/utils/index'
 
@@ -54,25 +54,25 @@ const TabList = styled(MuiTabList)<TabListProps>(({ theme }) => ({
   }
 }))
 
-const findMinMax = (logList: LogAnalyticsType[]) => {
-  if (logList.length === 0) {
-    return { min: 0, max: 0 }
-  }
+// const findMinMax = (logList: LogAnalyticsType[]) => {
+//   if (logList.length === 0) {
+//     return { min: 0, max: 0 }
+//   }
 
-  let min = logList[0].count
-  let max = logList[0].count
+//   let min = logList[0].count
+//   let max = logList[0].count
 
-  for (const num of logList) {
-    if (num.count < min) {
-      min = num.count
-    }
-    if (num.count > max) {
-      max = num.count
-    }
-  }
+//   for (const num of logList) {
+//     if (num.count < min) {
+//       min = num.count
+//     }
+//     if (num.count > max) {
+//       max = num.count
+//     }
+//   }
 
-  return { min, max }
-}
+//   return { min, max }
+// }
 
 const AnalyticsTabsWithChart = ({ dataAnalytics }: AnalyticsTabsWithChartProps) => {
   // ** State
@@ -86,21 +86,21 @@ const AnalyticsTabsWithChart = ({ dataAnalytics }: AnalyticsTabsWithChartProps) 
 
   const VLGseries = [{ name: 'Vibrate & light', data: getSeries(dateLastWeek, dataAnalytics.VLGLastWeek) }]
 
-  const VBRMinMax = findMinMax(dataAnalytics.VBRLastWeek)
-  const LGTMinMax = findMinMax(dataAnalytics.LGTLastWeek)
-  const VLGMinMax = findMinMax(dataAnalytics.VLGLastWeek)
+  // const VBRMinMax = findMinMax(dataAnalytics.VBRLastWeek)
+  // const LGTMinMax = findMinMax(dataAnalytics.LGTLastWeek)
+  // const VLGMinMax = findMinMax(dataAnalytics.VLGLastWeek)
 
-  let minCtrl = Math.min(VBRMinMax.min, LGTMinMax.min, VLGMinMax.min)
-  const maxCtrl = Math.max(VBRMinMax.max, LGTMinMax.max, VLGMinMax.max)
-  let tickAmountChart
-  if (minCtrl == 0) {
-    tickAmountChart = 4
-  } else {
-    tickAmountChart = (maxCtrl - minCtrl) / minCtrl
-    minCtrl -= tickAmountChart
-    if (minCtrl <= 0) minCtrl = 0
-    if (tickAmountChart < 1 && tickAmountChart > 0) tickAmountChart = 1
-  }
+  // let minCtrl = Math.min(VBRMinMax.min, LGTMinMax.min, VLGMinMax.min)
+  // const maxCtrl = Math.max(VBRMinMax.max, LGTMinMax.max, VLGMinMax.max)
+  // let tickAmountChart
+  // if (minCtrl == 0) {
+  //   tickAmountChart = 4
+  // } else {
+  //   tickAmountChart = (maxCtrl - minCtrl) / minCtrl
+  //   minCtrl -= tickAmountChart
+  //   if (minCtrl <= 0) minCtrl = 0
+  //   if (tickAmountChart < 1 && tickAmountChart > 0) tickAmountChart = 1
+  // }
 
   // ** Hook
   const theme = useTheme()
@@ -199,10 +199,10 @@ const AnalyticsTabsWithChart = ({ dataAnalytics }: AnalyticsTabsWithChartProps) 
       }
     },
     yaxis: {
-      min: minCtrl,
-      max: maxCtrl,
+      min: 0,
+      max: 10,
       show: false,
-      tickAmount: tickAmountChart
+      tickAmount: 2.5
     },
     markers: {
       size: 8,

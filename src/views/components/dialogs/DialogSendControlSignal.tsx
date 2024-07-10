@@ -15,7 +15,7 @@ import FormControl from '@mui/material/FormControl'
 import Fade, { FadeProps } from '@mui/material/Fade'
 import DialogContent from '@mui/material/DialogContent'
 import DialogActions from '@mui/material/DialogActions'
-import Select from '@mui/material/Select'
+import Select, { SelectChangeEvent } from '@mui/material/Select'
 import Divider from '@mui/material/Divider'
 
 // ** Icon Imports
@@ -47,7 +47,7 @@ const Transition = forwardRef(function Transition(
 
 const DialogSendControlSignal = ({ open, toggle, device }: DialogSendControlSignalProps) => {
   // ** States
-  const [type, setType] = useState<string>('VBR')
+  const [type, setType] = useState<string>('')
   const [controlTime, setControlTime] = useState<number>(0)
   const [periodTime, setPeriodTime] = useState<number>(0)
   const [pauseTime, setPauseTime] = useState<number>(0)
@@ -90,24 +90,30 @@ const DialogSendControlSignal = ({ open, toggle, device }: DialogSendControlSign
 
   const handleSend = async () => {
     if (device != null) {
-      // get command from backend
-      const res = await axios.post(`${API_DEVICES_URL}/control`, {
-        userName: user?.fullName,
-        deviceName: device.name,
-        objId: device._id,
-        type,
-        deviceId: device.deviceId,
-        controlTime,
-        periodTime,
-        pauseTime
-      })
-      const ctrlSignal = res.data.command
+      if (type === '') {
+      } else {
+        // get command from backend
+        const res = await axios.post(`${API_DEVICES_URL}/control`, {
+          userName: user?.fullName,
+          deviceName: device.name,
+          objId: device._id,
+          type,
+          deviceId: device.deviceId,
+          controlTime,
+          periodTime,
+          pauseTime
+        })
+        const ctrlSignal = res.data.command
 
-      // console.log(ctrlSignal)
-      await writeToPort(ctrlSignal, setResponse)
-
+        // console.log(ctrlSignal)
+        await writeToPort(ctrlSignal, setResponse)
+      }
+      setType('')
       toggle(device._id)
     }
+  }
+  const handleTypeValue = (e: SelectChangeEvent) => {
+    setType(e.target.value)
   }
 
   return (
@@ -124,7 +130,10 @@ const DialogSendControlSignal = ({ open, toggle, device }: DialogSendControlSign
           >
             <IconButton
               size='small'
-              onClick={() => toggle(device._id)}
+              onClick={() => {
+                setType('')
+                toggle(device._id)
+              }}
               sx={{ position: 'absolute', right: '1rem', top: '1rem' }}
             >
               <Icon icon='bx:x' />
@@ -196,13 +205,7 @@ const DialogSendControlSignal = ({ open, toggle, device }: DialogSendControlSign
               <Grid item sm={3} xs={12}>
                 <FormControl fullWidth>
                   <InputLabel id='type-select'>Type</InputLabel>
-                  <Select
-                    defaultValue='VBR'
-                    fullWidth
-                    labelId='type-select'
-                    label='VBR'
-                    onChange={e => setType(e.target.value)}
-                  >
+                  <Select fullWidth labelId='type-select' label='Type' value={type} onChange={handleTypeValue}>
                     <MenuItem value='VBR'>Vibrate</MenuItem>
                     <MenuItem value='LGT'>Light</MenuItem>
                     <MenuItem value='VLG'>Vibrate & light</MenuItem>
@@ -250,7 +253,14 @@ const DialogSendControlSignal = ({ open, toggle, device }: DialogSendControlSign
             <Button variant='contained' sx={{ mr: 1 }} endIcon={<Icon icon='bx:send' />} onClick={handleSend}>
               Send
             </Button>
-            <Button variant='outlined' color='secondary' onClick={() => toggle(device._id)}>
+            <Button
+              variant='outlined'
+              color='secondary'
+              onClick={() => {
+                setType('')
+                toggle(device._id)
+              }}
+            >
               Cancel
             </Button>
           </DialogActions>
