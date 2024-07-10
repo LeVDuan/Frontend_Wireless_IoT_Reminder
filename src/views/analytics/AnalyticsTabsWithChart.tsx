@@ -200,7 +200,7 @@ const AnalyticsTabsWithChart = ({ dataAnalytics }: AnalyticsTabsWithChartProps) 
     },
     yaxis: {
       min: 0,
-      max: 10,
+      max: 12.5,
       show: false,
       tickAmount: 2.5
     },
