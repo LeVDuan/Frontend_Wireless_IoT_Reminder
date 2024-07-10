@@ -92,9 +92,9 @@ const DeviceViewRight = ({ deviceData }: DeviceViewLeftProps) => {
   const chartRatioData =
     totalControl !== 0
       ? [
-          (deviceData.VBRCount * 100) / totalControl,
-          (deviceData.LGTCount * 100) / totalControl,
-          (deviceData.VLGCount * 100) / totalControl
+          parseFloat(((deviceData.VBRCount * 100) / totalControl).toFixed(1)),
+          parseFloat(((deviceData.LGTCount * 100) / totalControl).toFixed(1)),
+          parseFloat(((deviceData.VLGCount * 100) / totalControl).toFixed(1))
         ]
       : [0, 0, 0]
   const data: DataType[] = [
@@ -129,7 +129,7 @@ const DeviceViewRight = ({ deviceData }: DeviceViewLeftProps) => {
     legend: { show: false },
     tooltip: { enabled: false },
     dataLabels: { enabled: false },
-    labels: ['Vibrate', 'Light Up', 'Vibrate & Light Up'],
+    labels: ['Vibrate', 'Light Up', 'Both'],
     colors: [theme.palette.primary.main, theme.palette.success.main, theme.palette.info.main],
     grid: {
       padding: {
